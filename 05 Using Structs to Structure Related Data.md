@@ -37,10 +37,41 @@ It doesn’t matter if we mix up width and height for the area calculation, but 
 # 3 方法语法 Method Syntax
 
 
-### 3.1 
-### 
-### 
-### 
+### 3.1 Defining Methods
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+}
+```
+
+The main benefit of using methods instead of functions, in addition to using method syntax and not having to repeat the type of self in every method’s signature, is for organization. We’ve put all the things we can do with an instance of a type in one impl block rather than making future users of our code search for capabilities of Rectangle in various places in the library we provide.
+
+
+### 3.2 Methods with More Parameters
+### 3.3 Associated Functions
+### 3.4 Multiple `impl` Blocks
+### 3.5 Summary
 
 
 
