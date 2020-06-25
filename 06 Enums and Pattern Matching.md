@@ -56,8 +56,10 @@ fn main() {
 
 
 
-### 1.2 The Option Enum and Its Advantages Over Null Values
+### 1.2 `Option`枚举类型以及它相对于空值的高级特性 (The Option Enum and Its Advantages Over Null Values)
 
+Null 的发明者 `Tony Hoare` 在他的2009年演讲“Null References”：一个十亿美元的错误中提到：
+> 我称之为我的十亿美元错误。当时，我正在设计第一个全面的类型系统，以面向对象的语言进行引用。我的目标是确保所有引用的使用都绝对安全，并由编译器自动执行检查。但是我忍不住要插入空引用的诱惑，仅仅是因为它很容易实现。这导致了无数的错误，漏洞和系统崩溃，在最近四十年中可能造成十亿美元的痛苦和破坏。
 ### 
 
 ### 
