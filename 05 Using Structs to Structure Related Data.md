@@ -74,8 +74,6 @@ fn main() {
 > Where’s the `->` Operator?
 > 
 
-
-
 ### 3.2 Methods with More Parameters
 ```rust
 fn main() {
