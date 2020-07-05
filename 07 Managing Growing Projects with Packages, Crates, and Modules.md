@@ -1,4 +1,3 @@
-As you write large programs, organizing your code will be important because keeping track of your entire program in your head will become impossible. By grouping related functionality and separating code with distinct features, you’ll clarify where to find code that implements a particular feature and where to go to change how a feature works.
 当你写大型的程序的时候，如果去组织你的代码会变的非常重要，因为你不可能能单纯靠着脑子去跟踪你的代码。通过吧相关的功能都组织起来，以及吧单独的功能给拆分开，找到的你一个特别的功能可以就变得很清晰，很容易了，
 The programs we’ve written so far have been in one module in one file. As a project grows, you can organize code by splitting it into multiple modules and then multiple files. A package can contain multiple binary crates and optionally one library crate. As a package grows, you can extract parts into separate crates that become external dependencies. This chapter covers all these techniques. For very large projects of a set of interrelated packages that evolve together, Cargo provides workspaces, which we’ll cover in the “Cargo Workspaces” section in Chapter 14.
 
@@ -16,7 +15,7 @@ In this chapter, we’ll cover all these features, discuss how they interact, an
 
 
 # 1 包 和 箱 Packages and Crates
-我们介绍的模块系统的第一部分是 包(packages) 和 箱(crates)，一个 箱 是一个 二进制文件(binary file) 或者 库(libiary)。箱(crate)的根目录是一个是 Rust编译器开始运行的代码文件，以及组成了箱的组成模块。一个包是一个或者多个的提供功能的箱。一个包(package)包含一个 `Cargo.toml` 文件，这个文件描述了如何构建这些箱。
+我们介绍的模块系统的第一部分是 包(packages) 和 箱(crates)，一个 箱 可以是一个 二进制文件(binary file) 或者 库(libiary)。箱(crate)的根目录是一个是 Rust编译器开始运行的代码文件，以及组成了箱的组成模块。一个包是一个或者多个的提供功能的箱。一个包(package)包含一个 `Cargo.toml` 文件，这个文件描述了如何构建这些箱。
 有几个规则规定了一个包(package)里可以包含什么。一个包必须包含0个 或者 1个的代码库，并且不能包含更多的代码库了，他可以包含任意数量的二进制箱子，但是他必须包含至少一个箱。
 让我们来看看我们创建一个代码包的时候，我们会发生什么？首先，我们输入一个命令：`cargo new`：
 ```shell
@@ -32,11 +31,8 @@ main.rs
 此时，我们只有一个仅仅包含了 `src/main.rs`的包，这个就意味着它仅仅包含了一个命名为 `my-project` 的二进制箱，如果一个包含 `src/main.rs` 和 `src/lib.rs`，那么它就有了两个箱：一个库和一个二进制文件，两个的箱的名称和包的名称相同。通过吧文件放在 `src/bin` 的文件夹下面，1个软件包就可以具有多个二进制的文件，每个文件都是一个单独的文件箱。
 
 箱会把一个作用域里的所用的相关的功能组合在一起，因此该功能就可以在不同的项目之间共享。通过把箱导入我们项目范围，比如，我们在第二章中用的 `rand` 的箱提供可以可以生成随机数能给你。通过把包导入倒我们的项目中，就可以通过 `rand` 的箱来访问 `rand` 的箱提供的功能了。
-
-Keeping a crate’s functionality in its own scope clarifies whether particular functionality is defined in our crate or the rand crate and prevents potential conflicts. For example, the rand crate provides a trait named Rng. We can also define a struct named Rng in our own crate. Because a crate’s functionality is namespaced in its own scope, when we add rand as a dependency, the compiler isn’t confused about what the name Rng refers to. In our crate, it refers to the struct Rng that we defined. We would access the Rng trait from the rand crate as rand::Rng.
-
-Let’s move on and talk about the module system!
-
+把 箱的功能保持在自己的范围之内，这样就可以分清楚这是在的我们的箱中还是在 `rand` 箱中的定义了特定的功能，并且防止了潜在的冲突。比如，`rand` 箱提供了一个 命名为 `Rng` 的功能。我们也可以顶一个命名为 `Rng` 的结构体，在我们的自己箱中。因为一个箱的功能是在他自己的范围内命名的，因此当我们把 `rand`  添加为依赖项的时候，编译器是不会对 `Rng` 的所指的名称感到困惑。在我们的代码箱中，它值的我们定义的 `Rng`的结构体。我们将从 `rand` 箱中以 `rand::Rng` 访问 `Rng` 的功能。
+接下来我们继续讨论模块系统。
 # Defining Modules to Control Scope and Privacy
 在这一节，我们将讨论模块以及模块的其他部分， 用关键字 `use` 来把想一个路径引入我们的项目，用 `pub` 的关键字来把代码的功能公开。我们也会讨论的 关键字 `as` 外部包，以及 `glob` 操作符。现在让我们先来关注 『modules(模块)』
 
