@@ -33,13 +33,137 @@ main.rs
 箱会把一个作用域里的所用的相关的功能组合在一起，因此该功能就可以在不同的项目之间共享。通过把箱导入我们项目范围，比如，我们在第二章中用的 `rand` 的箱提供可以可以生成随机数能给你。通过把包导入倒我们的项目中，就可以通过 `rand` 的箱来访问 `rand` 的箱提供的功能了。
 把 箱的功能保持在自己的范围之内，这样就可以分清楚这是在的我们的箱中还是在 `rand` 箱中的定义了特定的功能，并且防止了潜在的冲突。比如，`rand` 箱提供了一个 命名为 `Rng` 的功能。我们也可以顶一个命名为 `Rng` 的结构体，在我们的自己箱中。因为一个箱的功能是在他自己的范围内命名的，因此当我们把 `rand`  添加为依赖项的时候，编译器是不会对 `Rng` 的所指的名称感到困惑。在我们的代码箱中，它值的我们定义的 `Rng`的结构体。我们将从 `rand` 箱中以 `rand::Rng` 访问 `Rng` 的功能。
 接下来我们继续讨论模块系统。
-# Defining Modules to Control Scope and Privacy
+# 2 Defining Modules to Control Scope and Privacy
 在这一节，我们将讨论模块以及模块的其他部分， 用关键字 `use` 来把想一个路径引入我们的项目，用 `pub` 的关键字来把代码的功能公开。我们也会讨论的 关键字 `as` 外部包，以及 `glob` 操作符。现在让我们先来关注 『modules(模块)』
+模块让我们可以将 箱(crate)中的代码分组，以及提高代码的可读性以及重用性。模块也可以控制项目的隐私，就是这个代码是可以被外部使用的(public)的，还是仅仅是内部的实现细节，不被外部使用(private)。
 
-Modules let us organize code within a crate into groups for readability and easy reuse. Modules also control the privacy of items, which is whether an item can be used by outside code (public) or is an internal implementation detail and not available for outside use (private).
-
-As an example, let’s write a library crate that provides the functionality of a restaurant. We’ll define the signatures of functions but leave their bodies empty to concentrate on the organization of the code, rather than actually implement a restaurant in code.
-
+我们提供了一个例子，要先写一个提供 『餐厅』 功能的 代码库箱(library crate)。我们要会顶一个方法的签名，但是要会留着他妈的方法体空白以专注于代码的组织，而不是在去实现餐厅的代码。
 In the restaurant industry, some parts of a restaurant are referred to as front of house and others as back of house. Front of house is where customers are; this is where hosts seat customers, servers take orders and payment, and bartenders make drinks. Back of house is where the chefs and cooks work in the kitchen, dishwashers clean up, and managers do administrative work.
+在餐饮行业中，餐厅的某些部分被成为房屋前部，而其他部分称为房屋的后。屋前就是顾客的信任所在。店主在这里招待客人，服务员在这里开单子以及付款。屋后是厨师工作的地方，以及洗碟子，以及管理店的地方。
+
 
 To structure our crate in the same way that a real restaurant works, we can organize the functions into nested modules. Create a new library named restaurant by running cargo new --lib restaurant; then put the code in Listing 7-1 into src/lib.rs to define some modules and function signatures.
+
+为了以实际餐厅的模型来构造 箱(crate)，我们可以功能到嵌套模块中。创建一个新的代码库命名为 `restaurant `，通过运行命令：`cargo new --lib restaurant`；同时把代码清单的 7-1的代码写到 `src/lib.rs` 文件中为了定义模块以及方法签名。
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+↑ 代码清单：7 - 1：`front_of_house ` 包含其他的模块，以及功能。
+顶一个模块从关键字 `mod` 开始，以及指名这个模块的名字(在这个案例里，名字叫 `front_of_house`)，然后用大括号把模块的代码体包裹起来。在模块中，我们可以有其他的模块，在这个案例里，里面的模块就是 `hosting` 和 `serving`。模块也可以定义别结构的代码，比如结构体，枚举型，常量以及功能特性，还有函数。
+
+通过使用模块，我们就能根据代码的功能相关性进行分组了。开发者就可以这个花更短的时间根据代码的所代表的功能来查找代码，因为开发者可以根据代码的分组导航到代码，不用阅读所有的代码。这样添加新的代码的时候就可以知道把代码放到何处以保持程序的组织性。
+
+
+在前面，有提到关于 *src/main.rs* 和 *src/lib.rs* 是箱的根，是因为这个文件中的任何一个内容在箱的模块的根目录形成了一个名为 crate  的模块。
+Listing 7-2 shows the module tree for the structure in Listing 7-1.
+```
+crate
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
+↑ 代码清单 7-2: 代码清单 7-1 的模块代码树
+
+注意，这个模块树是在隐含的模块 `crate` 下面的
+
+# 3 引用项目的路径 Paths for Referring to an Item in the Module Tree
+
+A path can take two forms:
+路径有两种格式
+- An absolute path starts from a crate root by using a crate name or a literal crate.
+- 绝对路径是通过使用箱的名称或者字符串 `crate` 从箱的根目录开始的。
+- A relative path starts from the current module and uses self, super, or an identifier in the current module.
+
+
+Both absolute and relative paths are followed by one or more identifiers separated by double colons (::).
+绝对路径和相对路径吊样能够都是用 两个冒号来进行调用的 `::`
+
+以下的代码有问题，无法编译通过。
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+↑ 代码7-3:根据绝对路径和相对路径来调用 `add_to_waitlist` 函数
+### 3.1 使用关键字 `pub` 来公开路径 Exposing Paths with the pub Keyword
+
+
+### 3.2 利用`super`来使用 相对路径Starting Relative Paths with super
+
+
+### 3.3 把结构体和枚举的访问权限修改为 `Public` Making Structs and Enums Public
+
+```java
+#![allow(unused_variables)]
+fn main() {
+    mod back_of_house {
+        pub struct Breakfast {
+            pub toast: String,
+            seasonal_fruit: String,
+        }
+
+        impl Breakfast {
+            pub fn summer(toast: &str) -> Breakfast {
+                Breakfast {
+                    toast: String::from(toast),
+                    seasonal_fruit: String::from("peaches"),
+                }
+            }
+        }
+    }
+
+    pub fn eat_at_restaurant() {
+        // Order a breakfast in the summer with Rye toast
+        let mut meal = back_of_house::Breakfast::summer("Rye");
+        // Change our mind about what bread we'd like
+        meal.toast = String::from("Wheat");
+        println!("I'd like {} toast please", meal.toast);
+
+        // The next line won't compile if we uncomment it; we're not allowed
+        // to see or modify the seasonal fruit that comes with the meal
+        // meal.seasonal_fruit = String::from("blueberries");
+    }
+}
+```
+代码清单：7-9 一个有public的字段和private字段的结构体
+
+试着把注释那行代码取消注释，来看看会发生什么错误信息。
+
+
+另外，这里要注意，由于`back_of_house::Breakfast`有个私有字段
+
+
+枚举里如有 `pub` 来修饰 `enum` 那么里面的所有的枚举类型都是公开的(`public`)的权限的。
+
+这里还没有涉及`pub`另一种情况，
+
+# 4 用关键字`use`把模块路径引入作用域 Bringing Paths into Scope with the  use  Keyword
