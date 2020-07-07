@@ -63,10 +63,9 @@ mod front_of_house {
 }
 ```
 ↑ 代码清单：7 - 1：`front_of_house ` 包含其他的模块，以及功能。
-顶一个模块从关键字 `mod` 开始，以及指名这个模块的名字(在这个案例里，名字叫 `front_of_house`)，然后用大括号把模块的代码体包裹起来。在模块中，我们可以有其他的模块，在这个案例里，里面的模块就是 `hosting` 和 `serving`。模块也可以定义别结构的代码，比如结构体，枚举型，常量以及功能特性，还有函数。
+定义一个模块从关键字 `mod` 开始，以及指名这个模块的名字(在这个案例里，名字叫 `front_of_house`)，然后用大括号把模块的代码体包裹起来。在模块中，我们可以有其他的模块，在这个案例里，里面的模块就是 `hosting` 和 `serving`。模块也可以定义别结构的代码，比如结构体，枚举型，常量以及功能特性，还有函数。
 
 通过使用模块，我们就能根据代码的功能相关性进行分组了。开发者就可以这个花更短的时间根据代码的所代表的功能来查找代码，因为开发者可以根据代码的分组导航到代码，不用阅读所有的代码。这样添加新的代码的时候就可以知道把代码放到何处以保持程序的组织性。
-
 
 在前面，有提到关于 *src/main.rs* 和 *src/lib.rs* 是箱的根，是因为这个文件中的任何一个内容在箱的模块的根目录形成了一个名为 crate  的模块。
 Listing 7-2 shows the module tree for the structure in Listing 7-1.
@@ -161,9 +160,88 @@ fn main() {
 
 另外，这里要注意，由于`back_of_house::Breakfast`有个私有字段
 
-
 枚举里如有 `pub` 来修饰 `enum` 那么里面的所有的枚举类型都是公开的(`public`)的权限的。
 
 这里还没有涉及`pub`另一种情况，
 
 # 4 用关键字`use`把模块路径引入作用域 Bringing Paths into Scope with the  use  Keyword
+
+
+
+In Listing 7-11, we bring the `crate::front_of_house::hosting` module into the scope of the `eat_at_restaurant` function so we only have to specify `hosting::add_to_waitlist` to call the `add_to_waitlist` function in `eat_at_restaurant`.
+
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+
+fn main() {}
+```
+Listing 7-11: Bringing a module into scope with use
+
+
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use self::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+
+fn main() {}
+```
+Listing 7-12: 用关键字 `use`和相对路径导入包
+
+### 4.1 Creating Idiomatic use Paths
+
+ 为什么我们要用 `hosting` 这个路径来导入相应的包，而不是直接用 `add_to_waitlist` 这个方法来导入包
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting::add_to_waitlist;
+
+pub fn eat_at_restaurant() {
+    add_to_waitlist();
+    add_to_waitlist();
+    add_to_waitlist();
+}
+
+fn main() {}
+```
+Listing 7-13: Bringing the add_to_waitlist function into scope with use, which is unidiomatic
+最热代码 7-11 和代码7-13是可以完成相同功能的，但是代码清单7-11是一个惯用的用法。
+
+### 4.2 Providing New Names with the `as` Keyword
+
+
+在第二个 `use` 语句中，给 `std::io::Result` 类型选择了新的名字 `IoResult `。
+
+
+
+### 4.3 Re-exporting Names with pub use
+
+
