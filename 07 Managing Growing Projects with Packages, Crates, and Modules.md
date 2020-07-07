@@ -211,10 +211,8 @@ fn main() {}
 ```
 Listing 7-12: 用关键字 `use`和相对路径导入包
 
-### 4.1 Creating Idiomatic use Paths
-
- 为什么我们要用 `hosting` 这个路径来导入相应的包，而不是直接用 `add_to_waitlist` 这个方法来导入包
-
+### 4.1 创建一个惯用的 `use` 路径
+也许你会疑惑，在代码7-11 中为什么我们要指定 `use crate::front_of_house::hosting` 这个路径，然后在 `eat_at_restaurant` 调用 `hosting::add_to_waitlist` 来使用方法，而不是直接指定 全路径直到 `add_to_waitlist` 来达到相同的效果，就像代码7-13中展示的：
 ```rust
 mod front_of_house {
     pub mod hosting {
@@ -232,16 +230,96 @@ pub fn eat_at_restaurant() {
 
 fn main() {}
 ```
-Listing 7-13: Bringing the add_to_waitlist function into scope with use, which is unidiomatic
-最热代码 7-11 和代码7-13是可以完成相同功能的，但是代码清单7-11是一个惯用的用法。
+Listing 7-13: 把函数 `add_to_waitlist` 通过关键字 `use` 引入作用域 ，但这个不是习惯的用法
+代码 7-11 和代码7-13是可以完成相同功能的，但是代码清单7-11是一个惯用的通过 `use` 关键字把函数引入作用域的。通过引入函数的父模块，我们就不得不在调用函数的带出函数的父模块，以便知道这个函数到底是不是本地定义的，同时又让完整路径重复覆盖达到了最小。代码 7-13 中，我们不知道函数 `add_to_waitlist` 实在哪里定义的。
+另一方面，当引入结构体，枚举类型还有其他项的时候，习惯上制定完整的路径。代码7-14就显示了将标准库 `HashMap` 引入二进制的代码箱的习惯方式。
+```rust
+use std::collections::HashMap;
 
-### 4.2 Providing New Names with the `as` Keyword
+fn main() {
+    let mut map = HashMap::new();
+    map.insert(1, 2);
+}
+
+```
+Listing 7-14: Bringing HashMap into scope in an idiomatic way
+为什么一定要这样使用，其实并没有非常有说服力的理由，只能说这个就是给习惯的用法，人们已经习惯了这样阅读 Rust 代码。
+这个惯例的例外情况是，如果我们将两个相同名称的类型放入作用域中，rust是不允许这么使用的。代码 7-15 显示了，如何将两个有相同名称但是不同父模块的不同的 `Result` 引入作用域中，以及如何去引用他它们：
+```rust
+#![allow(unused_variables)]
+fn main() {
+    use std::fmt;
+    use std::io;
+
+    fn function1() -> fmt::Result {
+        // --snip--
+        Ok(())
+    }
+
+    fn function2() -> io::Result<()> {
+        // --snip--
+        Ok(())
+    }
+}
+
+```
+Listing 7-15: Bringing two types with the same name into the same scope requires using their parent modules.
+就像你看到的，利用父模块来曲风这两个 `Rusult` 类型。如果我们用 `use std::fmt::Result` 和 `use std::io::Result` 来引入这两个类型，那么在编译的时候，Rust 就不知道在代码中，我们使用的 `Result` 指的是哪一个类型。
+
+### 4.2 使用关键字`as` 来指定一个新的名称 Providing New Names with the `as` Keyword
+
+```rust
+use std::fmt::Result;
+use std::io::Result as IoResult;
+
+fn function1() -> Result {
+    // --snip--
+}
+
+fn function2() -> IoResult<()> {
+    // --snip--
+}
+```
+Listing 7-16: Renaming a type when it’s brought into scope with the as keyword
 
 
-在第二个 `use` 语句中，给 `std::io::Result` 类型选择了新的名字 `IoResult `。
+在第二个 `use` 语句中，给 `std::io::Result` 类型用了一个新的名字 `IoResult `，
 
 
 
 ### 4.3 Re-exporting Names with pub use
 
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
 
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+
+fn main() {}
+```
+Listing 7-17: Making a name available for any code to use from a new scope with pub use
+
+
+### 4.4  Using External Packages
+
+
+
+### 4.5 Using Nested Paths to Clean Up Large use Lists
+
+### 4.6 The Glob Operator
+
+
+# 5 Separating Modules into Different Files
+
+
+
+# 6 Summary
