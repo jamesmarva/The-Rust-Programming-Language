@@ -304,9 +304,16 @@ Re-exporting is useful when the internal structure of your code is different fro
 `重导入` 是一个非常有用的功能，
 ### 4.4  用第三方的包 (Using External Packages)
 
+In Chapter 2, we programmed a guessing game project that used an external package called rand to get random numbers. To use rand in our project, we added this line to Cargo.toml:
+```toml
+[dependencies]
+rand = "0.5.5"
+```
 
+Then, to bring rand definitions into the scope of our package, we added a use line starting with the name of the package, rand, and listed the items we wanted to bring into scope. Recall that in the “Generating a Random Number” section in Chapter 2, we brought the Rng trait into scope and called the rand::thread_rng function:
 
 ### 4.5 Using Nested Paths to Clean Up Large use Lists
+
 
 ### 4.6 The Glob Operator
 

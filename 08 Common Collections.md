@@ -7,14 +7,12 @@ To learn about the other kinds of collections provided by the standard library, 
 
 We’ll discuss how to create and update vectors, strings, and hash maps, as well as what makes each special.
 
-
-
 # 1 Storing Lists of Values with Vectors
 
-### 1.1 Creating a New Vector
+### 1.1 创建一个新的 `Vector` (Creating a New Vector)
 
 
-### 1.2 Updating a Vector
+### 1.2 更新 `Vector` (Updating a Vector )
 
 ### 1.3 Dropping a Vector Drops Its Elements
 
@@ -22,16 +20,23 @@ We’ll discuss how to create and update vectors, strings, and hash maps, as wel
 ### 1.4 Reading Elements of Vectors
 
 
+### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
 
-
-### 1.5 Iterating over the Values in a Vector
-
-
+```rust
+fn main() {
+    let v = vec![100, 32, 57];
+    for i in &v {
+        println!("{}", i);
+    }
+}
+```
 
 ### 1.6 Using an Enum to Store Multiple Types
 
 
 # 2 Storing UTF-8 Encoded Text with Strings
+
+
 
 
 
