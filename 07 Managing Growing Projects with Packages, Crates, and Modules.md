@@ -275,7 +275,8 @@ fn function2() -> IoResult<()> {
 }
 ```
 ↑ 代码 7-16: 用关键字 `as` 来给引入的类型重新命名
-在第二个 `use` 语句中，给 `std::io::Result` 类型用了一个新的名字 `IoResult `，这样就不会和 `std::fmt` 的Result 的冲突了。不管是代码 7-15 还是 代码 7-16 都是惯用的方式，至于用哪个，完全取决于你。
+在第二个 `use` 语句中，给 `std::io::Result` 类型用了一个新的名字 `IoResult`，这样就不会和 `std::fmt` 的Result 的冲突了。不管是 代码 7-15 还是 代码 7-16 都是惯用的方式，至于用哪个，完全取决于你。
+
 ### 4.3 Re-exporting Names with `pub use`
 
 ```rust
@@ -295,10 +296,13 @@ pub fn eat_at_restaurant() {
 
 fn main() {}
 ```
-Listing 7-17: Making a name available for any code to use from a new scope with pub use
+↑ 代码 7-17: Making a name available for any code to use from a new scope with pub use
 
-
-### 4.4  Using External Packages
+By using pub use, external code can now call the add_to_waitlist function using hosting::add_to_waitlist. If we hadn’t specified pub use, the eat_at_restaurant function could call hosting::add_to_waitlist in its scope, but external code couldn’t take advantage of this new path.
+通过使用 `pub use`，外部的代码就可以在调用 `add_to_waitlist` 的同时使用 `hosting::add_to_waitlist` 了。如果我们不用 `pub use`，那么 `eat_at_restaurant` 可以调用 `hosting::add_to_waitlist` 在它的作用域里，但是外部的代码不能利用这个这个新的路径了。
+Re-exporting is useful when the internal structure of your code is different from how programmers calling your code would think about the domain. For example, in this restaurant metaphor, the people running the restaurant think about “front of house” and “back of house.” But customers visiting a restaurant probably won’t think about the parts of the restaurant in those terms. With pub use, we can write our code with one structure but expose a different structure. Doing so makes our library well organized for programmers working on the library and programmers calling the library.
+`重导入` 是一个非常有用的功能，
+### 4.4  用第三方的包 (Using External Packages)
 
 
 
