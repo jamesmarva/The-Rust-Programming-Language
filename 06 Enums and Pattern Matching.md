@@ -70,8 +70,6 @@ Null 的发明者 `Tony Hoare` 在他的2009年演讲“Null References”：一
 
 ### 
 
-
-
 # 2. The match Control Flow Operator
 Rust has an extremely powerful control flow operator called match that allows you to compare a value against a series of patterns and then execute code based on which pattern matches. Patterns can be made up of literal values, variable names, wildcards, and many other things; Chapter 18 covers all the different kinds of patterns and what they do. The power of match comes from the expressiveness of the patterns and the fact that the compiler confirms that all possible cases are handled.
 
