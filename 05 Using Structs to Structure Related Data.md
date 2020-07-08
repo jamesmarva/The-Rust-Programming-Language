@@ -146,14 +146,9 @@ impl Rectangle {
 When we run this code with the  main  function in Listing 5-14, we’ll get our desired output.
 Methods can take multiple parameters that we add to the signature after the  self
 parameter, and those parameters work just like parameters in functions.
-当我们运行这段在 代码清单 5-14 ，我们就会得到想要的结果了。方法是可以有多个参数的，在方法的签名后面的 `self` 后面增加就可以了，这些参数就像函数的参数一样。
+当我们运行这段在 代码清单 5-14 ，我们就会得到想要的结果了。方法是可以有多个参数的，在方法的签名后面的 `self` 后面增加这些参数的参数名和类型就可以了，就像向函数传参一样。
 
 ### 3.3 关联函数 Associated Functions
-Another useful feature of  impl  blocks is that we’re allowed to de ne functions within  impl
-blocks that don’t take  self  as a parameter. These are called associated functions because
-they’re associated with the struct. They’re still functions, not methods, because they don’t
-have an instance of the struct to work with. You’ve already used the  String::from
-associated function.
 另一个在 `impl` 代码块中的有用的特性就是，我们可以定义一个不带 `self` 变量的函数在 `impl` 代码块中。这些函数被称之为 *关联函数* ，因为他们与 结构体(struct) 相关联，他们仍然是函数，而不是方法，因为他们没有可使用的结构体实例。比如之前你使用的 `String::from` 这个就是关联函数。
 
 Associated functions are often used for constructors that will return a new instance of the struct. For example, we could provide an associated function that would have one dimension parameter and use that as both width and height, thus making it easier to create a square Rectangle rather than having to specify the same value twice:
@@ -208,15 +203,8 @@ fn main() {
     println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
 }
 ```
-Listing 5-16: Rewriting Listing 5-15 using multiple impl blocks
-There’s no reason to separate these methods into multiple impl blocks here, but this is valid syntax. We’ll see a case in which multiple impl blocks are useful in Chapter 10, where we discuss generic types and traits.
-这里的拆分是毫无道理的，但是这样的语法是么有问题的。在第10章中我们将会讨论多个 `impl` 代码块有效果的情况，就是根据实际的需求来进行拆分，我们将在第10章讨论泛型的类型和特点。
-
-
-### 3.5 Summary
-Structs let you create custom types that are meaningful for your domain. By using structs, you can keep associated pieces of data connected to each other and name each piece to make your code clear. Methods let you specify the behavior that instances of your structs have, and associated functions let you namespace functionality that is particular to your struct without having an instance available.
-
-
+↑ 代码 5-16: 用多个实现代码快来重写 代码 5-15 
+这里这样把两个方法放到两个实现中并没有充分的理由支撑，甚至可以说是完全没有必要，但是这样的使用从语法上来说是没有问题的。在第10章中我们将会讨论多个 `impl` 代码块有效果的情况，就是根据实际的需求来进行拆分，因为我们将在第10章讨论泛型的类型和特点。
+# 4 总结 (Summary)
 结构体(Struct) 让你可以创建自己对自己的作用有意义的类型，通过使用结构体，可以使数据互相产生联系，并且为每个字段都明民有意义的名字，使得代码更加清晰。方法让你可以指定结构体的行为，关联函数可以让你在没有实例可用的情况下使用特定的结构体的命名空间。
-But structs aren’t the only way you can create custom types: let’s turn to Rust’s enum feature to add another tool to your toolbox.
 但是结构体并不是创建自定义的类型唯一方法，让我们来看看 Rust 的枚举的特性，这会让你的工具箱中多出一个工具。
