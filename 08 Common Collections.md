@@ -17,7 +17,7 @@ We’ll discuss how to create and update vectors, strings, and hash maps, as wel
 ### 1.3 Dropping a Vector Drops Its Elements
 
 
-### 1.4 Reading Elements of Vectors
+### 1.4 读取 `Vector` 中的元素 (Reading Elements of Vectors)
 
 
 ### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
