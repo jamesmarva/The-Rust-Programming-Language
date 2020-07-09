@@ -59,7 +59,48 @@ fn main() {
     };
 }
 ```
+代码 6-1: Listing 6-1: Storing the data and IpAddrKind variant of an IP address using a struct
 
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+fn main() {}
+```
+Listing 6-2: A Message enum whose variants each store different amounts and types of values
+
+This enum has four variants with different types:
+
+- `Quit` has no data associated with it at all.
+- `Move` includes an anonymous struct inside it.
+- `Write` includes a single String.
+- `ChangeColor` includes three `i32` values.
+
+```rust
+fn main() {
+    enum Message {
+        Quit,
+        Move { x: i32, y: i32 },
+        Write(String),
+        ChangeColor(i32, i32, i32),
+    }
+
+    impl Message {
+        fn call(&self) {
+            // method body would be defined here
+        }
+    }
+
+    let m = Message::Write(String::from("hello"));
+    m.call();
+}
+```
+The body of the method would use `self` to get the value that we called the method on. In this example, we’ve created a variable `m` that has the value `Message::Write(String::from("hello"))` , and that is what `self` will be in the body of the call method when `m.call()` runs.
 
 
 ### 1.2 `Option`枚举类型以及它相对于空值的高级特性 (The Option Enum and Its Advantages Over Null Values)
@@ -71,12 +112,36 @@ Null 的发明者 `Tony Hoare` 在他的2009年演讲“Null References”：一
 ### 
 
 # 2. The match Control Flow Operator
-Rust has an extremely powerful control flow operator called match that allows you to compare a value against a series of patterns and then execute code based on which pattern matches. Patterns can be made up of literal values, variable names, wildcards, and many other things; Chapter 18 covers all the different kinds of patterns and what they do. The power of match comes from the expressiveness of the patterns and the fact that the compiler confirms that all possible cases are handled.
+Rust has an extremely powerful control flow operator called `match` that allows you to compare a value against a series of patterns and then execute code based on which pattern matches. Patterns can be made up of literal values, variable names, wildcards, and many other things; Chapter 18 covers all the different kinds of patterns and what they do. The power of `match` comes from the expressiveness of the patterns and the fact that the compiler confirms that all possible cases are handled.
 
 Think of a match expression as being like a coin-sorting machine: coins slide down a track with variously sized holes along it, and each coin falls through the first hole it encounters that it fits into. In the same way, values go through each pattern in a match, and at the first pattern the value “fits,” the value falls into the associated code block to be used during execution.
 
 Because we just mentioned coins, let’s use them as an example using match! We can write a function that can take an unknown United States coin and, in a similar way as the counting machine, determine which coin it is and return its value in cents, as shown here in Listing 6-3.
+```rust
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
 
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+
+fn main() {}
+```
+↑ Listing 6-3: An enum and a match expression that has the variants of the enum as its patterns
+
+
+### 2.1 Patterns that Bind to Values
+
+### 2.2 
 # 3. Concise Control Flow with if let
 
 The if let syntax lets you combine if and let into a less verbose way to handle values that match one pattern while ignoring the rest. Consider the program in Listing 6-6 that matches on an Option<u8> value but only wants to execute code if the value is 3.
