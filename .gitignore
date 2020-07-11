@@ -10,6 +10,15 @@ code/ch04/section01/demo_04_04/Cargo.lock
 code/ch04/section01/demo_04_04/target
 code/ch04/section01/demo_04_05/Cargo.lock
 code/ch04/section01/demo_04_05/target
+
+
+code/ch04/listing_04_07/target
+code/ch04/listing_04_07/Cargo.lock
+
+code/ch04/listing_04_08/target
+code/ch04/listing_04_08/Cargo.lock
+
+
 code/ch05/listing_05_13/target
 code/ch05/listing_05_13/Cargo.lock
 code/ch05/listing_05_14/Cargo.lock
