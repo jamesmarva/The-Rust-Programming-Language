@@ -65,10 +65,60 @@ Rust needs to know what types will be in the vector at compile time so it knows 
 
 We talked about strings in Chapter 4, but we’ll look at them in more depth now. New Rustaceans commonly get stuck on strings for a combination of three reasons: Rust’s propensity for exposing possible errors, strings being a more complicated data structure than many programmers give them credit for, and UTF-8. These factors combine in a way that can seem difficult when you’re coming from other programming languages.
 
-It’s useful to discuss strings in the context of collections because strings are implemented as a collection of bytes, plus some methods to provide useful functionality when those bytes are interpreted as text. In this section, we’ll talk about the operations on String that every collection type has, such as creating, updating, and reading. We’ll also discuss the ways in which String is different from the other collections, namely how indexing into a String is complicated by the differences between how people and computers interpret String data.
+把字符放在集合的这个内容来讲是比较容易让人理解的，因为字符串以一个字节的集合来实现的，而且在这些字节被解释为文本的时候提供了很多有用方法。在这一小节，我们将会谈论到的在 `String` 中的在别的集合中都有的操作，比如创建，读取，更新。也会讨论到这些操作和别的集合的不同点，因为人与计算机对 `String` 的不同的理解导致了在字符串中使用索引变得无比复杂。
+
+### 2.1 字符串是什么？What Is a String?
+In Chapter 4, we talked about string slices, which are references to some UTF-8 encoded string data stored elsewhere. String literals, for example, are stored in the program’s binary and are therefore string slices.
+我们首先定义术语 *string* 的含义。在Rust核心的语法中，只有一种 `string`(译者注：：注意，这里的s是小写的) 类型，就是 `str` 切片，通常是以借用的形式看到的`&str`。在第四章中，我们讨论了*字符串切片(string slices)*，这是对一些 UTF-8 编码格式的字符串的引用。比如的， 字符文件字存储在存储在程序的二进制文件中，因此这里的就是字符串切片(string slice)。
+`String` 是有Rust的标准库(Rust’s standard library)提供的，注意上的是核心库( core language)，他是一个可以边长，可修改的，可以被所有的，并且是 UTF-8 编码格式的字符串类型。当 Rustaceans 在Rust 中提到 “strings” 的时候，通常指的就是这 `String` 类型 和 字符串切片`&str`类型，而不仅仅是这两种类型之一。经过本小节是关于`String` 的，但是在 rust  的标准库中都大量使用到了两种类型，并且 `String` 和字符串切片(strnig slice)  都是 UTF-8 编码格式的。
+Rust’s standard library also includes a number of other string types, such as OsString, OsStr, CString, and CStr. Library crates can provide even more options for storing string data. See how those names all end in String or Str? They refer to owned and borrowed variants, just like the String and str types you’ve seen previously. These string types can store text in different encodings or be represented in memory in a different way, for example. We won’t discuss these other string types in this chapter; see their API documentation for more about how to use them and when each is appropriate.
+
+### 2.1 创建一个 `String` Creating a New String
+用 `Vec<T>` 可以使用的操作在 `String` 中也同样可以使用，比如 `new` 函数，我们用`new` 函数来创建一个字符串：
+```java
+fn main() {
+    let mut s = String::new();
+}
+```
+Listing 8-11: Creating a new, empty String
 
 
-### 2.1 What Is a String?
+这行代码创建了一个名为 `s` 新的空字符串，然后我们可以把我们的数据加到其中。通常我们都会用一些初始的数据作为字符串的开头。为了查看类型中的有那些数据，我们使用`to_stirng`来查看这个类型上的数据，这个方法可以用在任意的类型上的。
+```rust
+fn main() {
+    let data = "initial contents";
+
+    let s = data.to_string();
+
+    // the method also works on a literal directly:
+    let s = "initial contents".to_string();
+}
+```
+Listing 8-12: Using the to_string method to create a String from a string literal
+
+
+### 2.1 字符串是什么？What Is a String?
+
+### 2.1 字符串是什么？What Is a String?
+### 2.1 字符串是什么？What Is a String?
+### 2.1 字符串是什么？What Is a String?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
