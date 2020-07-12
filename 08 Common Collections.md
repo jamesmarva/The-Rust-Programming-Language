@@ -74,16 +74,14 @@ In Chapter 4, we talked about string slices, which are references to some UTF-8 
 Rust’s standard library also includes a number of other string types, such as OsString, OsStr, CString, and CStr. Library crates can provide even more options for storing string data. See how those names all end in String or Str? They refer to owned and borrowed variants, just like the String and str types you’ve seen previously. These string types can store text in different encodings or be represented in memory in a different way, for example. We won’t discuss these other string types in this chapter; see their API documentation for more about how to use them and when each is appropriate.
 
 ### 2.1 创建一个 `String` Creating a New String
-用 `Vec<T>` 可以使用的操作在 `String` 中也同样可以使用，比如 `new` 函数，我们用`new` 函数来创建一个字符串：
-```java
+在 `Vect<T>` 和 `String` 中有很多相同的操作方法，我们先用`new` 函数来创建一个字符串：
+```rust
 fn main() {
     let mut s = String::new();
 }
 ```
-Listing 8-11: Creating a new, empty String
-
-
-这行代码创建了一个名为 `s` 新的空字符串，然后我们可以把我们的数据加到其中。通常我们都会用一些初始的数据作为字符串的开头。为了查看类型中的有那些数据，我们使用`to_stirng`来查看这个类型上的数据，这个方法可以用在任意的类型上的。
+↑ 代码 8-11: 创建一个空字符
+这行代码创建了一个名为 `s` 新的空字符串，然后我们可以把我们的数据加到其中。通常我们都会用一些初始的数据作为字符串的开头。如果你想查看某些对象中的数据，可以使用使用`to_stirng`来查看这个类型上的数据，这个方法可以用在任意的类型上的。
 ```rust
 fn main() {
     let data = "initial contents";
@@ -94,35 +92,203 @@ fn main() {
     let s = "initial contents".to_string();
 }
 ```
-Listing 8-12: Using the to_string method to create a String from a string literal
+↑ 代码 8-12: 利用 `to_string` 来根据文本来创建一个字符串
+上面这个代码创建了一个包含“initial contents” 的字符串。
+
+我们也可以用 ``String::from 来根据一个文本字符串来创建一个字符串(String)，代码 8-13 和 代码 8-12 达到效果是一样的。
+```rust
+fn main() {
+    let s = String::from("initial contents");
+}
+```
+↑ Listing 8-13: Using the String::from function to create a String from a string literal
+
+```rust
+fn main() {
+    let hello = String::from("السلام عليكم");
+    let hello = String::from("Dobrý den");
+    let hello = String::from("Hello");
+    let hello = String::from("שָׁלוֹם");
+    let hello = String::from("नमस्ते");
+    let hello = String::from("こんにちは");
+    let hello = String::from("안녕하세요");
+    let hello = String::from("你好");
+    let hello = String::from("Olá");
+    let hello = String::from("Здравствуйте");
+    let hello = String::from("Hola");
+}
+```
+↑ Listing 8-14: Storing greetings in different languages in strings
 
 
-### 2.1 字符串是什么？What Is a String?
+### 2.2 更新一个字符串(Updating a String)
+字符串的长度是可以边长的，同时，这个字符串的内容也是可变的，就像 `Vec<T>` 一样。另外，你也可以用 `+` 或者的宏函数 `format!` 来进行字符串的串联。
+##### 2.2.1 用 `push_str` 和 `push` 来进行字符串的增加
+通过用 `push_str` 方法来把字符串切片来增加到字符的末尾。
+```rust
+fn main() {
+    let mut s = String::from("foo");
+    s.push_str("bar");
+}
+```
+↑ Listing 8-15: Appending a string slice to a String using the push_str method
 
-### 2.1 字符串是什么？What Is a String?
-### 2.1 字符串是什么？What Is a String?
-### 2.1 字符串是什么？What Is a String?
+变量 `s` 的字符串就变成了 `foobar`。`push_str`方法会使用字符串切片，这种情况比较适用于，我们只想要这个数据的值，不用非的获取参数的所有权的情况。比如，如果在代码 8-16 中，如果把 `s2` 被添加到 `s1` 就无法使用就是很坑的。
+```rust
+fn main() {
+    let mut s1 = String::from("foo");
+    let s2 = "bar";
+    s1.push_str(s2);
+    println!("s2 is {}", s2);
+}
+```
+↑ 代码 8-16: 把 `s2` 的内容添加到 `s1` 之后
+
+`push` 把单个字符增加到字符串(String)的后面。
+```rust
+fn main() {
+    let mut s = String::from("lo");
+    s.push('l');
+}
+```
+↑ 代码 8-17: 用push 字符串的后面增加一个字母
+
+上面的这个字符串 `s` 的结果就是 `lol`
+
+##### 2.2.2 用 `+` 或者 宏函数 `format` 把字符串串联起来
+```rust
+fn main() {
+    let s1 = String::from("Hello, ");
+    let s2 = String::from("world!");
+    let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used
+}
+```
+↑ Listing 8-18: Using the + operator to combine two String values into a new String value
+
+
+
+### 2.3  字符串中的索引(Indexing into Strings)
+
+### 2.4 Slicing Strings
+### 2.5 Methods for Iterating Over Strings
+
+### 2.6 Methods for Iterating Over Strings
+
+### 2.7 Strings Are Not So Simple
+
+
+# 3 Storing Keys with Associated Values in Hash Maps
+
+### 3.1 Creating a New Hash Map
+
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+}
+```
+Listing 8-20: Creating a new hash map and inserting some keys and values
+
+
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+
+    let mut scores: HashMap<_, _> =
+        teams.into_iter().zip(initial_scores.into_iter()).collect();
+}
+```
+Listing 8-21: Creating a hash map from a list of teams and a list of scores
+
+
+
+
+
+### 3.2 Hash Maps and Ownership
+
+
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Blue");
+
+    let mut map = HashMap::new();
+    map.insert(field_name, field_value);
+    // field_name and field_value are invalid at this point, try using them and
+    // see what compiler error you get!
+}
+
+```
+
+### 3.3 Accessing Values in a Hash Map
+
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    let team_name = String::from("Blue");
+    let score = scores.get(&team_name);
+}
+
+```
+
+### 3.4 Updating a Hash Map
+
+Although the number of keys and values is growable, each key can only have one value associated with it at a time. When you want to change the data in a hash map, you have to decide how to handle the case when a key already has a value assigned. You could replace the old value with the new value, completely disregarding the old value. You could keep the old value and ignore the new value, only adding the new value if the key doesn’t already have a value. Or you could combine the old value and the new value. Let’s look at how to do each of these!
+
+
+
+### 3.5 Only Inserting a Value If the Key Has No Value
+
+
+### 3.6 Updating a Value Based on the Old Value
+```rust
+fn main() {
+    use std::collections::HashMap;
+    let text = "hello world wonderful world";
+    let mut map = HashMap::new();
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+    println!("{:?}", map);
+}
+
+```
+Listing 8-26: Counting occurrences of words using a hash map that stores words and counts
+
+This code will print {"world": 2, "hello": 1, "wonderful": 1}. The or_insert method actually returns a mutable reference (&mut V) to the value for this key. Here we store that mutable reference in the count variable, so in order to assign to that value, we must first dereference count using the asterisk (*). The mutable reference goes out of scope at the end of the for loop, so all of these changes are safe and allowed by the borrowing rules.
+
+we must first dereference count using the asterisk (*). The mutable reference goes out of scope at the end of the for loop, so all of these changes are safe and allowed by the borrowing rules.
+
+
+
+
+### 3.6 Hashing Functions
+By default, HashMap uses a “cryptographically strong”1 hashing function that can provide resistance to Denial of Service (DoS) attacks. This is not the fastest hashing algorithm available, but the trade-off for better security that comes with the drop in performance is worth it. If you profile your code and find that the default hash function is too slow for your purposes, you can switch to another function by specifying a different hasher. A hasher is a type that implements the BuildHasher trait. We’ll talk about traits and how to implement them in Chapter 10. You don’t necessarily have to implement your own hasher from scratch; crates.io has libraries shared by other Rust users that provide hashers implementing many common hashing algorithms.
+
+1 [https://www.131002.net/siphash/siphash.pdf](https://doc.rust-lang.org/book/ch08-02-strings.html#storing-utf-8-encoded-text-with-strings)
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 4 Summary
 
 
 
