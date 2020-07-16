@@ -178,9 +178,11 @@ fn main() {
 
 
 # 3 Storing Keys with Associated Values in Hash Maps
-
+最后一个日常会用的数据结构是 HashMap，HashMap 存储了键(key) 和 值(value)的映射关系的映射关系，通过一个哈希函数，它确定了要把键与值存在内存哪个位置。大多数的语言都支持这种数据结构，只不过他们有不同的名字罢了，比如，hash、map、Object、hash table、dictionary和associative array。这些代表都是相同的数据结构，只不过有着不同的名字罢了。
+当你想不依赖索引，而是用某个数据类型的对象来查找数据的时候，HashMap 会非常有用。比如在某个游戏中，你可以用队伍来作为键(key)，然后用的这个队伍的得分来作为值(value)，这样你就利用Hash Map 根据队伍的名称来直接队伍的得分了。
+在本节中，我们将会介绍HashMap的基本的API，但是在
 ### 3.1 Creating a New Hash Map
-
+你可以用关键字 `new` 创建一个空的HashMap，用的insert方法来插入数据，在代码 8-20 中的，我们会跟踪两个名字分别为 blue 和 yellow 的队伍的得分。
 ```rust
 fn main() {
     use std::collections::HashMap;
@@ -191,8 +193,14 @@ fn main() {
     scores.insert(String::from("Yellow"), 50);
 }
 ```
-Listing 8-20: Creating a new hash map and inserting some keys and values
+↑ 代码 8-20: 创建一个Hash Map，然后插入一些数据
 
+注意，这里我们是用的标准库里的HashMap这个数据结构。在我们三个常见的集合中的，这个集合是我们最不常见的集合。所以这个就不会自动的被引入作用域中。HashMap也没有得到标准库的支持。比如，没有内置的标准洪来支持他们。
+
+就像Vector一样，HashMap是把数据存在堆中的。上面这个例子的中，HashMap的键是String类型的，值是i32类型的。就像Vector一样，HashMap有同质的特性，也就是说，所有的key 要是同一种类型的，所有的value也要是同一种类型的。
+
+Another way of constructing a hash map is by using iterators and the collect method on a vector of tuples, where each tuple consists of a key and its value. We’ll be going into more detail about iterators and their associated methods in the ”Processing a Series of Items with Iterators” section of Chapter 13. The collect method gathers data into a number of collection types, including HashMap. For example, if we had the team names and initial scores in two separate vectors, we could use the zip method to create a vector of tuples where “Blue” is paired with 10, and so forth. Then we could use the collect method to turn that vector of tuples into a hash map, as shown in Listing 8-21.
+另一种构造HashMpa的方法就是在一个元祖构造的数组上用迭代器，还有 `collect` 方法。每个元组都是一个映射关系。我们将在第13涨的 “使用迭代器来处理项目” 中介绍迭代器以及其的使用方法。collect 方法可以把数据收到多种的集合的数据类型中，当然也包括HashMap。比如，我们在有个两个队伍的名称，以及两队伍的得分。，用 `zip` 方法创建一个元组的 Vector 。然后使用collect 方法来把元组的 vector 转化为 HashMap。
 
 ```rust
 fn main() {
@@ -205,14 +213,11 @@ fn main() {
         teams.into_iter().zip(initial_scores.into_iter()).collect();
 }
 ```
-Listing 8-21: Creating a hash map from a list of teams and a list of scores
+↑ 代码 8-21: 两个数组来创建HashMap
 
-
-
-
-
+类型注解HashMap<_, _> 这里是必须的，因为这里的 collect 方法会收集到很多的数据，但是rust是不知道你想要哪个数据类型的，除非你自己指定。但是对于key和value的类型的参数，我们用下划线，rust可以根据向量中的数据的额类型推断出HashMap中的数据类型。
 ### 3.2 Hash Maps and Ownership
-
+如果类型有复制的特性的话，就像 `i32` 这种的数据类型，这些值会被复制到HashMap中。
 
 ```rust
 fn main() {
