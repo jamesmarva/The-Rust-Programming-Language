@@ -218,7 +218,6 @@ fn main() {
 类型注解HashMap<_, _> 这里是必须的，因为这里的 collect 方法会收集到很多的数据，但是rust是不知道你想要哪个数据类型的，除非你自己指定。但是对于key和value的类型的参数，我们用下划线，rust可以根据向量中的数据的额类型推断出HashMap中的数据类型。
 ### 3.2 Hash Maps and Ownership
 如果类型有复制的特性的话，就像 `i32` 这种的数据类型，这些值会被复制到HashMap中。
-
 ```rust
 fn main() {
     use std::collections::HashMap;
