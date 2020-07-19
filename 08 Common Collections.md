@@ -179,8 +179,9 @@ fn main() {
 
 # 3 Storing Keys with Associated Values in Hash Maps
 最后一个日常会用的数据结构是 HashMap，HashMap 存储了键(key) 和 值(value)的映射关系的映射关系，通过一个哈希函数，它确定了要把键与值存在内存哪个位置。大多数的语言都支持这种数据结构，只不过他们有不同的名字罢了，比如，hash、map、Object、hash table、dictionary和associative array。这些代表都是相同的数据结构，只不过有着不同的名字罢了。
+
 当你想不依赖索引，而是用某个数据类型的对象来查找数据的时候，HashMap 会非常有用。比如在某个游戏中，你可以用队伍来作为键(key)，然后用的这个队伍的得分来作为值(value)，这样你就利用Hash Map 根据队伍的名称来直接队伍的得分了。
-在本节中，我们将会介绍HashMap的基本的API，但是在
+在本节中，我们将会介绍HashMap的基本的API。
 ### 3.1 Creating a New Hash Map
 你可以用关键字 `new` 创建一个空的HashMap，用的insert方法来插入数据，在代码 8-20 中的，我们会跟踪两个名字分别为 blue 和 yellow 的队伍的得分。
 ```rust
@@ -199,7 +200,6 @@ fn main() {
 
 就像Vector一样，HashMap是把数据存在堆中的。上面这个例子的中，HashMap的键是String类型的，值是i32类型的。就像Vector一样，HashMap有同质的特性，也就是说，所有的key 要是同一种类型的，所有的value也要是同一种类型的。
 
-Another way of constructing a hash map is by using iterators and the collect method on a vector of tuples, where each tuple consists of a key and its value. We’ll be going into more detail about iterators and their associated methods in the ”Processing a Series of Items with Iterators” section of Chapter 13. The collect method gathers data into a number of collection types, including HashMap. For example, if we had the team names and initial scores in two separate vectors, we could use the zip method to create a vector of tuples where “Blue” is paired with 10, and so forth. Then we could use the collect method to turn that vector of tuples into a hash map, as shown in Listing 8-21.
 另一种构造HashMpa的方法就是在一个元祖构造的数组上用迭代器，还有 `collect` 方法。每个元组都是一个映射关系。我们将在第13涨的 “使用迭代器来处理项目” 中介绍迭代器以及其的使用方法。collect 方法可以把数据收到多种的集合的数据类型中，当然也包括HashMap。比如，我们在有个两个队伍的名称，以及两队伍的得分。，用 `zip` 方法创建一个元组的 Vector 。然后使用collect 方法来把元组的 vector 转化为 HashMap。
 
 ```rust
@@ -232,6 +232,7 @@ fn main() {
 }
 ```
 ↑ 代码 8-22: 一旦插入就拥有所有权的HashMap
+
 当调用了 `insert` 的方法之后，我们不能再使用 已经成为 key(`field_name`) 和 value(`field_value`) 的变量了。
 
 如果我们是把引用插入道德HashMap中，那么值就不会被搬家到HashMap中。引用的值至少要保证在HashMap的有效期的期间是有效的(也就是不能被drop和move？)。在第10章，将会讨论关于生命周期验证参考的内容。
@@ -253,12 +254,13 @@ fn main() {
 
 ```
 ↑ 代码 8-23 通过队伍的名来获取队伍的分数
+
 这里的 分数(score) 和 蓝队是分数，而且这里的值一定是`Some(&10)`，这个结果是被`Some`这个结构体包装的，因为get方法会返回一个 `Option<&V>` 类型的对象；如果key其实对应的value在HashMap中并不存在，那么调用get方法之后就会返回 None。这个程序需要被 `Option` 这个结构体处理一下。
+
 就像在 `Vector` 的使用一样，可以用迭代的方法来遍历HashMap中的所有的键值对( key/value pair)
 
 ### 3.4 更新HashMap (Updating a Hash Map)
 
-Although the number of keys and values is growable, each key can only have one value associated with it at a time. When you want to change the data in a hash map, you have to decide how to handle the case when a key already has a value assigned. You could replace the old value with the new value, completely disregarding the old value. You could keep the old value and ignore the new value, only adding the new value if the key doesn’t already have a value. Or you could combine the old value and the new value. Let’s look at how to do each of these!
 经过key 和 value 的数量是不断增长的，每个key只能对应一个value。当你想要的更新HashMap的值的时候，那么你就要根据现有的值进行相应的更新了。
 1 用新值替换旧值
 2 保留旧值，放弃新值。
@@ -298,51 +300,41 @@ fn main() {
 ```
 ↑ 代码 8-25: 用 entry 方法，只有当key不存在的是，才进行插入
 
+如果key 在HashMap中是存在，在结构体 `Entry` 的方法`or_insert` 会返回key所对应的value，如果key是不存在的，那么就会吧value插入之后，然后再返回插入之后的value。用这个方法要比自己实现的这套逻辑简单多了，此外这个与编译器的借用属性配合的更加出色。
 
-
-
-##### 3.4.3 Only Inserting a Value If the Key Has No Value
-
-
-### 3.6 Updating a Value Based on the Old Value
+##### 3.4.3 根据老value 来更新 value (Updating a Value Based on the Old Value)
+另一个的经常处理的场景就是，根据key来得到对应的value，然后根据老的value来设置成新的value。比如在代码8-26 里面的，记录文本中的单词的出现的次数。我们把单词作为key ，把次数作为value，每遍历到一个单词，那么单词的次数+1。如果遇到新的单词，那么就再HashMap里面初始为0。
 ```rust
 fn main() {
     use std::collections::HashMap;
+
     let text = "hello world wonderful world";
+
     let mut map = HashMap::new();
+
     for word in text.split_whitespace() {
         let count = map.entry(word).or_insert(0);
         *count += 1;
     }
+
     println!("{:?}", map);
 }
-
 ```
-Listing 8-26: Counting occurrences of words using a hash map that stores words and counts
-
-This code will print {"world": 2, "hello": 1, "wonderful": 1}. The or_insert method actually returns a mutable reference (&mut V) to the value for this key. Here we store that mutable reference in the count variable, so in order to assign to that value, we must first dereference count using the asterisk (*). The mutable reference goes out of scope at the end of the for loop, so all of these changes are safe and allowed by the borrowing rules.
-
-we must first dereference count using the asterisk (*). The mutable reference goes out of scope at the end of the for loop, so all of these changes are safe and allowed by the borrowing rules.
-
-
-
+↑ 代码 8-26: 用HashMap的来进行保存单词的和单词的数量 
+上这段代码会输出 `{"world": 2, "hello": 1, "wonderful": 1}`。`or_insert` 方法实际上会返回一个 value 对应的 `可变的引用(&mut V)` 。这里我们吧这个可变的引用放在变量 `count` 变量中，要先用 `*` 取消引用。可变的引用在循环后就消失了，这些更改都是安全的，并且是符合借用规则的。
 
 ### 3.6 Hashing Functions
-By default, HashMap uses a “cryptographically strong”1 hashing function that can provide resistance to Denial of Service (DoS) attacks. This is not the fastest hashing algorithm available, but the trade-off for better security that comes with the drop in performance is worth it. If you profile your code and find that the default hash function is too slow for your purposes, you can switch to another function by specifying a different hasher. A hasher is a type that implements the BuildHasher trait. We’ll talk about traits and how to implement them in Chapter 10. You don’t necessarily have to implement your own hasher from scratch; crates.io has libraries shared by other Rust users that provide hashers implementing many common hashing algorithms.
+
+HashMap 默认用的是 "cryptographically strong" 的哈希函数，可以提供抵抗 `Denial of Service (DoS)` 的攻击，但是这个函数不是性能最好的哈希函数，但是这个函数是性能下降和安全的一种相对平衡的方案。如你分析代码发现默认的哈希函数太慢了，那么你可以指定一个更快的 `哈希生生成器(hasher)`。`哈希生成器(hasher)`是 `BuildHasher` 特性的一种实现。在第十章，就会介绍特性(trait)，以及要如何实习它们。你不用从头开始的实现一个哈希生成器(hasher)；[crates.io](https://crates.io/) 有很多现有的哈希函数的实现。
 
 1 [https://www.131002.net/siphash/siphash.pdf](https://doc.rust-lang.org/book/ch08-02-strings.html#storing-utf-8-encoded-text-with-strings)
 
 
 
-
-
-
 ### 4 Summary
-
-
-
-
-
-
-
-
+Vector， string，以及HashMap都是程序中大量使用的功能，为了熟悉这些数据结构，你应该要进行一些练习：
+- 给一个数组的整型，返回这个 `Vector` 的中位数，平均值，众数。
+- 转换字符串，每个单词的第一个辅音，都移动到单词的末端，以及要增加要给“ay”，比如第 “first” 要转换成 “irst-fay”。以元音开头的单词在末尾加了“ hay”（“ apple”变成“ apple-hay”）。
+- 使用一个HashMap 和 vectors, 创建一个文本接口，允许一个用户哈希图和向量，创建文本界面，以允许用户将员工姓名添加到公司的部门中。例如，“将Sally添加到工程部门”或“将Amir添加到销售部门”。然后让用户的去创建一个所有用户的列表，或者根据部门进行分组，并且按照字典序排序。
+标准库的API都可以帮助你完成这些练习。
+我们将在下一章中讨论关于错误处理。
