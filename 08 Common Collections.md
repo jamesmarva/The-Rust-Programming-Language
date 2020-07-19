@@ -216,8 +216,8 @@ fn main() {
 ↑ 代码 8-21: 两个数组来创建HashMap
 
 类型注解HashMap<_, _> 这里是必须的，因为这里的 collect 方法会收集到很多的数据，但是rust是不知道你想要哪个数据类型的，除非你自己指定。但是对于key和value的类型的参数，我们用下划线，rust可以根据向量中的数据的额类型推断出HashMap中的数据类型。
-### 3.2 Hash Maps and Ownership
-如果类型有复制的特性的话，就像 `i32` 这种的数据类型，这些值会被复制到HashMap中。
+### 3.2 HashMap 和 所有权(Hash Maps and Ownership)
+如果类型有复制的特性的话，就像 `i32` 这种的数据类型，这些值会被复制HashMap中。有所有权的特性的数据类型，HashMap就会成为他们的所有者。
 ```rust
 fn main() {
     use std::collections::HashMap;
@@ -230,10 +230,13 @@ fn main() {
     // field_name and field_value are invalid at this point, try using them and
     // see what compiler error you get!
 }
-
 ```
+↑ 代码 8-22: 一旦插入就拥有所有权的HashMap
+当调用了 `insert` 的方法之后，我们不能再使用 已经成为 key(`field_name`) 和 value(`field_value`) 的变量了。
 
-### 3.3 Accessing Values in a Hash Map
+如果我们是把引用插入道德HashMap中，那么值就不会被搬家到HashMap中。引用的值至少要保证在HashMap的有效期的期间是有效的(也就是不能被drop和move？)。在第10章，将会讨论关于生命周期验证参考的内容。
+### 3.3 获取在HashMap中值 (Accessing Values in a Hash Map)
+可以用key来获取相应的HashMap中的值。
 
 ```rust
 fn main() {
@@ -249,14 +252,56 @@ fn main() {
 }
 
 ```
+↑ 代码 8-23 通过队伍的名来获取队伍的分数
+这里的 分数(score) 和 蓝队是分数，而且这里的值一定是`Some(&10)`，这个结果是被`Some`这个结构体包装的，因为get方法会返回一个 `Option<&V>` 类型的对象；如果key其实对应的value在HashMap中并不存在，那么调用get方法之后就会返回 None。这个程序需要被 `Option` 这个结构体处理一下。
+就像在 `Vector` 的使用一样，可以用迭代的方法来遍历HashMap中的所有的键值对( key/value pair)
 
-### 3.4 Updating a Hash Map
+### 3.4 更新HashMap (Updating a Hash Map)
 
 Although the number of keys and values is growable, each key can only have one value associated with it at a time. When you want to change the data in a hash map, you have to decide how to handle the case when a key already has a value assigned. You could replace the old value with the new value, completely disregarding the old value. You could keep the old value and ignore the new value, only adding the new value if the key doesn’t already have a value. Or you could combine the old value and the new value. Let’s look at how to do each of these!
+经过key 和 value 的数量是不断增长的，每个key只能对应一个value。当你想要的更新HashMap的值的时候，那么你就要根据现有的值进行相应的更新了。
+1 用新值替换旧值
+2 保留旧值，放弃新值。
+3 忽略新值，仅当键(key)不存在的时候才进行插入
+4 结合新值和旧值。
+
+##### 3.4.1 覆写值(Overwriting a Value)
+如果我们将一个键(key) 和 一个值(value) 插入到HashMap中，那然后用相同的键(key) 插入一个不同的值(value)，那么与这个键相关联的值就会被替换。就像代码8-24中那样
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Blue"), 25);
+
+    println!("{:?}", scores);
+}
+```
+↑ 代码 8-24: 用一个相同的key替换已经存在的值。
+
+##### 3.4.2 当key没有value的时候才尽心插入(Only Inserting a Value If the Key Has No Value) 
+通常，用HashMap的是，要先判断一个键是否已经存在了。HashMap对于这个操作有特别的API，在调用的 `entry` 的时候，你可以把想要的检查的键(key)作为参数传递给 `entry` 方法，entry 方法的返回值是一个名称是 Entry 的结构体，它表示了一个也许存在，也许不存在值的Entry。我们要先检查是否 `Yellow` 队伍是否存在，如果不存在，再继续插入值：
+```rust
+fn main() {
+    use std::collections::HashMap;
+
+    let mut scores = HashMap::new();
+    scores.insert(String::from("Blue"), 10);
+
+    scores.entry(String::from("Yellow")).or_insert(50);
+    scores.entry(String::from("Blue")).or_insert(50);
+
+    println!("{:?}", scores);
+}
+```
+↑ 代码 8-25: 用 entry 方法，只有当key不存在的是，才进行插入
 
 
 
-### 3.5 Only Inserting a Value If the Key Has No Value
+
+##### 3.4.3 Only Inserting a Value If the Key Has No Value
 
 
 ### 3.6 Updating a Value Based on the Old Value
