@@ -1,12 +1,11 @@
-Rust’s standard library includes a number of very useful data structures called collections. Most other data types represent one specific value, but collections can contain multiple values. Unlike the built-in array and tuple types, the data these collections point to is stored on the heap, which means the amount of data does not need to be known at compile time and can grow or shrink as the program runs. Each kind of collection has different capabilities and costs, and choosing an appropriate one for your current situation is a skill you’ll develop over time. In this chapter, we’ll discuss three collections that are used very often in Rust programs:
+Rust 的标准库里包含了很非常有用的称之为“集合(collections)” 的数据结构。大多数的数据类型都只是表示一种值，但是集合(collections) 可以包含多个值。但是的内置的数组(array) 和 元组(tuple) 不同，这些集合的数据是保存在堆中的，所以说不用在编译器就确定数据量，并且在程序的运行的时候可以随着增长或者减少。每种类型的数据集合的都是都有不同的额功能和开销，并且在合适的时间里找到一个合适的集合类型是会随着你不同的 成长的技能。在本章节中，我们将会讨论 Rust 开发中的经常使用的三种集合：
+- Vector 可以让你保存多个都排在一起的元素。
+- string 是一个字符的集合。在前面我们已经提过了String 类型了，但是在本章中，我们将会深入讨论。
+- HashMap key让你的把一个值(value) 和一个 键(key)对应起来，这种情况称之为映射。比如在查询某个人的信息的时候，你输入他的身份证号，那么就会对应的出现他的名字，这里的身份证号就是键(key)，名字就是值(value)。这是被成为 *map* 的特定实现。
 
-A vector allows you to store a variable number of values next to each other.
-A string is a collection of characters. We’ve mentioned the String type previously, but in this chapter we’ll talk about it in depth.
-A hash map allows you to associate a value with a particular key. It’s a particular implementation of the more general data structure called a map.
-To learn about the other kinds of collections provided by the standard library, see the documentation.
+如果想你想学更多的标准库提供其他的类型的集合，那么就看[文档](https://doc.rust-lang.org/std/collections/index.html)
 
-We’ll discuss how to create and update vectors, strings, and hash maps, as well as what makes each special.
-
+接下来就会涉及如何创建，更新 Vector，stirng和hash.
 # 1 Storing Lists of Values with Vectors
 
 ### 1.1 创建一个新的 `Vector` (Creating a New Vector)
