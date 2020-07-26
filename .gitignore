@@ -65,15 +65,37 @@ code/ch07/listing_07_13/Cargo.lock
 code/ch07/listing_07_14/target
 code/ch07/listing_07_14/Cargo.lock
 
+
+code/ch08/listing_08_01/target
+code/ch08/listing_08_01/Cargo.lock
+
+code/ch08/listing_08_02/target
+code/ch08/listing_08_02/Cargo.lock
+
+
+code/ch08/listing_08_03/target
+code/ch08/listing_08_03/Cargo.lock
+
+code/ch08/listing_08_04/target
+code/ch08/listing_08_04/Cargo.lock
+
+code/ch08/listing_08_05/target
+code/ch08/listing_08_05/Cargo.lock
+
+code/ch08/listing_08_06/target
+code/ch08/listing_08_06/Cargo.lock
+
 code/ch08/listing_08_07/target
 code/ch08/listing_08_07/Cargo.lock
 
 code/ch08/listing_08_08/target
 code/ch08/listing_08_08/Cargo.lock
 
+code/ch08/listing_08_09/target
+code/ch08/listing_08_09/Cargo.lock
+
 code/ch08/listing_08_10/target
 code/ch08/listing_08_10/Cargo.lock
-
 
 code/ch08/listing_08_11/target
 code/ch08/listing_08_11/Cargo.lock
@@ -81,8 +103,8 @@ code/ch08/listing_08_11/Cargo.lock
 code/ch08/listing_08_12/target
 code/ch08/listing_08_12/Cargo.lock
 
-code/ch08/listing_07_14/target
-code/ch08/listing_07_14/Cargo.lock
+code/ch08/listing_08_14/target
+code/ch08/listing_08_14/Cargo.lock
 
 
 

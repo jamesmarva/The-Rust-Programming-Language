@@ -1,7 +1,7 @@
 Rust 的标准库里包含了很非常有用的称之为“集合(collections)” 的数据结构。大多数的数据类型都只是表示一种值，但是集合(collections) 可以包含多个值。但是的内置的数组(array) 和 元组(tuple) 不同，这些集合的数据是保存在堆中的，所以说不用在编译器就确定数据量，并且在程序的运行的时候可以随着增长或者减少。每种类型的数据集合的都是都有不同的额功能和开销，并且在合适的时间里找到一个合适的集合类型是会随着你不同的 成长的技能。在本章节中，我们将会讨论 Rust 开发中的经常使用的三种集合：
 - Vector 可以让你保存多个都排在一起的元素。
 - string 是一个字符的集合。在前面我们已经提过了String 类型了，但是在本章中，我们将会深入讨论。
-- HashMap key让你的把一个值(value) 和一个 键(key)对应起来，这种情况称之为映射。比如在查询某个人的信息的时候，你输入他的身份证号，那么就会对应的出现他的名字，这里的身份证号就是键(key)，名字就是值(value)。这是被成为 *map* 的特定实现。
+- HashMap key让你的把一个值(value) 和一个 键(key)43比如在查询某个人的信息的时候，你输入他的身份证号，那么就会对应的出现他的名字，这里的身份证号就是键(key)，名字就是值(value)。这是被成为 *map* 的特定实现。
 
 如果想你想学更多的标准库提供其他的类型的集合，那么就看[文档](https://doc.rust-lang.org/std/collections/index.html)
 
@@ -18,32 +18,48 @@ fn main() {
 ```
 ↑ 代码 8-1 创建一个空的 vector来保存 `i32`类型的元素
 
-Note that we added a type annotation here. Because we aren’t inserting any values into this vector, Rust doesn’t know what kind of elements we intend to store. This is an important point. Vectors are implemented using generics; we’ll cover how to use generics with your own types in Chapter 10. For now, know that the Vec<T> type provided by the standard library can hold any type, and when a specific vector holds a specific type, the type is specified within angle brackets. In Listing 8-1, we’ve told Rust that the Vec<T> in v will hold elements of the i32 type.
+注意，这里增加了类型的声明。因为我们还没有往 Vector里面插入元素，所以Rust不知道我们打算在 Vector 里面的保存哪一种数据类型。这是很重要的一点，Vector 是基于 泛型(generics) 实现的；我们会在第10章来详细介绍泛型(generics)。`Vec<T>` 可以容纳任何的数据类型。当你需要指定Vector的保存的类型的时候，这个类型必须在`<>` 声明。
 
-Note that we added a type annotation here. Because we aren’t inserting any values into this vector, Rust doesn’t know what kind of elements we intend to store. This is an important point. Vectors are implemented using generics; we’ll cover how to use generics with your own types in Chapter 10. For now, know that the Vec<T> type provided by the standard library can hold any type, and when a specific vector holds a specific type, the type is specified within angle brackets. In Listing 8-1, we’ve told Rust that the Vec<T> in v will hold elements of the i32 type.
+在更加实际的代码中的，Rust通常可以在插入的值之后就判断出要存储的值的类型，因此你不需要增加任何的类型声明。创建有初始-化-值的 `Vec<T>` 是比较常见的做法，为了方便的，Rust提供了宏函数 `vec!` 来创建有初始化的值vector。代码 8-2 展示了如何创建一个新的 `Vec<i32>`，这个整型的的类型 `i32`，因为这默认的整数类型。
 ```
 fn main() {
     let v = vec![1, 2, 3];
 }
 ```
-↑ 代码 8-2 
+↑ 代码 8-2 创建一个有初始值的 vector
 
+因为我们已经给这个给 Vector 初始值了，所以rust就可以推断出这个Vector里面存放的数据类型是i32.
 
 ### 1.2 更新 `Vector` (Updating a Vector )
-To create a vector and then add elements to it, we can use the push method, as shown in Listing 8-3.
+创建一个 vector，然后用 `push` 方法插入元素其中。
 
 ```rust
 fn main() {
     let mut v = Vec::new();
-
     v.push(5);
     v.push(6);
     v.push(7);
     v.push(8);
 }
 ```
+↑ 代码 8-3 用 `push` 方法 来插入元素
 
-### 1.3 Dropping a Vector Drops Its Elements
+就像别的变量一样，如果想要它是可变的，那么就要用 关键字 `mut` 来进行修饰。我们往里面插入的数据类型是 `i32`，rust可以推断出这个数据类型，不需要继续 增加 `Vec<i32>` 的声明。
+
+### 1.3 删除Vector (Dropping a Vector Drops Its Elements)
+就像别的结构体的一样的，当 Vector 离开了他的作用域，它使用的内存就会被释放
+```rust
+fn main() {
+    {
+        let v = vec![1, 2, 3, 4];
+
+        // do stuff with v
+    } // <- v goes out of scope and is freed here
+}
+```
+↑ 代码 8-4 vector 会被删除
+
+当Vector被删除之后，它所包含的元素也会被删除，也就是它那些包含的整型也会被清除。这个看起来很简单，但是如果你开始引入对 Vector 里面的元素的引用的时候，情况就变的复杂了。我们接下来来解决这个问题。
 
 
 ### 1.4 读取 `Vector` 中的元素 (Reading Elements of Vectors)
