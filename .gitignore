@@ -106,9 +106,6 @@ code/ch08/listing_08_12/Cargo.lock
 code/ch08/listing_08_14/target
 code/ch08/listing_08_14/Cargo.lock
 
-
-
-
 code/ch08/listing_08_20/target
 code/ch08/listing_08_20/Cargo.lock
 
@@ -139,7 +136,8 @@ code/ch08/listing_08_26/Cargo.lock
 
 
 
-
+code/ch09/listing_09_03/target
+code/ch09/listing_09_03/Cargo.lock
 
 
 

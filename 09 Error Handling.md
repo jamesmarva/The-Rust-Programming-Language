@@ -41,6 +41,34 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 
 
 # 2 Recoverable Errors with Result
+大多数的错误是没有充分的理由让整个程序停止运行的。有时候一个函数调用的失败，你是可以很快找到原因，并且解决的。比如，你想要开启一个库文件，但是操作因为文件不存在而失败，那么你需要的是创建文件而不是停止整个程序。
+在第2章中提到的“用 `result` 类型来处理是可能出现的失败”，里面粗出现的结构体 `result` 有两个变量。
+```rust
+#![allow(unused_variables)]
+fn main() {
+    enum Result<T, E> {
+        Ok(T),
+        Err(E),
+    }
+}
+```
+`T` 和 `E` 是泛型的参数类型：在第10章中，会有更多的讨论 泛型(generic type)的内容。现在你只要知道的就是，`T`代表的数据类型的值会在的随着变量 `OK`返回。`E` 代表的数据类型值会随着的变量 `Err` 在运行失败的情况下返回。由于 `Result` 有这些泛型参数，我们可以用 `Result` 类型和标准库中的函数在很多不同的错误的情况下处理错误。
+
+当调用函数的时候，需要考虑到失败的情况，所以需要返回 `Result`。在代码9-3 的功能就是尝试打开文件。
+```
+use std::fs::File;
+fn main() {
+    let f = File::open("hello.txt");
+}
+```
+↑ 代码 9-6 打开文件
+要如何知道 `File::open` 返回一个 `Result` 对象？
+
+
+
+
+
+
 
 ### 2.1 Matching on Different Errors
 ```rust
