@@ -123,11 +123,20 @@ fn main() {
 这里，我们告诉 `Rust`，如果结果为 `Ok`，那就就返回`Ok` 里的值，并且，把文件的句柄分配给变量 `f`， `match`之后，我们就可以用变量 `f` 来对文件进行读取和写入。
 
 另一部分的代码就是处理 `File::open` 出现的错误的情况，在这个例子当中，我们用了宏函数 `panic!` 进行处理错误的情况。如果这个时候，你的目录下面没有 `hello.txt` 这个文件，那么就会报错。
+```rust
+$ cargo run
+   Compiling error-handling v0.1.0 (file:///projects/error-handling)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.73s
+     Running `target/debug/error-handling`
+thread 'main' panicked at 'Problem opening the file: Os { code: 2, kind: NotFound, message: "No such file or directory" }', src/main.rs:8:23
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
-
+这个输出告诉我们错误的原因是什么。
 
 
 ### 2.1 匹配不同的错误类型 (Matching on Different Errors)
+不管为什么 `File::open` 因为什么出现错误，程序都会出现用宏函数 `panic!` 来报错。此时，我们想要根据不同错误来进行不同操作。比如，如果返回的是文件没找到的错误，那么就创建文件，并且重新返回，如果是别的错误，那么就调用函数 `panic!` 来返回。
+
 ```rust
 use std::fs::File;
 use std::io::ErrorKind;
@@ -149,13 +158,101 @@ fn main() {
     };
 }
 ```
-Listing 9-5: Handling different kinds of errors in different ways
+↑ 代码 9-5 根据不同的错误类型分配不同的错误方式。
+`File::open` 会返回在变量 `Err` 中的数据类型是 `io::Error`，这个是标准库提供的结构体。我们可以用这个结构体的 `kind` 方法来的到错误得 `io:ErrorKind` 类型的值。结构体 `io:ErrorKind` 是标准库提供的，有一个变量来表示不同的因为 `io` 操作导致的错误类型。在这里使用的类型是 `ErrorKind::NotFound`，这类型的错误就表示我们尝试打开的文件不存在的。
 
-### 2.2 Shortcuts for Panic on Error: unwrap and expect
+检查内部匹配项的条件就是，函数 `error.kind()` 返回值是否就是的结构体 `ErrorKind` 的变量 `NotFound`。如果正好匹配上了，那么就表示没有文件，那么我们就要创建文件。可是因为 `File::create` 也有可能失败，我们需要在 match 匹配的表达式的内部再次使用一次 match 表达式。当无法创建文件袋饿时候，就会输出这个错误信息。外部那个match的不变，所以程序会因为没有文件而报错。
+
+此处有很多 match 表达式，Match是非常有用的，同时用起来也比较繁琐。在第13章中的将会学到关于闭包(closures) ；`result<T, E>` 中有很多接受一个闭包对象，并且用 `match` 表达式来实现。用这些方法可以让你的代码变得更加简洁。很多经验丰富的 Rustacean　会编写更加简洁的代码　代码 9-5 ：
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap_or_else(|error| {
+        if error.kind() == ErrorKind::NotFound {
+            File::create("hello.txt").unwrap_or_else(|error| {
+                panic!("Problem creating the file: {:?}", error);
+            })
+        } else {
+            panic!("Problem opening the file: {:?}", error);
+        }
+    });
+}
+```
+尽管以上的这代码的是实现的功能和 代码 9-5 相同个，但是他它不包含任何的匹配表达式，并且更加容易阅读。这里例子在阅读完 第13章之后的。在处理错误的时候，有很多方法可以用来去除 `match` 的匹配表达式。
+
+### 2.2 简单的使用 Panic 来处理错误(Shortcuts for Panic on Error: unwrap and expect) 
+使用 match 表达式使用起来效果很好，但是有点冗长，并且不一定可以很好的表达需要传达的意图. `Result<T, E>` 需要在其定义之上定义许多辅助方法来执行各种任务。其中一个方法就是 `unwrap`， 一种快捷方法来实现和 `match` 表达式一样的功能。如果result的结果是 `Ok` 变量，upwrap 方法就会返回 Ok 变量里的值。如果出现了错误，那么就会调用 宏函数 `panic!` 。
+```rust
+use std::fs::File;
+fn main() {
+    let f = File::open("hello.txt").unwrap();
+}
+```
+如果在运行程序的时候没有 *hello.txt* 文件的话，就会看到调用 `panic!` 函数出现的错误信息。
+```rust
+thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: Error {
+repr: Os { code: 2, message: "No such file or directory" } }',
+src/libcore/result.rs:906:4
+```
+另一个方法 `expect`，这个和 `upwarp` 的使用方式有点像，但是它可以让开发者指定的调用 `panic!` 错误的信息。使用 `expect` 方法 而不是用 `unwrap` ，就是因为 `expect` 可以提供更好的错误信息以帮助我可以更简单的跟做错误的信息，使用方式如下。
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt").expect("Failed to open hello.txt");
+}
+
+```
+传递给 `expect` 方法的参数会变成我们指定的错误信息，而不是原来的 默认的错误信息。
+```rust
+thread 'main' panicked at 'Failed to open hello.txt: Error { repr: Os { code:
+2, message: "No such file or directory" } }', src/libcore/result.rs:906:4
+
+```
+得益于我们指定的错误信息，所以我们可以更快的定位到错位的位置。如果我们使用 `unwrap` 的话，那么就花很多时间在定位错误上。因为所有的 `unwrap` 会返回同样的 错误。
 
 
 
-### 2.3 Propagating Errors
+
+### 2.3 错误的传播 (Propagating Errors)
+
+When you’re writing a function whose implementation calls something that might fail, instead of handling the error within this function, you can return the error to the calling code so that it can decide what to do. This is known as propagating the error and gives more control to the calling code, where there might be more information or logic that dictates how the error should be handled than what you have available in the context of your code.
+
+For example, Listing 9-6 shows a function that reads a username from a file. If the file doesn’t exist or can’t be read, this function will return those errors to the code that called this function.
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+use std::fs::File;
+use std::io;
+use std::io::Read;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let f = File::open("hello.txt");
+
+    let mut f = match f {
+        Ok(file) => file,
+        Err(e) => return Err(e),
+    };
+
+    let mut s = String::new();
+
+    match f.read_to_string(&mut s) {
+        Ok(_) => Ok(s),
+        Err(e) => Err(e),
+    }
+}
+```
+Listing 9-6: A function that returns errors to the calling code using match
+
+
+
+
+
+
+
 
 
 
