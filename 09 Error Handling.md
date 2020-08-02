@@ -1,13 +1,13 @@
 Rust’s commitment to reliability extends to error handling. Errors are a fact of life in software, so Rust has a number of features for handling situations in which something goes wrong. In many cases, Rust requires you to acknowledge the possibility of an error and take some action before your code will compile. This requirement makes your program more robust by ensuring that you’ll discover errors and handle them appropriately before you’ve deployed your code to production!
+
 Rust 的稳定性的体现也在错误处理上也得到了不错的体现。错误(Errors) 在整个软件生命周期中是必然存在的。
+
 Rust groups errors into two major categories: recoverable and unrecoverable errors. For a recoverable error, such as a file not found error, it’s reasonable to report the problem to the user and retry the operation. Unrecoverable errors are always symptoms of bugs, like trying to access a location beyond the end of an array.
 
 Most languages don’t distinguish between these two kinds of errors and handle both in the same way, using mechanisms such as exceptions. Rust doesn’t have exceptions. Instead, it has the type Result<T, E> for recoverable errors and the panic! macro that stops execution when the program encounters an unrecoverable error. This chapter covers calling panic! first and then talks about returning Result<T, E> values. Additionally, we’ll explore considerations when deciding whether to try to recover from an error or to stop execution.
 
 
 # 1 Unrecoverable Errors with panic!
-
-Sometimes, bad things happen in your code, and there’s nothing you can do about it. In these cases, Rust has the panic! macro. When the panic! macro executes, your program will print a failure message, unwind and clean up the stack, and then quit. This most commonly occurs when a bug of some kind has been detected and it’s not clear to the programmer how to handle the error.
 有的时候，代码里面会发生一些你意想不到的错误，但是你面对这些错误却无能为力。在这些场景下，Rust 有一个洪函数 `panic!` 。在这个函数执行之后，程序中就会输出失败的消息，并且释放栈和堆的内存，然后退出程序。最常见的情况就是的遇到某个错误，但是开发者不知道要如何处理这个错误。
 
 
@@ -27,7 +27,6 @@ fn main() {
 }
 
 ```
-When you run the program, you’ll see something like this:
 
 当你运行了上的代码，你会在命令行里看到下面这段：
 ```
@@ -42,6 +41,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 
 # 2 Recoverable Errors with Result
 大多数的错误是没有充分的理由让整个程序停止运行的。有时候一个函数调用的失败，你是可以很快找到原因，并且解决的。比如，你想要开启一个库文件，但是操作因为文件不存在而失败，那么你需要的是创建文件而不是停止整个程序。
+
 在第2章中提到的“用 `result` 类型来处理是可能出现的失败”，里面粗出现的结构体 `result` 有两个变量。
 ```rust
 #![allow(unused_variables)]
@@ -62,15 +62,72 @@ fn main() {
 }
 ```
 ↑ 代码 9-6 打开文件
+
 要如何知道 `File::open` 返回一个 `Result` 对象？
 
+1 可以API文档(https://doc.rust-lang.org/std/index.html)
+
+2 可以问编译器
+
+如何问编译器，只要随便给 `f` 声明一个变量，并且尝试编译，编译器就是会告诉我们返回类型不匹配。错误信息会告诉我们函数 `File::open` 的函数的真正返回类型。因为我们没提前知道了 `File::open` 的返回类型肯定不是 `u32`，所以就有下面这个代码：
+```rust
+use std::fs::File;
+
+fn main() {
+    let f: u32 = File::open("hello.txt");
+}
+```
+尝试编译之后就有以下的错误信息：
+```rust
+error[E0308]: mismatched types
+ --> src\main.rs:5:18
+  |
+5 |     let f: u32 = File::open("hello.txt");
+  |            ---   ^^^^^^^^^^^^^^^^^^^^^^^ expected `u32`, found enum `std::result::Result`
+  |            |
+  |            expected due to this
+  |
+  = note: expected type `u32`
+             found enum `std::result::Result<std::fs::File, std::io::Error>`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `listing_09_03`.
+
+To learn more, run the command again with --verbose.
+```
+这个信息告诉我们函数的 `File::open` 就是 `Result<T, E>`，泛型的类型的参数`T`在此处就是成功的调用后的返回类型：`std::fs::File`。如果调用中出现立刻错误，那么就会返回 `std::io::Error`类型。
+
+这个返回类型就表示在如果 `File::open` 调用成功了，那么就会返回文件的句柄，你可以用这个句柄对文件进行读取和写入操作。当然，也许函数也会调用失败，比如文件也许不存在，或者我们没有权限使用文件。`File::open` 函数需要一种方途径告诉我们到底这个函数调用成功还是失败了，以及同时给我们成功后的文件句柄，或者告诉我们出现错误的信息。这就是枚举类型 (enum) 的用武之地了。
+
+如果成功，那么就返回就是Ok的实例，这个对象就包含句柄了。
+如果失败，那么就包含 Err 的实例，这里就有所有的错误信息。
+
+我们需要把处理不同的情况的值添加到 代码 9-3 中，整体代码如下：
+```rust
+use std::fs::File;
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => panic!("Problem opening the file: {:?}", error),
+    };
+}
+```
+↑ 代码 9-4：用 `match` 表达式来处理 `result` 变量
+
+注意，就像 `Option` 结构体一样，结构体 `Result` 是被纳入了作用域中的(其实就死活不用引入才能使用的意思)，所以我们不用得在使用 `Ok` 和 `Err` 变量之前指出 `Result::`.
+
+这里，我们告诉 `Rust`，如果结果为 `Ok`，那就就返回`Ok` 里的值，并且，把文件的句柄分配给变量 `f`， `match`之后，我们就可以用变量 `f` 来对文件进行读取和写入。
+
+另一部分的代码就是处理 `File::open` 出现的错误的情况，在这个例子当中，我们用了宏函数 `panic!` 进行处理错误的情况。如果这个时候，你的目录下面没有 `hello.txt` 这个文件，那么就会报错。
+```
 
 
 
-
-
-
-### 2.1 Matching on Different Errors
+### 2.1 匹配不同的错误类型 (Matching on Different Errors)
 ```rust
 use std::fs::File;
 use std::io::ErrorKind;
