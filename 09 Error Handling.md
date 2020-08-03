@@ -217,11 +217,9 @@ thread 'main' panicked at 'Failed to open hello.txt: Error { repr: Os { code:
 
 
 ### 2.3 错误的传播 (Propagating Errors)
+当我们的调用一个函数的时候，这个被调用的函数是有可能会出现错误的情况的，所以我们有可能会得到一个错误的返回值，开发者可以根据错误来进行相应的操作（是捕获然后日志记录，还是继续往上层抛）而不是一概让函数自己的吧错误给处理了。这种函数抛出错误的行为被称为 “错误的传播(Propagating Errors)”，这让代码有了更多的控制权。在这里有更多信息传递或者提示错误的逻辑处理方式，而不是仅仅在函数中处理错误。
 
-When you’re writing a function whose implementation calls something that might fail, instead of handling the error within this function, you can return the error to the calling code so that it can decide what to do. This is known as propagating the error and gives more control to the calling code, where there might be more information or logic that dictates how the error should be handled than what you have available in the context of your code.
-
-For example, Listing 9-6 shows a function that reads a username from a file. If the file doesn’t exist or can’t be read, this function will return those errors to the code that called this function.
-
+举个例子，在代码9-6 中，就展示啦一个函数，这个函数实现了读取一个文件中的用户名。如果这个文件不存在或者程序没有读取文件的权限，那么调用这个函数的代码就会得到一个错误。
 ```rust
 #![allow(unused_variables)]
 fn main() {
@@ -245,7 +243,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
     }
 }
 ```
-Listing 9-6: A function that returns errors to the calling code using match
+代码 9-6 用match表达式返回不同的错误
 
 
 
