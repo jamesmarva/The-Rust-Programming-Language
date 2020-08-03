@@ -244,6 +244,18 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 ```
 代码 9-6 用match表达式返回不同的错误
+上面的这个代码可以有更加简短的表达方式，但是我们为了更加明白错误处理(error handling)还是用多代码的形式来表达，在后面，有更加简短的表达。首先，来看看这个函数的返回值：`Result<String, io::Error>`。这个就表示了这个函数的返回值的数据类型是`Result<T, E>`，`T` 的具体数据类型是 `String`，而 `E` 的具体数据类型是 `io::Error`。如果这个函数没有发生任何的问题，就会成功返回用 `Ok` 包裹String 的对象。如果程序发生了任何的问题，那么就会出现问题，就会返回用 `Err` ，其包裹了 `io::Error` 类型的对象，这个对象中包含了函数的错误的信息。之所以选择类型 `io::Error`，是因为不管 `File::open` 操作还是 `read_to_String` 操作的错误的类型都是 `io::Error`。
+
+The body of the function starts by calling the File::open function. Then we handle the Result value returned with a match similar to the match in Listing 9-4, only instead of calling panic! in the Err case, we return early from this function and pass the error value from File::open back to the calling code as this function’s error value. If File::open succeeds, we store the file handle in the variable f and continue.
+
+Then we create a new String in variable s and call the read_to_string method on the file handle in f to read the contents of the file into s. The read_to_string method also returns a Result because it might fail, even though File::open succeeded. So we need another match to handle that Result: if read_to_string succeeds, then our function has succeeded, and we return the username from the file that’s now in s wrapped in an Ok. If read_to_string fails, we return the error value in the same way that we returned the error value in the match that handled the return value of File::open. However, we don’t need to explicitly say return, because this is the last expression in the function.
+
+The code that calls this code will then handle getting either an Ok value that contains a username or an Err value that contains an io::Error. We don’t know what the calling code will do with those values. If the calling code gets an Err value, it could call panic! and crash the program, use a default username, or look up the username from somewhere other than a file, for example. We don’t have enough information on what the calling code is actually trying to do, so we propagate all the success or error information upward for it to handle appropriately.
+
+This pattern of propagating errors is so common in Rust that Rust provides the question mark operator ? to make this easier.
+
+
+
 
 
 
