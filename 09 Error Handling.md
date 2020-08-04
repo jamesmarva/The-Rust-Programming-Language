@@ -247,27 +247,31 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 上面的这个代码可以有更加简短的表达方式，但是我们为了更加明白错误处理(error handling)还是用多代码的形式来表达，在后面，有更加简短的表达。首先，来看看这个函数的返回值：`Result<String, io::Error>`。这个就表示了这个函数的返回值的数据类型是`Result<T, E>`，`T` 的具体数据类型是 `String`，而 `E` 的具体数据类型是 `io::Error`。如果这个函数没有发生任何的问题，就会成功返回用 `Ok` 包裹String 的对象。如果程序发生了任何的问题，那么就会出现问题，就会返回用 `Err` ，其包裹了 `io::Error` 类型的对象，这个对象中包含了函数的错误的信息。之所以选择类型 `io::Error`，是因为不管 `File::open` 操作还是 `read_to_String` 操作的错误的类型都是 `io::Error`。
 
-The body of the function starts by calling the File::open function. Then we handle the Result value returned with a match similar to the match in Listing 9-4, only instead of calling panic! in the Err case, we return early from this function and pass the error value from File::open back to the calling code as this function’s error value. If File::open succeeds, we store the file handle in the variable f and continue.
+这个函数在最开始时候调用了一个 `File::open` 函数。接着我们用了和 代码 9-4中的同一种方式：`match` 表达式，来处理了这函数的返回的 `Result` 类型的值，只不过在9-4 中是把错误输出。在 `Err` case 中，此函数会把从函数 `File::open` 得到错误返回给调用方。如果调用函数 `File::open` 成功执行了，那么就把文件句柄保存在变量 `f` 继续下面的步骤。
 
-Then we create a new String in variable s and call the read_to_string method on the file handle in f to read the contents of the file into s. The read_to_string method also returns a Result because it might fail, even though File::open succeeded. So we need another match to handle that Result: if read_to_string succeeds, then our function has succeeded, and we return the username from the file that’s now in s wrapped in an Ok. If read_to_string fails, we return the error value in the same way that we returned the error value in the match that handled the return value of File::open. However, we don’t need to explicitly say return, because this is the last expression in the function.
+然后创建一个新的 `String(字符串)` 类型的变量 `s`以及在文件句柄 `f` 中调用 `read_to_string` 方法，然后读取文件的内容到变量 `s`中。方法 `read_to_string ` 是有可能会出现错误情况的，所以会返回 `Result` 类型的值。所以就需要另一个 `match` 的表达式来处理这个 `Result` 类型的值：如果成功返回数据，那么就会返回一个用 `Ok` 包裹的s的对象；如果出现错误的情况，那么就会返回用 `Err` 包裹的错误信息。不过在最后的这一行不用关键字 `return` 来修饰，这是这个函数的最后一个表达式。
 
-The code that calls this code will then handle getting either an Ok value that contains a username or an Err value that contains an io::Error. We don’t know what the calling code will do with those values. If the calling code gets an Err value, it could call panic! and crash the program, use a default username, or look up the username from somewhere other than a file, for example. We don’t have enough information on what the calling code is actually trying to do, so we propagate all the success or error information upward for it to handle appropriately.
+调用上面这个函数 `read_username_from_file` 的最后会得到一个 `Reuslt` 类型的值，在成功执行到了函数的情况下，就会得到包含的用户名 `Ok` 对象；如果出现错误了，那么就返回用`Err` 包裹的 `io::Error` 的值。因为不知道到底调用代码会出现什么的错误，如果出现错误那么，就会返回就会中断程序，如果正确执行的话，那么就会返回相应的值(用户名)。因为没有足够的信息来确定调用代码是正确还是错误，所以我们把不管是成功还是错误的结果都向上传播。
 
-This pattern of propagating errors is so common in Rust that Rust provides the question mark operator ? to make this easier.
+##### 2.3.1 一个简短版的传播错误的代码: `?` 操作符 (A Shortcut for Propagating Errors: the ? Operator) 
+代码 9-7 展示了和函数 `read_username_from_file` 在代码 9-6 中一样的功能的代码，只不过有部分的功能是用 `?` 操作符。
+```rust
 
+#![allow(unused_variables)]
+fn main() {
+use std::fs::File;
+use std::io;
+use std::io::Read;
 
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+}
+```
 
-
-
-
-
-
-
-
-
-
-
-##### 2.3.1 A Shortcut for Propagating Errors: the ? Operator
 
 
 
