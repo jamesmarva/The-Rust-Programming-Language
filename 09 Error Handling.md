@@ -256,7 +256,6 @@ fn read_username_from_file() -> Result<String, io::Error> {
 ##### 2.3.1 一个简短版的传播错误的代码: `?` 操作符 (A Shortcut for Propagating Errors: the ? Operator) 
 代码 9-7 展示了和函数 `read_username_from_file` 在代码 9-6 中一样的功能的代码，只不过有部分的功能是用 `?` 操作符。
 ```rust
-
 #![allow(unused_variables)]
 fn main() {
 use std::fs::File;
@@ -271,7 +270,15 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 }
 ```
+代码 9-7: 用 `? `操作符来返回错误的情况
 
+The ? placed after a Result value is defined to work in almost the same way as the match expressions we defined to handle the Result values in Listing 9-6. If the value of the Result is an Ok, the value inside the Ok will get returned from this expression, and the program will continue. If the value is an Err, the Err will be returned from the whole function as if we had used the return keyword so the error value gets propagated to the calling code.
+
+There is a difference between what the match expression from Listing 9-6 does and what the ? operator does: error values that have the ? operator called on them go through the from function, defined in the From trait in the standard library, which is used to convert errors from one type into another. When the ? operator calls the from function, the error type received is converted into the error type defined in the return type of the current function. This is useful when a function returns one error type to represent all the ways a function might fail, even if parts might fail for many different reasons. As long as each error type implements the from function to define how to convert itself to the returned error type, the ? operator takes care of the conversion automatically.
+
+In the context of Listing 9-7, the ? at the end of the File::open call will return the value inside an Ok to the variable f. If an error occurs, the ? operator will return early out of the whole function and give any Err value to the calling code. The same thing applies to the ? at the end of the read_to_string call.
+
+The ? operator eliminates a lot of boilerplate and makes this function’s implementation simpler. We could even shorten this code further by chaining method calls immediately after the ?, as shown in Listing 9-8.
 
 
 
