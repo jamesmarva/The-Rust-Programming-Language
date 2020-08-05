@@ -281,20 +281,37 @@ use std::io::Read;
 
 fn read_username_from_file() -> Result<String, io::Error> {
     let mut s = String::new();
-
     File::open("hello.txt")?.read_to_string(&mut s)?;
-
     Ok(s)
 }
 ```
 代码 9-8: 在 `?` 操作符之后调用方法 
 
-We’ve moved the creation of the new String in s to the beginning of the function; that part hasn’t changed. Instead of creating a variable f, we’ve chained the call to read_to_string directly onto the result of File::open("hello.txt")?. We still have a ? at the end of the read_to_string call, and we still return an Ok value containing the username in s when both File::open and read_to_string succeed rather than returning errors. The functionality is again the same as in Listing 9-6 and Listing 9-7; this is just a different, more ergonomic way to write it.
+当然，这个函数依然有一个更加简短的书写方式。
+```rust
+use std::fs;
+use std::io;
 
-Speaking of different ways to write this function, Listing 9-9 shows that there’s a way to make this even shorter.
+fn read_username_from_file() -> Result<String, io::Error> {
+    fs::read_to_string("hello.txt")
+}
+```
+代码 9-9: 用函数 `fs::read_to_string` 来代替打开文件以及读取文件的内容
+
+从文件中读取字符串是非常常见的操作，所以 Rust 提供了便捷函数 `fs::read_to_string` 来完成这个功能，该函数执行打开文件，创建新的 `String`，读取文件内容，把内容放入新创建的 `String` 的值中，以及返回。当然，用 `fs::read_to_string` 不会给我们机会来解释错误处理。所以我们必须要进行错误处理。
 
 ##### 2.3.2 The ? Operator Can Be Used in Functions That Return Result
 
+
+Let’s look at what happens if we use the ? operator in the main function, which you’ll recall has a return type of ():
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt")?;
+}
+```
 
 # 3 To panic! or Not to panic!
 
