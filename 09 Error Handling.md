@@ -268,17 +268,30 @@ fn read_username_from_file() -> Result<String, io::Error> {
 ```
 代码 9-7: 用 `? `操作符来返回错误的情况
 
-The ? placed after a Result value is defined to work in almost the same way as the match expressions we defined to handle the Result values in Listing 9-6. If the value of the Result is an Ok, the value inside the Ok will get returned from this expression, and the program will continue. If the value is an Err, the Err will be returned from the whole function as if we had used the return keyword so the error value gets propagated to the calling code.
-
-There is a difference between what the match expression from Listing 9-6 does and what the ? operator does: error values that have the ? operator called on them go through the from function, defined in the From trait in the standard library, which is used to convert errors from one type into another. When the ? operator calls the from function, the error type received is converted into the error type defined in the return type of the current function. This is useful when a function returns one error type to represent all the ways a function might fail, even if parts might fail for many different reasons. As long as each error type implements the from function to define how to convert itself to the returned error type, the ? operator takes care of the conversion automatically.
-
-In the context of Listing 9-7, the ? at the end of the File::open call will return the value inside an Ok to the variable f. If an error occurs, the ? operator will return early out of the whole function and give any Err value to the calling code. The same thing applies to the ? at the end of the read_to_string call.
-
-The ? operator eliminates a lot of boilerplate and makes this function’s implementation simpler. We could even shorten this code further by chaining method calls immediately after the ?, as shown in Listing 9-8.
+在 Result 值的后面有个 `?`的功能和代码 9-6 里的用 `match` 表达式来处理 `Result` 所达到的功能是相同的。如果 `File::open` 正确执行的话，那么就会返回 包裹着返回值的 `Ok`，并且程序继续执行。如果 `File::open` 执行错误的话，那么就会返回一个 `Err`，并起这个值会被返回，就像用了关键字 `return` 一样，所以错误的信息会被传播给调用函数 `read_username_from_file` 的调用方。
 
 
+但是用 `?` 操作符 和 用 `match` 表达式还是有一个不一样的地方的：用 `?` 操作符返回的错误值(error value) 是通过的 `from` 函数返回的，这个是先在 `From`特性(trait) 定义好的，在标准库(the standard library)的代码中，用于将一种错误类型转换成另一种错误类型。当 `?` 操作符调用 `from` 函数的是，当前的错误类型会被转换为当前函数定义好的发生错误的时候返回的错误类型，即使函数会因为各种不同的原因发生不同的错误，但是都会被返回成同一种错误的类型，这个是非常有用的功能。只要每种错误类型都实现了 如何把自身转化为返回的错误类型(error type)的`from` 函数，`?` 操作符就会在出现错误的时候自动进行转换成相应的错误类型。
 
+`?` 操作符消灭了很多死板的代码，使得这个函数的实现变得更加简洁。甚至可有更加简短代码来实现上面的 9-7 的代码。如 代码 9-8 所示
+```rust
+use std::fs::File;
+use std::io;
+use std::io::Read;
 
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut s = String::new();
+
+    File::open("hello.txt")?.read_to_string(&mut s)?;
+
+    Ok(s)
+}
+```
+代码 9-8: 在 `?` 操作符之后调用方法 
+
+We’ve moved the creation of the new String in s to the beginning of the function; that part hasn’t changed. Instead of creating a variable f, we’ve chained the call to read_to_string directly onto the result of File::open("hello.txt")?. We still have a ? at the end of the read_to_string call, and we still return an Ok value containing the username in s when both File::open and read_to_string succeed rather than returning errors. The functionality is again the same as in Listing 9-6 and Listing 9-7; this is just a different, more ergonomic way to write it.
+
+Speaking of different ways to write this function, Listing 9-9 shows that there’s a way to make this even shorter.
 
 ##### 2.3.2 The ? Operator Can Be Used in Functions That Return Result
 
