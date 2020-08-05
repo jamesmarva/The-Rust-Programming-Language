@@ -131,7 +131,7 @@ $ cargo run
 thread 'main' panicked at 'Problem opening the file: Os { code: 2, kind: NotFound, message: "No such file or directory" }', src/main.rs:8:23
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
-这个输出告诉我们错误的原因是什么。
+这个输出告诉了我们错误的原因是什么。
 
 
 ### 2.1 匹配不同的错误类型 (Matching on Different Errors)
@@ -209,12 +209,8 @@ fn main() {
 ```rust
 thread 'main' panicked at 'Failed to open hello.txt: Error { repr: Os { code:
 2, message: "No such file or directory" } }', src/libcore/result.rs:906:4
-
 ```
 得益于我们指定的错误信息，所以我们可以更快的定位到错位的位置。如果我们使用 `unwrap` 的话，那么就花很多时间在定位错误上。因为所有的 `unwrap` 会返回同样的 错误。
-
-
-
 
 ### 2.3 错误的传播 (Propagating Errors)
 当我们的调用一个函数的时候，这个被调用的函数是有可能会出现错误的情况的，所以我们有可能会得到一个错误的返回值，开发者可以根据错误来进行相应的操作（是捕获然后日志记录，还是继续往上层抛）而不是一概让函数自己的吧错误给处理了。这种函数抛出错误的行为被称为 “错误的传播(Propagating Errors)”，这让代码有了更多的控制权。在这里有更多信息传递或者提示错误的逻辑处理方式，而不是仅仅在函数中处理错误。
@@ -247,9 +243,11 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 上面的这个代码可以有更加简短的表达方式，但是我们为了更加明白错误处理(error handling)还是用多代码的形式来表达，在后面，有更加简短的表达。首先，来看看这个函数的返回值：`Result<String, io::Error>`。这个就表示了这个函数的返回值的数据类型是`Result<T, E>`，`T` 的具体数据类型是 `String`，而 `E` 的具体数据类型是 `io::Error`。如果这个函数没有发生任何的问题，就会成功返回用 `Ok` 包裹String 的对象。如果程序发生了任何的问题，那么就会出现问题，就会返回用 `Err` ，其包裹了 `io::Error` 类型的对象，这个对象中包含了函数的错误的信息。之所以选择类型 `io::Error`，是因为不管 `File::open` 操作还是 `read_to_String` 操作的错误的类型都是 `io::Error`。
 
-The body of the function starts by calling the File::open function. Then we handle the Result value returned with a match similar to the match in Listing 9-4, only instead of calling panic! in the Err case, we return early from this function and pass the error value from File::open back to the calling code as this function’s error value. If File::open succeeds, we store the file handle in the variable f and continue.
+这个函数的函数体以调用 `File::open` 函数开始。然后我们就开始处理这个 Result 类型的值，就像代码 9-4 里面那样，只不过在代码9-4 里面是直接输出错误，但是这里我们是把错误返回。
 
 Then we create a new String in variable s and call the read_to_string method on the file handle in f to read the contents of the file into s. The read_to_string method also returns a Result because it might fail, even though File::open succeeded. So we need another match to handle that Result: if read_to_string succeeds, then our function has succeeded, and we return the username from the file that’s now in s wrapped in an Ok. If read_to_string fails, we return the error value in the same way that we returned the error value in the match that handled the return value of File::open. However, we don’t need to explicitly say return, because this is the last expression in the function.
+
+然后我们创建一个新的字符串变量 `s` 然后调用方法 `read_to_string`，用文件句柄 `f` 来读取文件中的内容到 变量 `s` 中。 `read_to_string` 也会返回一个 `Result` 类型的值，因为这个方法也有一定的几率出现错误的情况。所以我们需要另一个 `match` 表达式来处理这个 `Result`：如果 方法`read_to_string`执行没有错误的话，那么方法就返回一个包裹着正确的用户名(文本文件的内容)的 `Ok` 数据累心的值给调用方；如果
 
 The code that calls this code will then handle getting either an Ok value that contains a username or an Err value that contains an io::Error. We don’t know what the calling code will do with those values. If the calling code gets an Err value, it could call panic! and crash the program, use a default username, or look up the username from somewhere other than a file, for example. We don’t have enough information on what the calling code is actually trying to do, so we propagate all the success or error information upward for it to handle appropriately.
 
