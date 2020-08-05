@@ -302,8 +302,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 ##### 2.3.2 The ? Operator Can Be Used in Functions That Return Result
 
-
-Let’s look at what happens if we use the ? operator in the main function, which you’ll recall has a return type of ():
+来看看，如果用了 `?` 操作符在 `main` 函数中，你会记得返回类型是 `()`。
 
 ```rust
 use std::fs::File;
@@ -312,6 +311,30 @@ fn main() {
     let f = File::open("hello.txt")?;
 }
 ```
+编译上面这个代码，会得到一个错误信息.
+```shell
+$ cargo run
+   Compiling error-handling v0.1.0 (file:///projects/error-handling)
+error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option` (or another type that implements `std::ops::Try`)
+ --> src/main.rs:4:13
+  |
+3 | / fn main() {
+4 | |     let f = File::open("hello.txt")?;
+  | |             ^^^^^^^^^^^^^^^^^^^^^^^^ cannot use the `?` operator in a function that returns `()`
+5 | | }
+  | |_- this function should return `Result` or `Option` to accept `?`
+  |
+  = help: the trait `std::ops::Try` is not implemented for `()`
+  = note: required by `std::ops::Try::from_error`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `error-handling`.
+
+To learn more, run the command again with --verbose.
+```
+
 
 # 3 To panic! or Not to panic!
 
