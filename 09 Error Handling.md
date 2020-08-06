@@ -334,8 +334,20 @@ error: could not compile `error-handling`.
 
 To learn more, run the command again with --verbose.
 ```
+这个错误指出了，想要用 `?` 操作符，那么函数要么返回的是 `Result` 类型，要么是`Option` 类型，要么就是另外一种实现了 `std::ops::Try` 的类型。如果你写的代码的 返回值都不是以上的类型的话，可是你又想着调用一个 返回 `Result<T, E>` 的函数，那么要如何解决这个问题？有两种选择，一种技术就是改变你的函数的返回类型，吧函数的转换类型转为 `Result` 类型，以此来返回。另一个就是用 `match` 表达式来处理这个 `Result<T, E>` 结果。
+自己的思考：上面这里不能直接用 `?` 操作符的原因就是因为 main 不是返回 `Result.Err`，但是 `?` 表达式又是会直接返回这个值的，这样导致必须要进行处理使用。
 
-
+`main` 是非常特殊的，因为它的返回值是必须要进行限制的。一种可行的对于 `main` 函数的返回值就是 `()`，相似地，另一种有效的返回类型就是 `Result<T, E>`，就像代码里面展示的那样：
+```rust
+use std::error::Error;
+use std::fs::File;
+fn main() -> Result<(), Box<dyn Error>> {
+    let f = File::open("hello.txt")?;
+    Ok(())
+}
+```
+`Box<dyn Error>`叫做 特性对象(trait object)，这在第17章就会被讨论到，你可以理解为 任意一种错误 `any kind of error`。用 `?` 在main方法中，用这种方法是可以允许的。
+目前为止我们讨论了 `panic!` 或者 返回 `Result`，让我们回到如何决定在什么情况下用什么的主题上面来。
 # 3 To panic! or Not to panic!
 
 ### 3.1 Examples, Prototype Code, and Tests
