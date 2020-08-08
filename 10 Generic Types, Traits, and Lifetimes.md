@@ -67,7 +67,6 @@ fn main() {
 在代码10-3 中，我们把找到数组中的最大的元素的代码提取到函数 `maximum` 中，
 
 ```rust
-
 fn largest(list: &[i32]) -> i32 {
     let mut largest = list[0];
 
@@ -108,21 +107,15 @@ fn main() {
 
 比如我有两个函数，一个是在 `i32` 切片中找到最大的元素，一个是在 `char` 的切片中寻找最大的元素。要如何如何消除重复的代码？
 
-
-# 1 Generic Data Types
+# 1 泛型数据类型(Generic Data Types)
 
 用泛型来创建函数签名或者结构体，这样我们就可以用多种不同的具体数据类型了。先来看看如何用泛型来定义函数，结构体，枚举类型，以及方法。然后在讨论泛型是如何影响代码的性能的。
 
-
 ### 1.1 函数定义(In Function Definitions)
+当定义泛型函数的时候，需要把泛型放到函数的签名当中，通常用来指定这个函数的参数和返回值的数据类型。这样使用会让我们的代码变得更加灵活并且在给使用者带来更能多的功能的同时也让代码变得更加简洁。
 
-When defining a function that uses generics, we place the generics in the signature of the function where we would usually specify the data types of the parameters and return value. Doing so makes our code more flexible and provides more functionality to callers of our function while preventing code duplication.
-
-Continuing with our largest function, Listing 10-4 shows two functions that both find the largest value in a slice.
-
-
+继续上面的 `largest` 函数，代码10-4 就展示了两个来找到两个切片中的最大值。
 ```rust
-
 fn largest_i32(list: &[i32]) -> i32 {
     let mut largest = list[0];
 
@@ -161,3 +154,32 @@ fn main() {
     assert_eq!(result, 'y');
 }
 ```
+代码 10-4 两个函数的区别在于他们的名字和他们的签名不同。
+
+`largest_i32 `函数是把代码10-3 的代码 提取出来，来寻找切片中的最大的 `i32` 的数据类型的值。`largest_char` 函数就是在切片中找最大的 `char` 类型的值。这两个函数体有相同的代码，让我们用泛型参数来减少重复的代码。
+
+想要在定义的新的函数中进行参数化，就需要对类型参数进行命名，就像在函数中的对值参数进行命名一样。你可以用任何一种标识符来作为类型参数的名字。但是这里将会用 `T`，因为从惯例的角度来说，Rust 中的参数名字普遍很短，通常只有一个字母， Rust 的命名习惯是 驼峰命名法(CamelCase)。`T` 就是 `type`的缩写，所以 `T` 是大多数 Rust 程序员的默认的选择。
+
+当我们在函数体重使用参数的时候，我们必须在签名中声明参数的名称(parameter name)，这样编译器才能知道如何使用参数。类似的，我们也要在使用类型参数的时候在函数的签名中声明变量的名。要定义泛型的 `largest` 函数，就要把类型名称的声明放在函数的名称和参数列表之间的 `尖括号(<>)` 中.
+
+```rust
+fn largest<T>(list: &[T]) -> T {
+```
+
+
+
+# 1.2 结构体的定义(In Struct Definitions)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
