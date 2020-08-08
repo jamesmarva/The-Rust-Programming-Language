@@ -165,19 +165,58 @@ fn main() {
 ```rust
 fn largest<T>(list: &[T]) -> T {
 ```
+这个函数的定义就是：`largest` 函数在类型 `T` 泛型的函数。这个函数的一个参数的名字是 `list`， 类型 `T` 的一个数值的切片， 函数`largest` 会返回和 T类型的最大值。
 
+代码10-5 展示来结合用泛型类型在 `largest` 函数定义的函数签名当中。这个代码给我们展示了如何的使用 `i32` 或者 `char` 的数组切片，注意这个代码有问题，不会被编译通过，后面会进行修改。
+```rust
+fn largest<T>(list: &[T]) -> T {
+    let mut largest = list[0];
+    for &item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+    largest
+}
 
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+```
+代码10-5 用泛型参数的 `largest` 函数，但是有语法错误，无法编译通过
+
+如果你编译上面的代码，那么就会报错：
+```shell
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0369]: binary operation `>` cannot be applied to type `T`
+ --> src/main.rs:5:17
+  |
+5 |         if item > largest {
+  |            ---- ^ ------- T
+  |            |
+  |            T
+  |
+  = note: `T` might need a bound for `std::cmp::PartialOrd`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0369`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+这里提及一个对象：`std::cmp::PartialOrd`，这是一种 特性(trait)。在下一节中，我们将会讨论 `特性(trait)`。目前看来，这个错误表示了，不是所有的数据类型都可以被 `largest` 函数体使用的。因为我们需要在函数体里面进行值比较，我们只能用可以用来排序的数据类型。为了可以满足排序的需求，标准库中提供了 `std::cmp::PartialOrd` 特性，可以实现值比较。
 
 # 1.2 结构体的定义(In Struct Definitions)
-
-
-
-
-
-
-
-
-
 
 
 
