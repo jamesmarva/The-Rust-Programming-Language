@@ -217,7 +217,7 @@ To learn more, run the command again with --verbose.
 这里提及一个对象：`std::cmp::PartialOrd`，这是一种 特性(trait)。在下一节中，我们将会讨论 `特性(trait)`。目前看来，这个错误表示了，不是所有的数据类型都可以被 `largest` 函数体使用的。因为我们需要在函数体里面进行值比较，我们只能用可以用来排序的数据类型。为了可以满足排序的需求，标准库中提供了 `std::cmp::PartialOrd` 特性，可以实现值比较。
 
 # 1.2 结构体的定义(In Struct Definitions)
-也可以用泛型参数来定义结构体(struct)，一个或者多个字段都可以使用 通用类型(generic type)。
+也可以用泛型参数来定义结构体(struct)，一个或者多个字段都可以是 通用类型(generic type)。
 ```java
 struct Point<T> {
     x: T,
@@ -230,6 +230,68 @@ fn main() {
 }
 ```
 代码 10-6 包含的两个都是T类型的字段 x 和 y
+
+在结构体定义中使用泛型语法和在函数定义中使用泛型语法很相似。首先，需要在结构体之后的尖括号中声明 type 参数的名称。然后，就可以在结构体的定义中原来是用具体的数据类型来声明的位置使用泛型类型。
+
+注意，因为我们只用了一种通用的类型来定义 `Point<T>`这里的定义就是告诉我们`Point<T>` 只有一种 `T` 泛型类型，所以字段 `x` 和 `y` 都是同一种数据类型，不管该类型是什么类型。如果我们创建了一个 `Point<T>` 的实例，且该实例的字段x，y分别是不同的数据类型，那么就会无法编译通过：
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+fn main() {
+    let wont_work = Point { x: 5, y: 4.0 };
+}
+```
+代码10-7 字段x，y必须是同一种数据类型。
+
+在这个例子中，我们把整数值5 分配给变量 `x`，这时候编译知道泛型T的数据类型是整数。然后把字段y指定为4.0，这个时候编译器就会报 `mismatch` 的错误：
+```shell
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0308]: mismatched types
+ --> src/main.rs:7:38
+  |
+7 |     let wont_work = Point { x: 5, y: 4.0 };
+  |                                      ^^^ expected integer, found floating-point number
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+如果想要定义一个结构体 `Point`，让两个字段 x，y都用泛型，但是拥有不同的数据类型，那么就要用多泛型的参数列表。比如，在代码10-8 中，就改变了`Point` 的定义，这时候字段 `x` 的类型是 `T`， 而字段 `y`的类型是 `U`
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+fn main() {
+    let both_integer = Point { x: 5, y: 10 };
+    let both_float = Point { x: 1.0, y: 4.0 };
+    let integer_and_float = Point { x: 5, y: 4.0 };
+}
+
+```
+代码 10-8 x，y不同的泛型的 `Point<T,U>`
+
+以上的所有的 `Point` 的实例都是可以被编译通过的。可以根据需求在定义中使用任意多个的泛型类型参数，但是如果泛型太多的话，会让代码难以理解，如果你的代码中需要大量的泛型，那么就表示，你的代码就需要继续少量的重构了。
+
+
+# 1.2 枚举的定义 (In Enum Definitions)
+就像在结构体中定义的那样，也同样可以在 枚举(enum)定义中使用泛型类型。先来看看标准库中挑给你`Option<T>` 的枚举类的代码
+```rust
+enum Option<T> {
+    Some<T>, 
+    None,
+}
+
+
 
 
 
