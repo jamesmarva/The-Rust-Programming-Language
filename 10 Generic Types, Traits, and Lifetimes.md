@@ -216,7 +216,7 @@ To learn more, run the command again with --verbose.
 ```
 这里提及一个对象：`std::cmp::PartialOrd`，这是一种 特性(trait)。在下一节中，我们将会讨论 `特性(trait)`。目前看来，这个错误表示了，不是所有的数据类型都可以被 `largest` 函数体使用的。因为我们需要在函数体里面进行值比较，我们只能用可以用来排序的数据类型。为了可以满足排序的需求，标准库中提供了 `std::cmp::PartialOrd` 特性，可以实现值比较。
 
-# 1.2 结构体的定义(In Struct Definitions)
+### 1.2 结构体的定义(In Struct Definitions)
 也可以用泛型参数来定义结构体(struct)，一个或者多个字段都可以是 通用类型(generic type)。
 ```java
 struct Point<T> {
@@ -283,13 +283,83 @@ fn main() {
 以上的所有的 `Point` 的实例都是可以被编译通过的。可以根据需求在定义中使用任意多个的泛型类型参数，但是如果泛型太多的话，会让代码难以理解，如果你的代码中需要大量的泛型，那么就表示，你的代码就需要继续少量的重构了。
 
 
-# 1.2 枚举的定义 (In Enum Definitions)
+### 1.3 枚举的定义 (In Enum Definitions)
 就像在结构体中定义的那样，也同样可以在 枚举(enum)定义中使用泛型类型。先来看看标准库中挑给你`Option<T>` 的枚举类的代码
 ```rust
 enum Option<T> {
     Some<T>, 
     None,
 }
+如你所见，`Option<T>` 是一个泛型的枚举类型，并且有两个变量，一个是`Some`，这个具有一个 `T` 类型的值；一个是 `None`，这个变量没有任何值。通过使用`Option<T>` 枚举类，我们可以写出需要可选值的情况，而且因为`Option<T>` 有泛型的特性，所以就可以用这个枚举类型来使用任意类型的。
+
+枚举类型也可以有多类型，比如 `Result<T, E>`
+```rust
+#![allow(unused_variables)]
+fn main() {
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+枚举类`Result`有两种类型，`T` 和 `E`，以及有两个变量：`Ok`，这个包含 `T` 类型的值；`Err` 这个有E类型的值。这个定义让我们在任何地方使用 Result都很方便。
+执行成功了会返回`Ok`，失败了会返回 `Err`。这就是我们在代码9-3中使用的逻辑，如果打开文件成功了，那么 `T` 就会被推断出是 `std::fs::File` 类型；如果失败了，那么 `E` 的类型就会被推断为 `std::io::Error`。
+
+### 1.4 方法定义 (In Method Definitions)
+我们可以在结构体(struct) 和 枚举类(enum) 中实现方法，也可以用使用的泛型。在代码10-9 展现了如何在结构体 `Point<T>` 实现泛型方法。
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+fn main() {
+    let p = Point { x: 5, y: 10 };
+
+    println!("p.x = {}", p.x());
+}
+
+```
+代码 10-9 实现一个名字是 `x` 的方法，在结构体 `Point<T>`，返回一个引用 `T`类型的字段 x
+
+注意，我们这里必须要 `impl` 关键字之后就声明 `T`，这样才可以使用它来指定我们要在 `Point<T>` 类型上实现方法。通过在 `impl` 之后声明泛型类型，Rust可以是识别出 Point 后面对 尖括号的类型是通用类型，而不是具体类型。
+
+比如，我们可以在仅仅在 `Point<f32>` 这个实例实现方法，而不是在 `Point<T>` 对象用泛型类型实现方法。在代码10-10中我们用了具体类型 `f32`，这样在 `impl` 就不用声明任何类型。
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+
+fn main() {
+    let p = Point { x: 5, y: 10 };
+
+    println!("p.x = {}", p.x());
+}
+```
+代码10-10 用特定的类型得来实现结构体的方法
+
+这里的表示，Point<f32> 类型有个名为 `distance_from_origin` 和 其他的数据类型 `Point<T>` 的对象里是没有这个方法。这个方法是用来计算某个点到 坐标(0.0， 0.0) 的距离。并且仅仅是计算 浮点型(floating) 的情况。
+
+
+
 
 
 
