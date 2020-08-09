@@ -217,7 +217,19 @@ To learn more, run the command again with --verbose.
 这里提及一个对象：`std::cmp::PartialOrd`，这是一种 特性(trait)。在下一节中，我们将会讨论 `特性(trait)`。目前看来，这个错误表示了，不是所有的数据类型都可以被 `largest` 函数体使用的。因为我们需要在函数体里面进行值比较，我们只能用可以用来排序的数据类型。为了可以满足排序的需求，标准库中提供了 `std::cmp::PartialOrd` 特性，可以实现值比较。
 
 # 1.2 结构体的定义(In Struct Definitions)
+也可以用泛型参数来定义结构体(struct)，一个或者多个字段都可以使用 通用类型(generic type)。
+```java
+struct Point<T> {
+    x: T,
+    y: T,
+}
 
+fn main() {
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
+}
+```
+代码 10-6 包含的两个都是T类型的字段 x 和 y
 
 
 
