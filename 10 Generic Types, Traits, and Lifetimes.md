@@ -358,9 +358,71 @@ fn main() {
 
 这里的表示，Point<f32> 类型有个名为 `distance_from_origin` 和 其他的数据类型 `Point<T>` 的对象里是没有这个方法。这个方法是用来计算某个点到 坐标(0.0， 0.0) 的距离。并且仅仅是计算 浮点型(floating) 的情况。
 
+结构体定义中的泛型参数和你的在该结构体方法中的方法签名中的泛型参数不会完全相同。比如在 代码10-11 中，定义了一个泛型方法 `mixup` 在 结构体 `Point<T, U>` 中，这个方法调用了另一个组泛型参数的对象 Point，这个方法创建了一个全新的 `Point<T, w>` 对象得，用新的 `Point<V, W>` 对象和 本身的 `Point<T, U>` 对象。
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
 
+impl<T, U> Point<T, U> {
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
 
+fn main() {
+    let p1 = Point { x: 5, y: 10.4 };
+    let p2 = Point { x: "Hello", y: 'c' };
 
+    let p3 = p1.mixup(p2);
+
+    println!("p3.x = {}, p3.y = {}", p3.x, p3.y);
+}
+
+```
+代码 10-11 用不同类型的泛型类型在结构体的定义中。
+
+在 `main` 的我们定义了一个 `Point`对象 p1 ，它的x是`i32`类型，它的y是 `f64`类型。这个p2的也是一个`Point`类型的对象，但是它的x是string切片，它的y是字符类型。`mixup` 调用 `p2` 来得到 同样是 `Point`类型的对象 `p3`。这个对象的x是 `i32` 类型，y是 `char` 类型的。通过宏函数 `println!`可以到看到输出的值。
+
+这个示例仅仅是演示一种情况，一些泛型参数是在 `impl` 关键字后面被定义的，有的则是在方法声明中被定义。这里的泛型参数 `T` 和 `U` 实在 `impl` 后面被定义的，因为它们是和 结构体 一起使用的；而 `v` 和 `w` 是在方法声明中被定义的，因为它们仅仅和方法有关。
+
+### 1.5 使用泛型的代码的性能(Performance of Code Using Generics)
+也许你会想知道使用泛型的参数是否会在运行的是产生运行时候的成本。好消息是，Rust 这样的泛型的使用，即使使用泛型，速度也不会变慢。
+
+Rust 通过在编译的时候对使用泛型的代码进行单态化(monomorphization)的处理。*单态话化(Monomorphization)* 是通过在编译时候把具体的类型填充进泛型类型中，将泛型的代码转换为特定的代码的过程。
+
+这个过程中，编译器会执行与创建在代码10-5泛型函数的相反的步骤，编译器会寻找到那些所所有调用泛型的代码的地方，然后为泛型代码的具体类型生成代码。
+
+来看看标准库中的枚举类 `Option<T>`:
+```rust
+let integer = Some(5);
+let float = Some(5.0);
+```
+Rust 在编译这个代码的时候，它会执行单态化。在这个过程中，编译器会将读取`Option<T>` 类型的被用到实例，然后分别为被用的到的实例创建不同的类型。这里代码中找到是两种 `Option<T>`，然后分别的编译出两种类型。
+
+这个代码 单态化的 效果如下
+```rust
+enum Option_i32 {
+    Some(i32),
+    None,
+}
+
+enum Option_f64 {
+    Some(f64),
+    None,
+}
+
+fn main() {
+    let integer = Option_i32::Some(5);
+    let float = Option_f64::Some(5.0);
+}
+
+```
+因为Rust会将泛型代码编译成代码中对象的具体类型，所以我们无需再运行的时候付出任何运行成本。代码运行的是，它的性能和我们用手工复制了每个重复代码一样。单态化(monomorphization) 使得rust的泛型运行时候更加高效。
 
 
 
