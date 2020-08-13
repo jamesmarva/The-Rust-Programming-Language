@@ -78,6 +78,7 @@ fn main() {
 ```
 ↑ 代码 8-5：用索引来预防熬或者get的方法来获取vector的元素
 
+这里有两个细节需要注意
 
 
 ### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
