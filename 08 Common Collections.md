@@ -5,9 +5,9 @@ Rust 的标准库里包含了很非常有用的称之为“集合(collections)�
 
 如果想你想学更多的标准库提供其他的类型的集合，那么就看[文档](https://doc.rust-lang.org/std/collections/index.html)
 
-接下来就会涉及如何创建，更新 Vector，stirng和hash.
+接下来就会涉及如何创建，更新 Vector，stirng 和 hash.
 # 1 用Vector 来保存多个元祖 (Storing Lists of Values with Vectors)
-
+第一种介绍的集合类型是 `Vec<T>`，当然，它更加广为人知的名字是 `Vector`. Vectors 可以让你在一种数据结构中保存多个数据，当然这个数据结构里的数据是相邻保存在内存当中。Vectors 保存的数据必须是同一种数据类型。
 
 ### 1.1 创建一个新的 `Vector` (Creating a New Vector)
 调用 `Vec::new` 函数来创建一个新的，空的Vector。
@@ -18,9 +18,9 @@ fn main() {
 ```
 ↑ 代码 8-1 创建一个空的 vector来保存 `i32`类型的元素
 
-注意，这里增加了类型的声明。因为我们还没有往 Vector里面插入元素，所以Rust不知道我们打算在 Vector 里面的保存哪一种数据类型。这是很重要的一点，Vector 是基于 泛型(generics) 实现的；我们会在第10章来详细介绍泛型(generics)。`Vec<T>` 可以容纳任何的数据类型。当你需要指定Vector的保存的类型的时候，这个类型必须在`<>` 声明。
+注意，这里添加了了类型的声明。因为我们还没有往 Vector里面插入元素，所以Rust不知道我们打算在 Vector 里面的保存哪一种数据类型，当然，后面会提到用带着初始化的值来创建 Vector 对象。这是很重要的一点，Vector 是基于 泛型(generics) 实现的；我们会在第10章来详细介绍泛型(generics)。`Vec<T>` 可以容纳任何的数据类型，你想要 Vector 保存的哪种数据类型，你就要在 `<>` 声明这种类型。
 
-在更加实际的代码中的，Rust通常可以在插入的值之后就判断出要存储的值的类型，因此你不需要增加任何的类型声明。创建有初始-化-值的 `Vec<T>` 是比较常见的做法，为了方便的，Rust提供了宏函数 `vec!` 来创建有初始化的值vector。代码 8-2 展示了如何创建一个新的 `Vec<i32>`，这个整型的的类型 `i32`，因为这默认的整数类型。
+在实际的编码中，Rust通常可以在插入的值之后就判断出要存储的值的类型，因此你不需要增加任何的类型声明。用初始化值的 `Vec<T>` 集合是比较常见的做法，为了方便的，Rust提供了宏函数 `vec!` 来创建有初始化的值 vector 类型。代码 8-2 展示了如何创建一个新的 `Vec<i32>`，这个整型的的类型 `i32`，因为这默认的整数类型。
 ```
 fn main() {
     let v = vec![1, 2, 3];
@@ -28,7 +28,7 @@ fn main() {
 ```
 ↑ 代码 8-2 创建一个有初始值的 vector
 
-因为我们已经给这个给 Vector 初始值了，所以rust就可以推断出这个Vector里面存放的数据类型是i32.
+因为我们已经给这个给 Vector 初始值了，所以rust就可以推断出这个Vector里面存放的数据类型是 `i32`。下一步我们将会讨论如何修改 vector。
 
 ### 1.2 更新 `Vector` (Updating a Vector )
 创建一个 vector，然后用 `push` 方法插入元素其中。
@@ -59,10 +59,25 @@ fn main() {
 ```
 ↑ 代码 8-4 vector 会被删除
 
-当Vector被删除之后，它所包含的元素也会被删除，也就是它那些包含的整型也会被清除。这个看起来很简单，但是如果你开始引入对 Vector 里面的元素的引用的时候，情况就变的复杂了。我们接下来来解决这个问题。
-
+当Vector被删除之后，它所包含的元素也会被删除。这个看起来很简单，但是如果你开始引入对 Vector 里面的元素的引用的时候，情况就变的复杂了。我们接下来来解决这个问题。
 
 ### 1.4 读取 `Vector` 中的元素 (Reading Elements of Vectors)
+已经知道了如何创建，更新和销毁 vector，下一步将会介绍如何读取 vector中的元素。有两种方法可以引用 vector中的元素。在下面的例子中，我们将会对代码进行注释，这样可以看的更加清楚。
+```rust
+fn main() {
+    let v = vec![1, 2, 3, 4, 5];
+
+    let third: &i32 = &v[2];
+    println!("The third element is {}", third);
+
+    match v.get(2) {
+        Some(third) => println!("The third element is {}", third),
+        None => println!("There is no third element."),
+    }
+}
+```
+↑ 代码 8-5：用索引来预防熬或者get的方法来获取vector的元素
+
 
 
 ### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
