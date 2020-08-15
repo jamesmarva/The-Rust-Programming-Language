@@ -135,7 +135,7 @@ To learn more, run the command again with --verbose.
 > 想要了解更多 `vector<T>` 的细节，可以看 “[The Rustonomicon](https://doc.rust-lang.org/nomicon/vec.html)” 
 
 ### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
-
+如果想要依次访问 vector 中的每个元素的话，就可以遍历所有元素，而不用每次都通过索引来获取元素。 代码 8-8 显示如何如何for 循环来获取vector中的元素不可变的引用，
 ```rust
 fn main() {
     let v = vec![100, 32, 57];
@@ -144,6 +144,7 @@ fn main() {
     }
 }
 ```
+↑ 代码 8-8 通过迭代的方式来输出vector中的每个元素
 
 ### 1.6 Using an Enum to Store Multiple Types
 
