@@ -95,11 +95,44 @@ fn main() {
 
 当用 `get` 方法去取超出 `vector` 对象的索引范围的元素的时候，它就会返回一个 `None` 对象，而不是报错。如果程序在运行正常的情况下会偶尔访问超出索引值的元素，那么就可以用这种方式来获取元素。这时候你的代码就要有处理 `Some(&element)` 或者 `None` 对象情况，就像第六章所描述的那样。比如，这个取元素的索引是来自用户的输入，那么他们有可能会输入一个很大的索引值，而这个索引值对应的元素不存在，那么就你就要处理这个错误，让他们重新输入这个值，而不是让程序直接崩溃。
 
-当程序有一个有效的引用的时候，借用检查器(the borrow checker) 会执行所有和 所有权(ownship) 相关的借用规则(borrowing rules)，以确保该引用以及其他的引用所对应 vector 的元素是有效的额。回想一下这个规则，这个规则规定，你不能在同一个作用域中持有一个可变或者不可能的引用。这个规则适用于 代码 8-7，当我们持有了 vector 的第一个元素，那么再去把元素添加到这个vector的末尾，这个程序就无法继续执行了。
+当程序有一个有效的引用的时候，借用检查器(the borrow checker) 会执行所有和 所有权(ownship) 相关的借用规则(borrowing rules)，以确保该引用以及其他的引用所对应 vector 的元素是有效的额。回想一下这个规则，这个规则规定，你不能在同一个作用域中同时持有一个可变和一个不可变的引用。这个规则适用于 代码 8-7，当我们持有了 vector 的第一个元素，那么再去把元素添加到这个vector的末尾，这个程序就无法继续执行了。
+you can’t have mutable and immutable references in the same scope. 
 ```rust
+fn main() {
+    let mut v = vec![1, 2, 3, 4, 5];
 
+    let first = &v[0];
+
+    v.push(6);
+
+    println!("The first element is: {}", first);
+}
 ```
+↑ 代码 8-7 尝试去有个引用持有它的情况下往vector 添加元素.
 
+编译上面的代码会出现错误
+```shell
+error[E0502]: cannot borrow `v` as mutable because it is also borrowed as immutable
+ --> src\main.rs:5:5
+  |
+3 |     let mut first = &v[0];
+  |                      - immutable borrow occurs here
+4 |     // let first1 = &v[0];
+5 |     v.push(6);
+  |     ^^^^^^^^^ mutable borrow occurs here
+6 |     println!("{}", first);
+  |                    ----- immutable borrow later used here
+
+error: aborting due to previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `listing_08_07`.
+
+To learn more, run the command again with --verbose.
+```
+代码 8-7 看起来是应该是可以运行的，但是为什么第一个元素的引用需要去关心vector的末尾会如何变化？这个错误是 vector 的工作坊方式早错的：如果在新增元素的时候发现原来的空间不够用，那么就要进行扩容，那么就要把原来的 vector 的元素都复制到一个容量更大的vector中，那么原来的占用的内存就要被释放。这种情况下，第一个元素的引用将释放。借用会组织程序执行完这种情况。
+
+> 想要了解更多 `vector<T>` 的细节，可以看 “[The Rustonomicon](https://doc.rust-lang.org/nomicon/vec.html)” 
 
 ### 1.5 遍历Vector里的所有元素 (Iterating over the Values in a Vector)
 
