@@ -146,11 +146,24 @@ fn main() {
 ```
 ↑ 代码 8-8 通过迭代的方式来输出vector中的每个元素
 
-### 1.6 Using an Enum to Store Multiple Types
+为了可以改变vector中的元素，也可以用可变的引用来对可变的vector的元素进行引用。
+```rust
+fn main() {
+    let mut v = vec![100, 32, 57];
+    for i in &mut v {
+        *i += 50;
+    }
+}
+```
+↑ 代码8-9 用可变的引用对元素进行引用
 
-At the beginning of this chapter, we said that vectors can only store values that are the same type. This can be inconvenient; there are definitely use cases for needing to store a list of items of different types. Fortunately, the variants of an enum are defined under the same enum type, so when we need to store elements of a different type in a vector, we can define and use an enum!
+要更改可变引用的值，就就要先用 `解引用运算符(*)` 来获取到 `i` 中的值，然后在用 `+=` 运算符来进行更新。在 第15章中，我们将会讨论和指针和一起讨论解引用运算符。
 
-For example, say we want to get values from a row in a spreadsheet in which some of the columns in the row contain integers, some floating-point numbers, and some strings. We can define an enum whose variants will hold the different value types, and then all the enum variants will be considered the same type: that of the enum. Then we can create a vector that holds that enum and so, ultimately, holds different types. We’ve demonstrated this in Listing 8-10.
+### 1.6 用枚举来保存多数据类型(Using an Enum to Store Multiple Types)
+
+在本章的开始，曾经声明过 vector 只能在保存一种数据类型。这可能就会带来一点不方便，就是如果有些情况下，我们需要保存一组不同数据类型的数据。幸好，枚举类型既可以帮助我们达到这个目的，因此当我们需要在vector中保存不同的数据类型的时候，就可以用枚举来实现。
+
+比如，假设我们要在一个电子表格中获取一组数据，其中某个列是整型的数据类型，某个列是浮点型的数据，某个列是字符串型的数据，那么想要保存这些数据，就要定义一个枚举类型。让后所有的枚举变量都被视为一种数据类型。然后创建一个保存这个枚举类型的vector 即可。
 
 ```rust
 fn main() {
@@ -167,9 +180,7 @@ fn main() {
     ];
 }
 ```
-↑ Listing 8-10: Defining an enum to store values of different types in one vector
-
-Rust needs to know what types will be in the vector at compile time so it knows exactly how much memory on the heap will be needed to store each element. A secondary advantage is that we can be explicit about what types are allowed in this vector. If Rust allowed a vector to hold any type, there would be a chance that one or more of the types would cause errors with the operations performed on the elements of the vector. Using an enum plus a match expression means that Rust will ensure at compile time that every possible case is handled, as discussed in Chapter 6.
+↑ 代码 8-10 定义一个枚举来保存不同数据到vector中
 
 如果Rust允许一个Vector 里面可以保存任意类型，那么在类执行一些特定操作的时候就会出现错误。比如有些结构体定义了一些方法，别的没有，那们就会出现异常。使用枚举，再加上 `match` 表达式，就意味着Rust将在编译的时候能确保处理所有的情况，就像第 6 章那样。
 
