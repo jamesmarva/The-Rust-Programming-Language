@@ -432,7 +432,7 @@ fn main() {
 ### 2.1 定义特性(Defining a Trait)
 类型的行为包含了我么可以在改类型上的调用的方法。如果我们可以在不同的类型上定义相同的行为，那么不同的类型就有了相同的行为。特性的定义就是将一种将方法的签名分组归纳在一起以实现某些目的所需要的方式。
 
-比如，让我们假设有多个结构体(struct)，这种结构体非可以有多个类型变量和多个文本：`NewArticle` 结构体可以持有一种字段，这种字段保存的是新闻的内容。`Tweet` 的这种结构图的字段则保存的一个不超过 280 个字段的字段，并且还要标识出是否为新推文，转发的推文，或者是对另一个推文的回复。
+有多个结构体(struct)，这种结构体非可以有多个类型变量和多个文本：`NewArticle` 结构体可以持有一种字段，这种字段保存的是新闻的内容。`Tweet` 的这种结构图的字段则保存的一个不超过 280 个字段的字段，并且还要标识出是否为新推文，转发的推文，或者是对另一个推文的回复。
 
 我们想要定义一个媒体的聚合库，这个库可以展示出不同的新闻的数据的摘要。为了完成这个功能，我们需要在每个数据类型(NewArticle、Tweet) 中新增一个摘要方法，用来将从新闻文本，或者从推文中把内容提取出来。
 
@@ -450,7 +450,39 @@ pub trait Summary {
 一个 特征(Trait) 可以有多个方法，具体的格式就是：每行一个方法签名，每行以分号结尾。
 
 ### 2.2 在类型中实现特征(Implementing a Trait on a Type)
+现在我们已经用了 `Summary` 特征定义了一个共用的方法签名，我们可以在我们的多媒体的聚合库中的类型中实现这些方法了。在 代码 10-13 中的展示了 `Summary` 特性一种的实现。在结构体 `NewsArticle` 中，用字段 headline、 author, location 来创建了一个方法 `summarize` 的返回值。在`Tweet` 结构体中，先假设了tweet的内容I要进限制了280个字符了，然后用 用户名和 内容来作为返回值：
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
 
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+```
+↑ 代码 10-13 类型`NewArticle` 和 `Tweet` 实现了特征 `Summary`
 
 
 
