@@ -484,16 +484,33 @@ impl Summary for Tweet {
 ```
 ↑ 代码 10-13 类型`NewArticle` 和 `Tweet` 实现了特征 `Summary`
 
+在类型上实现特征和实现常规的方法很相似。区别就在于，在 `impl` 关键字之后的，需要加上被实现的 特征(trait)的名称，并且在还要加上 `for` 关键字，然后指定需要实现特征(trait) 的类型的名字。在impl的后面的代码块中，必须加上trait里面声明的方方法。但是不同的是在原来的特种中的方法声明的后面的分号被代码块所代替。
 
+在实现了这个特征值之后，就可以想调用常规的方法一样。
+```rust
+let tweet = Tweet {
+    username: String::from("horse_ebooks"),
+    content: String::from("of course, as you probably already know, people"),
+    reply: false,
+    retweet: false,
+};
 
+println!("1 new tweet: {}", tweet.summarize());
+```
+输出：`1 new tweet: horse_ebooks: of course, as you probably already know, people`
 
+注意，因为这里我们都在同一个rs的文件中定义了 特征(trait)`Summary` 以及  `NewArticle`类型和`Tweet` 类型都在一个rs的文件中，那么就以为他们在统一作用域。假设想要这个rs文件的内容，当别人想要的这个库的功能的话，或者想要根据自己的需求实现`trait`，那么就要 先引入自己的代码中，通过代码 `use aggregator::Summary`来把这个 特征引入代码中。
 
+需要注意的一点是，类型实现特征(trait) 必须是在我们自己的本地板条箱(crate)中的。比如，我们既可以在类型 `Tweet` 中实现标准库中的 `Display`这个特征(trait)，作为我们的 `aggregator` 的功能。也可以在用`Vect<T>`中来实现 `Summary` ，因为Summary 在我们自己的 `aggregator` 的板条箱中。
 
+但是我们不能在外部的类型(types)中实现所有的外部的特征(trait) (can’t implement external traits on external types)。比如，我们就不能在 `Vec<T>` 中实现 特征 `Display` 在我们的 `aggregator`，这个板条箱中(注意，Summary 这个特性是在我们自己的板条箱中的)。这个限制是程序的一致性，称之为 `一致性(coherence)` 。这个限制是程序的一部分，可以确保别人不会破坏你的代码。如果没有这个规则，尼玛两个板条箱都会实行按一个相同的特征(trait) 在实现同一种类型，这样 Rust 就不知道那个实现是被使用的。
 
+```rust
 
+```
 
-
-
+### 2.3 默认实现(Default Implementations)
+有时候在很多类型里有相同的默认的方法的行为，不需要去在每个类型中都实现一个相同的方法。然后，我们可以再特定的类型上再实现这个特征的时候，可以选择保留这个实现，或者覆盖这个实现。
 
 
 
