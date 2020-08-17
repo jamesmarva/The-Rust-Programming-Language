@@ -484,7 +484,8 @@ impl Summary for Tweet {
 ```
 ↑ 代码 10-13 类型`NewArticle` 和 `Tweet` 实现了特征 `Summary`
 
-在类型上实现特征和实现常规的方法很相似。区别就在于，在 `impl` 关键字之后的，需要加上被实现的 特征(trait)的名称，并且在还要加上 `for` 关键字，然后指定需要实现特征(trait) 的类型的名字。在impl的后面的代码块中，必须加上trait里面声明的方方法。但是不同的是在原来的特种中的方法声明的后面的分号被代码块所代替。
+在类型上实现特征和实现常规的方法很相似。区别就在于，在 `impl` 关键字之后的，需要加上被实现的 特征(trait)的名称，并且在还要加上 `for` 关键字，然后指定需要实现特征(trait) 的类型的名字。在impl的后面的\
+码块中，必须加上trait里面声明的方方法。但是不同的是在原来的特种中的方法声明的后面的分号被代码块所代替。
 
 在实现了这个特征值之后，就可以想调用常规的方法一样。
 ```rust
@@ -503,7 +504,7 @@ println!("1 new tweet: {}", tweet.summarize());
 
 需要注意的一点是，类型实现特征(trait) 必须是在我们自己的本地板条箱(crate)中的。比如，我们既可以在类型 `Tweet` 中实现标准库中的 `Display`这个特征(trait)，作为我们的 `aggregator` 的功能。也可以在用`Vect<T>`中来实现 `Summary` ，因为Summary 在我们自己的 `aggregator` 的板条箱中。
 
-但是我们不能在外部的类型(types)中实现所有的外部的特征(trait) (can’t implement external traits on external types)。比如，我们就不能在 `Vec<T>` 中实现 特征 `Display` 在我们的 `aggregator`，这个板条箱中(注意，Summary 这个特性是在我们自己的板条箱中的)。这个限制是程序的一致性，称之为 `一致性(coherence)` 。这个限制是程序的一部分，可以确保别人不会破坏你的代码。如果没有这个规则，尼玛两个板条箱都会实行按一个相同的特征(trait) 在实现同一种类型，这样 Rust 就不知道那个实现是被使用的。
+但是我们不能在外部的类型(types)中实现所有的外部的特征(trait) (can’t implement external traits on external types)。比如，我们就不能在 `Vec<T>` 中实现 特征 `Display` 在我们的 `aggregator`，这个板条箱中(注意，Summary 这个特性是在我们自己的板条箱中的)。这个限制是程序的一致性，称之为 `一致性(coherence)` 。这个限制是程序的一部分，可以确保别人不会破坏你的代码。如果没有这个规则，尼玛两个板条箱都会实行按一个相同的特征(trait) 在实现同一种类型，这样 Rust 就不知道那个实现是被使用的
 
 ```rust
 
@@ -512,47 +513,78 @@ println!("1 new tweet: {}", tweet.summarize());
 ### 2.3 默认实现(Default Implementations)
 有时候在很多类型里有相同的默认的方法的行为，不需要去在每个类型中都实现一个相同的方法。然后，我们可以再特定的类型上再实现这个特征的时候，可以选择保留这个实现，或者覆盖这个实现。
 
+代码 10-14 展示了如何去定义一个默认的方法实现，而不是仅仅顶一个方法签名
 ```rust
-
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("Read more ...")
+    }
+}
 ```
+↑ 代码10-14 一个定义了默认实现的特征
 
+让默认的实现来代替原来的 `NewsArticle`的 `summarize` 的方法实现。`impl` 的代码代码块为空
 
+就算我们接下来都去实现 `NewsArticle` 的 `summarize` 的方法，我们依然还是可用默认的实现。可以在 `NewsArticle` 的对象中调用 `summarize`方法。
 
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("Read more ...")
+    }
+}
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+impl Summary for NewsArticle {
+    
+}
 
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("Penguins win the Stanley Cup Championship!"),
+        location: String::from("Pittsburgh, PA, USA"),
+        author: String::from("Iceburgh"),
+        content: String::from(
+            "The Pittsburgh Penguins once again are the best \
+             hockey team in the NHL.",
+        ),
+    };
 
+    println!("New article available! {}", article.summarize());
+}
+```
+上面这段代码输出 `New article available! Read more ...`。
 
+虽然创建了方法 `summarize` 的默认实现，但是在代码10-13 的 `Tweet` 对象的实现中是不用修改代码，也依然可以得到原来的 tweet 的代码的实现的。其实覆盖原来的特征(trait)的默认的实现和实现默认的方法的语法是一样的。
 
+默认的方法实现是可以调用同一个特征(trait)的其他的方法的，即便那个调用的方法还没有来得及实现。通过这种特性，特征(trait)可以提供很多有用的功能，而且仅仅是通过实现一小部分的代码。比如，我们可以先定义一个非默认方法 `summarize_author`，容纳后顶一个 `summarize` 方法来调用这个方法。
 
+```rsut
+pub trait Summary {
+    fn summarize_author(&self) -> String;
 
+    fn summarize(&self) -> String {
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+}
 
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+impl Summary for Tweet {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+```
 
 
 
