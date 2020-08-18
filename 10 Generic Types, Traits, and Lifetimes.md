@@ -561,9 +561,27 @@ fn main() {
 
 虽然创建了方法 `summarize` 的默认实现，但是在代码10-13 的 `Tweet` 对象的实现中是不用修改代码，也依然可以得到原来的 tweet 的代码的实现的。其实覆盖原来的特征(trait)的默认的实现和实现默认的方法的语法是一样的。
 
-默认的方法实现是可以调用同一个特征(trait)的其他的方法的，即便那个调用的方法还没有来得及实现。通过这种特性，特征(trait)可以提供很多有用的功能，而且仅仅是通过实现一小部分的代码。比如，我们可以先定义一个非默认方法 `summarize_author`，容纳后顶一个 `summarize` 方法来调用这个方法。
+默认的方法实现是可以调用同一个特征(trait)的其他的方法的，即便那个调用的方法还没有来得及实现。通过这种特性，特征(trait)可以提供很多有用的功能，而且仅仅是通过实现一小部分的代码。比如，我们可以先定义一个非默认方法 `summarize_author`，然后定义一个默认的实现 `summarize` 方法来调用这个`summarize_author`。
+```rust
+pub trait Summary {
+    fn summarize_author(&self) -> String;
+
+    fn summarize(&self) -> String {
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+}
+```
+想要使用这个版本的 `Summary`，我们仅仅需要重新实现 `summarize_author` 就行了
 
 ```rsut
+impl Summary for Tweet {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+```
+重新实现了`summarize_author`之后，我们可以用 `Tweet` 结构体调用 `summarize` 方法了，`summarize` 方法会调用 `summarize_author` 方法(当然这个方法是被我们实现过的)。
+```rust
 pub trait Summary {
     fn summarize_author(&self) -> String;
 
@@ -578,16 +596,27 @@ pub struct Tweet {
     pub reply: bool,
     pub retweet: bool,
 }
-
 impl Summary for Tweet {
     fn summarize_author(&self) -> String {
         format!("@{}", self.username)
     }
 }
+fn main() {
+    let tweet = Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people",
+        ),
+        reply: false,
+        retweet: false,
+    };
+
+    println!("1 new tweet: {}", tweet.summarize());
+}
 ```
+上面这点代码输出：`1 new tweet: (Read more from @horse_ebooks...).`
 
-
-
+注意，在你覆盖了默认方法实现之后，你不能再调用原来那个默认的实现方法的。
 
 
 
