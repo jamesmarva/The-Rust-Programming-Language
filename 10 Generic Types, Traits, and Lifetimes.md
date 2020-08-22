@@ -616,11 +616,43 @@ fn main() {
 ```
 上面这点代码输出：`1 new tweet: (Read more from @horse_ebooks...).`
 
-注意，在你覆盖了默认方法实现之后，你不能再调用原来那个默认的实现方法的。
+注意，在你覆盖了默认方法实现之后，你不能再调用原来那个默认的方法了，也就是说覆盖的方法和默认的方法你只能留下一个。
+
+### 2.4 参数是特征(Traits as Parameters)
+目前为止，我们已经知道了如何去定义，以及实现 特征(trait)，接下来将会探索如何用 特征(trait) 去定义一个方法，以及将不同的参数类型传入方法。
+
+在代码 10-13 中，我们在 `NewsArticle`类型和 `Tweet`类型中实现了 `Summary` 特征。我们可以也可以定义 `notify`函数，用 `Summary` 特征作为他的参数来调用 `summarize` 方法。为了完成这个，就会涉及到一个`impl Trait` 语法，就像下面这个代码：
+```rust
+pub fn notify(item: &impl Summary) {
+    println!("Breakinig news! {}", item.summarize());
+}
+```
+在函数的声明中，我们使用了关键字 `impl`以及特征的名字，而不是直接声明出对象的具体的类型。这样的参数声明是可以接受任何的实现了特征 `Summary`的类型的。在 函数 `notify` 的函数体中，我们可以通过 `item` 对象 来调用所有特征 `Summary` 的特征中有的接口方法，比如 `summarize`。想要调用这个 `notify`，我可以传入像 `NewsArticle` 和 `Tweet` 的对象。如果代码传入了其他类型，比如 `String` 或者 `i32`，会编译不通过的，因为这些类型没有实现 `Summary`。
+
+##### 2.4.1 特征绑定(Trait Bound Syntax)
+`impl Trait` 语法看起来使用简单，但是实际上是一个长形式的格式的语法糖，看起来是这样：
+```rust
+pub fn notify<T: Summary> (item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+这种形式的写法和上面的 `pub fn notify(item: &impl Summary)` 代码是等效的，但是看起来更加的冗长。把特征(trait) 和 泛型的声明绑定，并且放在尖括号中(`<>`) 。
+
+`impl trait` 语法是很方便的，并且在简单的场景下，可以使代码更加的简洁。在其他的更加复杂的场景下，特征绑定语法可以展现出更加更多的复杂性，比如，我们可以有两个实现了 `Summary` 特征的参数比如下面的这样
+```rust
+pub fn notify(item1: &impl Summary, item2: &impl Summary)
+```
+如果希望函数允许item1 和 item2 有不同的类型(比如分别传入`NewsArticle` 和 `Tweet`)，是可以用 `impl trait`语法的。如果我们想要两个参数都是相同的类型的话，那么可以用下面的这样的写法：
+```rust
+pub fn notify<T: Summary> (item1: &T, item2: &T)
+```
+泛型 `T` 指定了 `item1` 和 `item2`参数的具体的类型，并且进行了类型的约束。这样两个参数是必须是相同的。
+
+
+##### 2.4.2 用`+`语法来指定多个特征绑定(Specifying Multiple Trait Bounds with the + Syntax)
 
 
 
 
-
-
+##### 2.4.3 用`+`语法来指定多个特征绑定(Specifying Multiple Trait Bounds with the + Syntax)
 
