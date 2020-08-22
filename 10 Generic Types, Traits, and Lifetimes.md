@@ -651,8 +651,15 @@ pub fn notify<T: Summary> (item1: &T, item2: &T)
 
 ##### 2.4.2 用`+`语法来指定多个特征绑定(Specifying Multiple Trait Bounds with the + Syntax)
 
+也可以指定的多个特征和变量绑定起来，假设我们想要 `notify` 方法可以用展示变量`item`的数据，所以我们必须要要在定义中让item实现两个 `Display` 和 `Summary`，可以用 `+` 语法
+```rust
+pub fn notify(item: &(impl Summary + Display)) {
+```
+`+` 也可以用在特征绑定的泛型的场景中
+```java
+pub fn notify<T: Summary + Display> (item: T)
+```
+随着两个特征比被指定绑定，在notify的函数中就可以调用 `summaize` 和 `{}`来规整他们这个对象的。
+##### 2.4.3在特征绑定中更加进一步的界限 (Clearer Trait Bounds with where Clauses)
 
-
-
-##### 2.4.3 用`+`语法来指定多个特征绑定(Specifying Multiple Trait Bounds with the + Syntax)
 
