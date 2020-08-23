@@ -660,6 +660,96 @@ pub fn notify(item: &(impl Summary + Display)) {
 pub fn notify<T: Summary + Display> (item: T)
 ```
 随着两个特征比被指定绑定，在notify的函数中就可以调用 `summaize` 和 `{}`来规整他们这个对象的。
-##### 2.4.3在特征绑定中更加进一步的界限 (Clearer Trait Bounds with where Clauses)
+##### 2.4.3 用 where 条件语句 进行进一步说明特征绑定 (Clearer Trait Bounds with where Clauses)
+
+用多特征绑定有个缺点。每个泛型都有自己的特征绑定，所以用多个泛型参数作为参数的函数会有很多的特征绑定信息在函数的名称和函数的参数列表之间，这样会导致函数的签名阅读器来很不方便。因此，Rust 提供了备用语法，用于在函数的签名之后去指定特征的绑定信息，比如下面这个代码：
+```rust
+fn some_function<T: Display + Clone, U: Clone + Debug> (t: &T, u: &U) -> i32
+```
+用来  `where` 条件语句，就会写成下面这样：
+```rust
+fn some_function<T, U> (t: &T, u: &U) -> i32
+    where T: Display + Clone, 
+        U: Clone + Debug 
+    {}
+```
+这样的函数签名读起来就不会很混乱了：函数名称，参数列表，以及返回类型排列在一起，这样读起来就会想没有特征绑定的参数一样。
+
+
+### 2.5 返回实现了特征的类型(Returning Types that Implement Traits)
+也可以在返回的位置用 `impl trait` 来返回实现了某种特征的返回类型的值。
+```rust
+fn return_summarize() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+为了通过使用`impl Summary` 来返回类型，我们指定了 `returns_summarizable` h函数的返回类型是实现了 `Summary` 特征的，而不是直接写出类型的名字。在这种场景里，`returns_summarizable` 返回了一个 `Tweet` 类型的对象，但是调用这个函数的代码却不知道里面返回的是一个 `Tweet` 的对象。
+
+返回某个特征的实现的能力在闭包(closures)和迭代器(iterators)的功能中特别有用，这个功能将会在第13中介绍。闭包(closures)和迭代器(iterators)创建的类型只有编译器才知道，或者用长声明的来声明。`impl trait` 语法让你可以简洁的指定实现了 迭代器(Iterator) 类型，而不用非常长的类型声明。
+
+但是，仅当返回单一类型的时候，才可以用 `impl trait` 语法。比如，这个代码返回了 `NewsArticle` 或者 `Tweet` 两种类型，这样的代码会无法运行：
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+
+fn returns_summarizable(switch: bool) -> impl Summary {
+    if switch {
+        NewsArticle {
+            headline: String::from(
+                "Penguins win the Stanley Cup Championship!",
+            ),
+            location: String::from("Pittsburgh, PA, USA"),
+            author: String::from("Iceburgh"),
+            content: String::from(
+                "The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.",
+            ),
+        }
+    } else {
+        Tweet {
+            username: String::from("horse_ebooks"),
+            content: String::from(
+                "of course, as you probably already know, people",
+            ),
+            reply: false,
+            retweet: false,
+        }
+    }
+}
+```
+要么返回 `NewsArticle`，要么返回 `Tweet`在使用了 `impl Trait` 语法约束之后是不允许的。我们将会在第17章中
+
 
 
