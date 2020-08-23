@@ -826,7 +826,7 @@ error: could not compile `listing_10_03_right`.
 
 To learn more, run the command again with --verbose.
 ```
-这个错误的关键的关键行就是 `cannot move out of type [T], a non-copy slice`。在没有带泛型的版本的 `largest` 函数的代码中，我们仅仅能够去找到 `i32` 和 `char` 类型的最大值。就像在第四章中[Stack-Only Data: Copy](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy)讨论的那样，想 `i32` 和 `char` 这样的类型，已知道类型的存储的大小，可以存储在栈的空间中，所以它们实现实现 `Copy` 特征。但是当我们在 `largest` 函数中增加了泛型功能，在 list 的参数中可能并没有实现 `copy` 特征的类型。所以，我们就不能把值从 `list[0]` 移出来，并且移动进 `largest`变量中，这就是错误的来源。
+这个错误的关键的关键行就是 `cannot move out of type [T], a non-copy slice`。在没有带泛型的版本的 `largest` 函数的代码中，我们仅仅能够去找到 `i32` 和 `char` 类型的最大值。就像在第四章中[Stack-Only Data: Copy](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy)讨论的那样，想 `i32` 和 `char` 这样的类型，已知道类型的存储的大小，并且存储在栈的空间中，所以它们实现了 `Copy` 特征。但是当我们在 `largest` 函数中增加了泛型功能，在 list 的参数中可能并没有实现 `copy` 特征的类型。所以，我们就不能把值从 `list[0]` 移出来，并且移动进 `largest`变量中，这就是错误的来源。
 
 为了使用必须实现了 `Copy` 特征的类型，我们必须把 `Copy`特征添加到泛型 `T` 的实现的范围中。在代码 10-15 中，我们实现了完整版的代码，这样就可以编译通过了，只要传递给 `largest` 函数的slice的值实现了`Copy` 和 `PartialOrd` 特征，这样就可以使用 `i32` 和 `char`。
 ```rust
@@ -855,6 +855,63 @@ fn main() {
 }
 ```
 ↑ 代码10-15 实现了 `PartialOrd` 特征和 `Copy`特征 的泛型类型的 `largest`函数
+
+如果我们不想讲 `largest` 函数限制为 `Copy` 特征的类型，就可以指定 `T` 绑定到特征`Clone`，而不是绑定到特征 `Copy`。这样我们就可以在想要`largest` 函数有所有权的时候，克隆在的 slice 中的每个值了。使用 `clone` 函数，就意味着我们在使用像 `Stirng` 这种类型的时候，就要在堆中开辟更多的空间，如果我们需要处理大量的数据，那么堆的分配就会很慢。
+
+另一种可以实现 `largest` 函数就是从 slice 中返回一个 `T` 类型的值的引用。如果我们吧返回类型更改为 `&T` 而不是 `T`，从而更改了函数的代码体来返回一个引用，我们就不用需要`Clone` 和 `Copy` 的特征绑定了，就可以避免堆的分配和回收了。尝试自己实现这个代码。
+
+### 2.6 用特征绑定来有条件的实现方法。 (Using Trait Bounds to Conditionally Implement Methods)
+通过用`impl` 代码块来实现特征绑定，这个方案中有泛型的参宿，我们可以为了实现指定的特征，根据条件来实现特征的方法。比如在 代码10-16中，`Pair<T>` 类型永远都实现了 `new` 函数。但是`Pair<T>` 只有在内置类型 `T` 实现了 `PartialOrd` 特征以及实现了 `Display` 特征的情况下才实现 `cmp_display`。
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+}
+```
+ ↑ 代码10-16 根据不同的条件来实现泛型中的方法。
+
+对于任何实现了一种特征的类型，我们可以根据不同的条件实现另一种特征。实现一个特征满足特征绑定的的情况称为`blanket implementations`，并且在标准库中已经广泛使用了。比如，标准库中实现了 `ToString` 特征，并且在所有的 `Display` 特征，代码就像下面这样：
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+```
+因为在标准库中有这种 `blanket Implementation`，所以，我们就可以在任何实现了 `Display` 特征中调用 `ToString`特征才有 `to_string` 方法。比如，我们像下面代码一样，把整数的值转为字符串类型，因为这个额这个整数型的值已经实现了`Display` 特征了。
+```rust
+let s = 3.to_string();
+```
+`Blanket implementation` 出现在特征的 文档的 `implements` 章节部分。
+
+特征(Traits) 以及 特征绑定(Trait bound) 让我么可以用泛型参数来减少重复的代码，同时还向编译器指向我么系统通过特征来实现特定的特征行为。编译器可以在根据特征绑定的信息来检查我们提供方法实现是否提供了正确的方法的行为。因为不必在代码的与运行的时候进行类型的检查，所以，所以就可以提升代码的性能了，不必放弃泛型的灵活性了。
+
+另一种泛型已经被使用称之为 `lifetimes`， `lifetimes` 不是确保类型有我们想要的行为，而是确保只要有我们想要引用的时候，那么就是有有效的引用。接下来我们来看看 `lifetimes`是如何做到的。
+
+# 3 用 `LifeTime` 来验证引用的有效(Validating References with Lifetimes) 
+
+
+
 
 
 
