@@ -1,14 +1,12 @@
 fn largest_ele<T: PartialOrd + Copy> (list: &[T]) -> T {
     let mut largest = list[0];
-
     for &i in list {
         if i > largest {
             largest = i;
         }
     }
-    largest
+    return largest;
 }
-
 fn main() {
     let number_list = vec![34, 50, 25, 100, 65];
 
@@ -19,5 +17,7 @@ fn main() {
     let result = largest_ele(&char_list);
 
     println!("The largest char is {}", result);
-
 }
+
+
+

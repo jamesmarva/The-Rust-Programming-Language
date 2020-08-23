@@ -165,6 +165,9 @@ code/ch10/listing_10_02/Cargo.lock
 code/ch10/listing_10_03/target
 code/ch10/listing_10_03/Cargo.lock
 
+code/ch10/listing_10_03_right/target
+code/ch10/listing_10_03_right/Cargo.lock
+
 code/ch10/listing_10_04/target
 code/ch10/listing_10_04/Cargo.lock
 
@@ -205,6 +208,9 @@ code/ch10/listing_10_14/Cargo.lock
 
 code/ch10/listing_10_14_01/target
 code/ch10/listing_10_14_01/Cargo.lock
+
+code/ch10/listing_10_14_v1/target
+code/ch10/listing_10_14_v1/Cargo.lock
 
 code/ch10/listing_10_15/target
 code/ch10/listing_10_15/Cargo.lock

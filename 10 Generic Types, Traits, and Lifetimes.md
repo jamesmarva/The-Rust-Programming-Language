@@ -749,7 +749,127 @@ fn returns_summarizable(switch: bool) -> impl Summary {
     }
 }
 ```
-要么返回 `NewsArticle`，要么返回 `Tweet`在使用了 `impl Trait` 语法约束之后是不允许的。我们将会在第17章中
+要么返回 `NewsArticle`，要么返回 `Tweet`在使用了 `impl Trait` 语法约束之后是不允许的。我们将会在第17章中“用特征的对象来返回不同类型的值” 来实现有这个功能的函数。
+
+### 2.6 用特征绑定来解决最大的函数的问题 代码10-5 bug (Fixing the largest Function with Trait Bounds)
+现在你已经知道了通过特征绑定来指定你想要的函数的行为。让我们在看看 代码10-5 ，本来这个代码是有问题的。上一次我们运行这个代码的时候收到这样一条错误
+```shell
+error[E0369]: binary operation `>` cannot be applied to type `T`
+ --> src\main.rs:4:17
+  |
+4 |         if item > largest {
+  |            ---- ^ ------- T
+  |            |
+  |            T
+  |
+help: consider restricting type parameter `T`
+  |
+1 | fn largest_ele<T: std::cmp::PartialOrd> (list: &[T]) -> T {
+  |                 ^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0369`.
+error: could not compile `listing_10_05`.
+
+To learn more, run the command again with --verbose.
+```
+在这个 `largest_ele` 函数体中，我们想要比较两个类型 `T` 的值，并且用了大于号(`>`)。因为这个操作符是在标准库特征 `std::cmp::PartialOrd` 定义的，我们需要指出 `PartialOrd`特征类型绑定到`T`类型，这样 `largest` 函数就可以继续类型的比较了。我们是不需要把 `PartialOrd`类型引入代码范围中，因为这个类型是在 `prelude`中，只要更改 `largest` 函数就行：
+```rust
+fn largest<T: PartialOrd>(list: &[T]) -> T {
+    let mut largest = list[0];
+    for &item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+    let char_list = vec!['y', 'm', 'a', 'q'];
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+
+```
+运行上面这段代码，就会得到下面这个不同的错误：
+```shell
+error[E0508]: cannot move out of type `[T]`, a non-copy slice
+ --> src\main.rs:2:23
+  |
+2 |     let mut largest = list[0];
+  |                       ^^^^^^^
+  |                       |
+  |                       cannot move out of here
+  |                       move occurs because `list[_]` has type `T`, which does not implement the `Copy` trait
+  |                       help: consider borrowing here: `&list[0]`
+
+error[E0507]: cannot move out of a shared reference
+ --> src\main.rs:3:15
+  |
+3 |     for &i in list {
+  |         --    ^^^^
+  |         ||
+  |         |data moved here
+  |         |move occurs because `i` has type `T`, which does not implement the `Copy` trait
+  |         help: consider removing the `&`: `i`
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0507, E0508.
+For more information about an error, try `rustc --explain E0507`.
+error: could not compile `listing_10_03_right`.
+
+To learn more, run the command again with --verbose.
+```
+这个错误的关键的关键行就是 `cannot move out of type [T], a non-copy slice`。在没有带泛型的版本的 `largest` 函数的代码中，我们仅仅能够去找到 `i32` 和 `char` 类型的最大值。就像在第四章中[Stack-Only Data: Copy](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy)讨论的那样，想 `i32` 和 `char` 这样的类型，已知道类型的存储的大小，可以存储在栈的空间中，所以它们实现实现 `Copy` 特征。但是当我们在 `largest` 函数中增加了泛型功能，在 list 的参数中可能并没有实现 `copy` 特征的类型。所以，我们就不能把值从 `list[0]` 移出来，并且移动进 `largest`变量中，这就是错误的来源。
+
+为了使用必须实现了 `Copy` 特征的类型，我们必须把 `Copy`特征添加到泛型 `T` 的实现的范围中。在代码 10-15 中，我们实现了完整版的代码，这样就可以编译通过了，只要传递给 `largest` 函数的slice的值实现了`Copy` 和 `PartialOrd` 特征，这样就可以使用 `i32` 和 `char`。
+```rust
+fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+```
+↑ 代码10-15 实现了 `PartialOrd` 特征和 `Copy`特征 的泛型类型的 `largest`函数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
