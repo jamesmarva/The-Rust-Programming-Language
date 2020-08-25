@@ -636,7 +636,7 @@ pub fn notify<T: Summary> (item: &T) {
     println!("Breaking news! {}", item.summarize());
 }
 ```
-这种形式的写法和上面的 `pub fn notify(item: &impl Summary)` 代码是等效的，但是看起来更加的冗长。把特征(trait) 和 泛型的声明绑定，并且放在尖括号中(`<>`) 。
+这种形式的写法和上面的 `pub fn notify(item: &impl Summary)` 代码是等效的，但是看起来更加的冗长。把特征(trait) 和 泛型的声明绑定在一起，并且放入尖括号中(`<>`) 。
 
 `impl trait` 语法是很方便的，并且在简单的场景下，可以使代码更加的简洁。在其他的更加复杂的场景下，特征绑定语法可以展现出更加更多的复杂性，比如，我们可以有两个实现了 `Summary` 特征的参数比如下面的这样
 ```rust
@@ -838,7 +838,6 @@ fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
             largest = item;
         }
     }
-
     largest
 }
 
@@ -861,11 +860,8 @@ fn main() {
 另一种可以实现 `largest` 函数就是从 slice 中返回一个 `T` 类型的值的引用。如果我们吧返回类型更改为 `&T` 而不是 `T`，从而更改了函数的代码体来返回一个引用，我们就不用需要`Clone` 和 `Copy` 的特征绑定了，就可以避免堆的分配和回收了。尝试自己实现这个代码。
 
 ### 2.6 用特征绑定来有条件的实现方法。 (Using Trait Bounds to Conditionally Implement Methods)
-通过用`impl` 代码块来实现特征绑定，这个方案中有泛型的参宿，我们可以为了实现指定的特征，根据条件来实现特征的方法。比如在 代码10-16中，`Pair<T>` 类型永远都实现了 `new` 函数。但是`Pair<T>` 只有在内置类型 `T` 实现了 `PartialOrd` 特征以及实现了 `Display` 特征的情况下才实现 `cmp_display`。
-
+通过用`impl` 代码块来实现特征绑定，这个方案中有泛型的参数，我们可以为了实现指定的特征，根据条件来实现特征的方法。比如在 代码10-16中，`Pair<T>` 类型永远都实现了 `new` 函数。但是`Pair<T>` 只有在泛型 `T` 同时实现了 `PartialOrd` 特征以及 `Display` 特征的情况下才能实现 `cmp_display` 方法。
 ```rust
-#![allow(unused_variables)]
-fn main() {
 use std::fmt::Display;
 
 struct Pair<T> {
@@ -887,7 +883,6 @@ impl<T: Display + PartialOrd> Pair<T> {
             println!("The largest member is y = {}", self.y);
         }
     }
-}
 }
 ```
  ↑ 代码10-16 根据不同的条件来实现泛型中的方法。
