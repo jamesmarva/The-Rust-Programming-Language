@@ -19,7 +19,7 @@ Most languages don’t distinguish between these two kinds of errors and handle 
 > ```
 
 Let’s try calling panic! in a simple program:
-### 1.1 Using a panic! Backtrace
+## 1.1 Using a panic! Backtrace
 
 ```rust
 fn main() {
@@ -134,7 +134,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 这个输出告诉了我们错误的原因是什么。
 
 
-### 2.1 匹配不同的错误类型 (Matching on Different Errors)
+## 2.1 匹配不同的错误类型 (Matching on Different Errors)
 不管为什么 `File::open` 因为什么出现错误，程序都会出现用宏函数 `panic!` 来报错。此时，我们想要根据不同错误来进行不同操作。比如，如果返回的是文件没找到的错误，那么就创建文件，并且重新返回，如果是别的错误，那么就调用函数 `panic!` 来返回。
 
 ```rust
@@ -182,7 +182,7 @@ fn main() {
 ```
 尽管以上的这代码的是实现的功能和 代码 9-5 相同个，但是他它不包含任何的匹配表达式，并且更加容易阅读。这里例子在阅读完 第13章之后的。在处理错误的时候，有很多方法可以用来去除 `match` 的匹配表达式。
 
-### 2.2 简单的使用 Panic 来处理错误(Shortcuts for Panic on Error: unwrap and expect) 
+## 2.2 简单的使用 Panic 来处理错误(Shortcuts for Panic on Error: unwrap and expect) 
 使用 match 表达式使用起来效果很好，但是有点冗长，并且不一定可以很好的表达需要传达的意图. `Result<T, E>` 需要在其定义之上定义许多辅助方法来执行各种任务。其中一个方法就是 `unwrap`， 一种快捷方法来实现和 `match` 表达式一样的功能。如果result的结果是 `Ok` 变量，upwrap 方法就会返回 Ok 变量里的值。如果出现了错误，那么就会调用 宏函数 `panic!` 。
 ```rust
 use std::fs::File;
@@ -212,7 +212,7 @@ thread 'main' panicked at 'Failed to open hello.txt: Error { repr: Os { code:
 ```
 得益于我们指定的错误信息，所以我们可以更快的定位到错位的位置。如果我们使用 `unwrap` 的话，那么就花很多时间在定位错误上。因为所有的 `unwrap` 会返回同样的 错误。
 
-### 2.3 错误的传播 (Propagating Errors)
+## 2.3 错误的传播 (Propagating Errors)
 当我们的调用一个函数的时候，这个被调用的函数是有可能会出现错误的情况的，所以我们有可能会得到一个错误的返回值，开发者可以根据错误来进行相应的操作（是捕获然后日志记录，还是继续往上层抛）而不是一概让函数自己的吧错误给处理了。这种函数抛出错误的行为被称为 “错误的传播(Propagating Errors)”，这让代码有了更多的控制权。在这里有更多信息传递或者提示错误的逻辑处理方式，而不是仅仅在函数中处理错误。
 
 举个例子，在代码9-6 中，就展示啦一个函数，这个函数实现了读取一个文件中的用户名。如果这个文件不存在或者程序没有读取文件的权限，那么调用这个函数的代码就会得到一个错误。
@@ -249,7 +249,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 调用上面这个函数 `read_username_from_file` 的最后会得到一个 `Reuslt` 类型的值，在成功执行到了函数的情况下，就会得到包含的用户名 `Ok` 对象；如果出现错误了，那么就返回用`Err` 包裹的 `io::Error` 的值。因为不知道到底调用代码会出现什么的错误，如果出现错误那么，就会返回就会中断程序，如果正确执行的话，那么就会返回相应的值(用户名)。因为没有足够的信息来确定调用代码是正确还是错误，所以我们把不管是成功还是错误的结果都向上传播。
 
-##### 2.3.1 一个简短版的传播错误的代码: `?` 操作符 (A Shortcut for Propagating Errors: the ? Operator) 
+### 2.3.1 一个简短版的传播错误的代码: `?` 操作符 (A Shortcut for Propagating Errors: the ? Operator) 
 代码 9-7 展示了和函数 `read_username_from_file` 在代码 9-6 中一样的功能的代码，只不过有部分的功能是用 `?` 操作符。
 ```rust
 #![allow(unused_variables)]
@@ -300,7 +300,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
 
 从文件中读取字符串是非常常见的操作，所以 Rust 提供了便捷函数 `fs::read_to_string` 来完成这个功能，该函数执行打开文件，创建新的 `String`，读取文件内容，把内容放入新创建的 `String` 的值中，以及返回。当然，用 `fs::read_to_string` 不会给我们机会来解释错误处理。所以我们必须要进行错误处理。
 
-##### 2.3.2 The ? Operator Can Be Used in Functions That Return Result
+### 2.3.2 The ? Operator Can Be Used in Functions That Return Result
 
 来看看，如果用了 `?` 操作符在 `main` 函数中，你会记得返回类型是 `()`。
 
@@ -350,17 +350,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 目前为止我们讨论了 `panic!` 或者 返回 `Result`，让我们回到如何决定在什么情况下用什么的主题上面来。
 # 3 To panic! or Not to panic!
 
-### 3.1 Examples, Prototype Code, and Tests
+## 3.1 Examples, Prototype Code, and Tests
 
 
-### 3.2 Cases in Which You Have More Information Than the Compiler
+## 3.2 Cases in Which You Have More Information Than the Compiler
 
 
-### 3.3 Guidelines for Error Handling
+## 3.3 Guidelines for Error Handling
 
 
 
-### 3.4 Creating Custom Types for Validation
+## 3.4 Creating Custom Types for Validation
 
 
 # 4 Summary
