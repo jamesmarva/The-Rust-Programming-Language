@@ -12,6 +12,8 @@ code/ch04/section01/demo_04_04/target
 code/ch04/section01/demo_04_05/Cargo.lock
 code/ch04/section01/demo_04_05/target
 
+code/ch04/list_04_02/target
+code/ch04/list_04_02/Cargo.lock
 
 code/ch04/listing_04_07/target
 code/ch04/listing_04_07/Cargo.lock
@@ -229,3 +231,4 @@ code/ch10/listing_10_16/Cargo.lock
 
 
 
+*.lock
