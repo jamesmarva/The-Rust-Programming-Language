@@ -27,6 +27,19 @@ code/ch04/clone_example/Cargo.lock
 code/ch04/wrong_1/target
 code/ch04/wrong_1/Cargo.lock
 
+code/ch04/listing_4_3/target
+code/ch04/listing_4_3/Cargo.lock
+
+code/ch04/listing_4_5/target
+code/ch04/listing_4_5/Cargo.lock
+
+code/ch04/listing_4_4/target
+code/ch04/listing_4_4/Cargo.lock
+
+
+code/ch04/copy_example/target
+code/ch04/copy_example/Cargo.lock
+
 code/ch04/listing_04_08/target
 code/ch04/listing_04_08/Cargo.lock
 
