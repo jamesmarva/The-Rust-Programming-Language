@@ -5,10 +5,13 @@ code/ch05/demo02/target
 code/ch05/demo03/target
 code/ch05/rectangles/target
 code/ch06/demo01/target
+
 code/ch04/section01/demo_04_03/Cargo.lock
 code/ch04/section01/demo_04_03/target
+
 code/ch04/section01/demo_04_04/Cargo.lock
 code/ch04/section01/demo_04_04/target
+
 code/ch04/section01/demo_04_05/Cargo.lock
 code/ch04/section01/demo_04_05/target
 
@@ -17,6 +20,12 @@ code/ch04/list_04_02/Cargo.lock
 
 code/ch04/listing_04_07/target
 code/ch04/listing_04_07/Cargo.lock
+
+code/ch04/clone_example/target
+code/ch04/clone_example/Cargo.lock
+
+code/ch04/wrong_1/target
+code/ch04/wrong_1/Cargo.lock
 
 code/ch04/listing_04_08/target
 code/ch04/listing_04_08/Cargo.lock
