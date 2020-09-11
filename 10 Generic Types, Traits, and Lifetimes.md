@@ -927,16 +927,65 @@ fn main() {
 
 > 注意：代码10-17、10-18、10-24中，在声明变量的时候没有赋上初始值，因此变量名称只在外部域中。第一眼看起来，这个似乎和 “Rust不允许有空值” 相矛盾。可是如果我们在它们没有赋值之前尝试使用它们，就会出现编译错误，这就是表示Rust确实不允许空值。
 
-外部域声明了名字为 `r` 的变量，并且没有设置初始值，内部域声明了一个名字为 `x` 的变量，并且设置了初始值为 5。
+外部域声明了名字为 `r` 的变量，并且没有设置初始值，内部域声明了一个名字为 `x` 的变量，并且设置了初始值为 5.在内部的作用域，我们就尝试把 `x` 值的引用赋值给 `r`。然后这个内部的作用域结束，然后我们就尝试输出 `r`。上面这段代码不能编译，因为这个在是要使用 `r` 之前，`x` 就已经超出范围了，就被释放了。
+```shell
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0597]: `x` does not live long enough
+  --> src/main.rs:7:17
+   |
+7  |             r = &x;
+   |                 ^^ borrowed value does not live long enough
+8  |         }
+   |         - `x` dropped here while still borrowed
+9  | 
+10 |         println!("r: {}", r);
+   |                           - borrow later used here
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0597`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+
+
+## 3.2 The Borrow Checker   
 
 
 
-
-## 3.2 
-
+## 3.3 Generic Lifetimes in Functions
 
 
 
+## 3.4 Lifetime Annotation Syntax
+
+
+## 3.5 Lifetime Annotations in Function Signatures
+
+## 3.6 Thinking in Terms of Lifetimes
+
+
+## 3.7 Lifetime Annotations in Struct Definitions
+
+
+## 3.8 Lifetime Elision
+
+
+
+## 3.9 Lifetime Annotations in Method Definitions
+
+
+
+## 3.10 The Static Lifetime
+
+
+
+# 4 Generic Type Parameters, Trait Bounds, and Lifetimes Together
+
+
+# 5 Summary
 
 
 
