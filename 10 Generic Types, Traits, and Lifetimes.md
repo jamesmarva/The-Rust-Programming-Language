@@ -1044,6 +1044,11 @@ error: could not compile `listing_10_21`.
 
 To learn more, run the command again with --verbose.
 ```
+这段文本就告诉我们一个，返回类型的需要一个通用的生命期限的参数，因为Rust 不知道返回的引用是 `x` 还是 `y`。实际上，我们也不知道，因为 `if` 的代码块返回的是 `x`，而 `else` 的代码块是返回的 `y`.
+
+定义这个函数的时候，我们不知道将传递给这个函数的具体的值。
+
+
 
 ## 3.4 生命期限的注释语法(Lifetime Annotation Syntax)
 
