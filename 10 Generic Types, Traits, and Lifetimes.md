@@ -990,12 +990,63 @@ fn main() {
 
 现在你知道了生命期限是如何进行判断的了，以及 Rust 是如何分析生命期限来保证引用是永远有效的，接下来我们来看看关于函数的参数和返回值的生命期限
 
+## 3.3 函数的生命期限(Generic Lifetimes in Functions)
+写一个比返回两个字符串切片(string slices)中更长的切片。这个函数会比较两个字符串切片，然后返回其中更长的一个。之后再来实现`longest`函数，代码10-20 会输出 `The longest string is abcd`
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
 
-## 3.3 Generic Lifetimes in Functions
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
+```
+代码10-20 主函数(main)调用 `longest` 函数来寻找更长的字符串切片。
 
+注意，我们想要这个函数接受字符串切片的引用，因为我们不想要 `longest` 函数获取到参数的所有权(ownership)。有关于为什么我们在代码10-20 中使用的是参数的引用，可以参考第四章 “字符串切片作为参数”
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
 
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
 
-## 3.4 Lifetime Annotation Syntax
+fn longest(x: &str, y: &str) -> &str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+代码10-21 一段无法编译的 `longest` 函数，返回更长的字符串切
+
+我们可以得到下面的错误：
+```shell
+error[E0106]: missing lifetime specifier
+  --> src\main.rs:10:33
+   |
+10 | fn longest(x: &str, y: &str) -> &str {
+   |               ----     ----     ^ expected named lifetime parameter
+   |
+   = help: this function's return type contains a borrowed value, but the signature does not say whether it is borrowed from `x` or `y`
+help: consider introducing a named lifetime parameter
+   |
+10 | fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+   |           ^^^^    ^^^^^^^     ^^^^^^^     ^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0106`.
+error: could not compile `listing_10_21`.
+
+To learn more, run the command again with --verbose.
+```
+
+## 3.4 生命期限的注释语法(Lifetime Annotation Syntax)
+
 
 
 ## 3.5 Lifetime Annotations in Function Signatures
