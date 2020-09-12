@@ -1042,19 +1042,30 @@ error: aborting due to previous error
 For more information about this error, try `rustc --explain E0106`.
 error: could not compile `listing_10_21`.
 
-To learn more, run the command again with --verbose.
+To learn more, run the command again with --verbose.555555
 ```
 这段文本就告诉我们一个，返回类型的需要一个通用的生命期限的参数，因为Rust 不知道返回的引用是 `x` 还是 `y`。实际上，我们也不知道，因为 `if` 的代码块返回的是 `x`，而 `else` 的代码块是返回的 `y`.
 
-定义这个函数的时候，我们不知道将传递给这个函数的具体的值。
+定义这个函数的时候，我们不知道将传递给这个函数的具体的值，所以我们就不知道是否得执行 `if` 代码块的代码还是执行 `else` 的代码块的代码。也不知道传递给函数的引用的具体的生命期限，所以就无法像上面的代码18 和代码19那样查看范围，以及确定返回的引用是否有效。要解决这个错误，就要用到生命期限的参数，这些参数定义了引用之间的关系，以便 借用检查器(borrow checker)可以分析
 
+## 3.4 生命期限的注释语法 (Lifetime Annotation Syntax)
+生命期限的注释是不会更改任何引用的存活时间的。就像函数签名指定一个泛型类型的时候，函数可以接受任何类型的参数，函数可以接受可以接受任何声明期限的通过指定一个通用(generic)的生命期限参数。生命期限注释描述了多个引用的生命期限的关系，但是不会影响生命期限。
 
+生命期限的注释语法有点特殊：生命周期的参数的名称必须要以 `'`来开头，并且同时都是很短并且是小写，就像泛型类型一样。大多数人用的都是名称`'a`。将生命期限参数放在引用的 `&` 符号的后面，用一个空格把注释和引用的类型分开。
 
-## 3.4 生命期限的注释语法(Lifetime Annotation Syntax)
+下面有几个例子
+1 没有个生命期限注释的引用
+2 名称为 `'a` 的生命期限的注释的引用
+3 名称为 `'a` 的生命期限的注释的可变引用
+```rust
+&i32        // a reference
+&'a i32     // a reference with an explicit lifetime
+&'a mut i32 // a mutable reference with an explicit lifetime
+```
+一个生命期限的注释是没有太多的含义的，因为注释是为了告诉Rust多个引用的通用的生命期限的参数的之间的关系。比如，我们假设有个函数有个参数`first`是对 `i32` 的引用，同时有个生命期限 `'a`，同时也有另一个参数`second`，也是对类型 `i32`的引用，同时也有一个生命期限注释 `'b`。这样的生命期限注释就以为这第一个和第二个参数有同样长的生命期限。
 
+## 3.5 在函数签名中的生命期限注释(Lifetime Annotations in Function Signatures)
 
-
-## 3.5 Lifetime Annotations in Function Signatures
 
 ## 3.6 Thinking in Terms of Lifetimes
 
