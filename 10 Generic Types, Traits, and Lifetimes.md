@@ -1065,6 +1065,28 @@ To learn more, run the command again with --verbose.555555
 一个生命期限的注释是没有太多的含义的，因为注释是为了告诉Rust多个引用的通用的生命期限的参数的之间的关系。比如，我们假设有个函数有个参数`first`是对 `i32` 的引用，同时有个生命期限 `'a`，同时也有另一个参数`second`，也是对类型 `i32`的引用，同时也有一个生命期限注释 `'b`。这样的生命期限注释就以为这第一个和第二个参数有同样长的生命期限。
 
 ## 3.5 在函数签名中的生命期限注释(Lifetime Annotations in Function Signatures)
+让我们在 `longest` 的函数中检查生命期限的注释。和泛型类型参数一样，我们需要声明一个泛型参数在函数的名和参数列表之间的尖括号中。这个约束我们想要表达就是，在这个函数中的所有的参数以及返回值都有同一个生命期限。我们把这个生命期限称之为 `'a`，并且把它新增到每个引用中。
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
+
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+代码10-22 有同样的生命期限 `'a` 的 `longest` 函数
+
+代码可以编译，并且可以输出我们想要的结果。
+
 
 
 ## 3.6 Thinking in Terms of Lifetimes
