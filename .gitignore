@@ -252,7 +252,8 @@ code/ch10/listing_10_17/Cargo.lock
 code/ch10/listing_10_18/target
 code/ch10/listing_10_18/Cargo.lock
 
-
+code/ch10/listing_10_19/target
+code/ch10/listing_10_19/Cargo.lock
 
 
 *.lock
