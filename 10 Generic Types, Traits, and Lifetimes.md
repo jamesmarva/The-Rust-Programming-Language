@@ -1225,7 +1225,7 @@ To learn more, run the command again with --verbose.
 总的来说，生命期限的语法就是建立多个参数的和返回值的联系。一旦建立联系，Rust 就拥有了足够的信息以允许进行内存安全操作，并且禁止可能会创建悬挂引用或者违反内存安全的操作。
 
 ## 3.7 结构体的定义的中的生命期限的注释(Lifetime Annotations in Struct Definitions)
-
+到目前为止，我只定义了结构体来持有某个具体的类型，但是对于结构体来说，它也有可能持有某个引用类型。但是在这种情况下，我们就需要给每个引用添加上生命期限的注释。代码10-25就是这种情况。
 
 ```rust
 struct ImportantExcerpt<'a> {
@@ -1242,10 +1242,14 @@ fn main() {
 ```
 代码10-25 结构体带着一个引用，所以它的定义需要一个生命期限注释
 
+这个结构体有一个字段 `part`，持有一个字符串切片(string slice)，这个就是引用。和泛型数据类型一样，我们需要在结构的名称之后的尖括号的生命期现的名称，以便可以在结构体重中的主体中使用生命期限的参数。这个注释就表示 `ImportantExcerpt` 不能超过它在 `part` 字段保存的引用。
+
+这里的 `main` 函数创建一个 `ImportantExcerpt` 结构体的示例，该实例持有的一个字符串的类型的novel。这个来自 `novel` 在 `ImportantExcerpt`创建之前就存在的。另外 `novel` 在 `ImportantExcerpt` 释放之后才释放，所以在 `ImportantExcerpt` 的引用是有效的。
+
+## 3.8 生命期限省略(Lifetime Elision)
+我们现在知道了每个引用都有声明周期，以及你需要给每个使用引用的结构体指定生命期限参数。但是在第四章中，我们在代码4-9中有个函数代码，可以在没有生命期限的注解下也能运行。
 
 
-## 3.8 生命期限淘汰(Lifetime Elision)
-You’ve learned that every reference has a lifetime and that you need to specify lifetime parameters for functions or structs that use references. However, in Chapter 4 we had a function in Listing 4-9, which is shown again in Listing 10-26, that compiled without lifetime annotations.
 ```rust
 fn first_word(s: &str) -> &str {
     let bytes = s.as_bytes();
@@ -1275,8 +1279,27 @@ fn main() {
     let word = first_word(my_string_literal);
 }
 ```
+代码10-26 没有生命期限参数注释的代码示例
 
+这个函数在没有生命期限注释的情况下编译是有历史：在早期的版本中，这个代码是不能编译的，因为早期的版本都需要声明明确的生命期限参数。当时的代码要像下面的这样才能编译。
+```rust
+fn first_word<'a>(s: &'a str) -> &'a str {
+```
+在编写了很多的 Rust 代码之后，Rust团队发现很多 Rust程序员在一些特定的情况下输入都是相同的生命期限的注释。这些情况是可以预见的，并且是遵循一些已经确定的模式来编写的。开发人员吧这些模式写到编译器中，这样借用检查器就可以推断出在这些模式下的生命周期，并且不需要显示的注释。
 
+这段Rust的历史很重要，因为可能会有更多的确定模式添加到编译器当中来。在将来，需要注释生命期限的情况会更少。
+
+编程进Rust在分析引用的模式称之为 *生命期现省略规则(lifetime elision rules)*。这些不是开发者需要遵循的规则，有几个特定的情况下，编译器会替你考虑，如果到你的代码正好匹配这些情况，那么就没有必要显示编写生命期限注释
+
+省略规则无法提供完整的推断。如果Rust确定地应用了规则但是在引用的生命期限方面仍然存在歧义，那么编译器就不会推测其余引用的生命期限了。这种情况下，编译器会返回个你一个错误，你可以通过添加指定的引用之间的生命期现的联系来解决错误，而不是让编译器去猜测。
+
+在函数或者在方法上的生命期限，我们称之为 *输入生命期限(input lifetimes)*，在返回上的生命期限称之为*输出生命期限(outputlifetimes)*。
+
+编译器用三种规则来找出没有显示注释生命期限的引用的生命期限。第一个规则适用于 输入生命期限，第二种和第三种适用于输出生命期限。如果三种规则都判断了还是没确定生命期限，那么编译器就会停止，然后报错。这些规则都适用于 带`fn`关键字定义的代码，还有 `impl` 代码块。
+
+第一个规则就是：作为引用的每个参数都有它自己的生命期限参数。换句话说，如果一个函数只有一个参数，那么它就有一个生命期限了，比如 `fn foo<'a>(x: &'a i32)`；如果一个函数有两个参数，那么它就默认获得了两个生命期限了: `fn foo<'a, 'b>(x: &'a i32, y: &'b i32)`；多个参数就有多个。
+
+第二个规则就是：
 
 ## 3.9 Lifetime Annotations in Method Definitions
 

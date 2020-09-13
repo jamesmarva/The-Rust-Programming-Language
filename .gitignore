@@ -279,4 +279,7 @@ code/ch10/listing_10_24_2/Cargo.lock
 code/ch10/listing_10_25/target
 code/ch10/listing_10_25/Cargo.lock
 
+code/ch10/listing_10_26/target
+code/ch10/listing_10_26/Cargo.lock
+
 *.lock
