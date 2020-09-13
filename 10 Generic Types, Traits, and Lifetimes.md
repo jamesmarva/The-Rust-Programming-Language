@@ -995,7 +995,7 @@ fn main() {
 ```rust
 fn main() {
     let string1 = String::from("abcd");
-    let string2 = "xyz";
+    let string2 = "z";
 
     let result = longest(string1.as_str(), string2);
     println!("The longest string is {}", result);
@@ -1117,26 +1117,125 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 
 在这例子中，`string1` 一直到有效到了外部的作用域结束，`string2` 一直有有效到内部的作用域结束，以及 `result` 的引用的数据是在内部域的里有效的。运行这个代码，你会看到 借用检查器是允许这个代码运行的，以及会输出 `The longest string is long string is long`
 
-下一步，让我们再来试试一个例子，这个是得
+下一步，让我们再来试试一个例子，这个展示了 `result` 的引用是两个参数的生命期限里的较短的一个。我们将结果的变量声明放在内部的作用域之外，但是将在内部域里面的把 `string2` 赋值给 `result`。然后把`println!`移动到内部域之外。这样的代码不能编译
+```rust
+fn main() {
+    let string1 = String::from("long string is long");
+    let result;
+    {
+        let string2 = String::from("xyz");
+        result = longest(string1.as_str(), string2.as_str());
+    }
+    println!("The longest string is {}", result);
+}
+
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+代码10-24 尝试在 `string2` 超出作用域之后再使用 `result`
+
+尝试编译这段代码，就会得到以下错误信息
+```shell
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0597]: `string2` does not live long enough
+ --> src/main.rs:6:44
+  |
+6 |         result = longest(string1.as_str(), string2.as_str());
+  |                                            ^^^^^^^ borrowed value does not live long enough
+7 |     }
+  |     - `string2` dropped here while still borrowed
+8 |     println!("The longest string is {}", result);
+  |                                          ------ borrow later used here
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0597`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+
+```
+这个错误就告诉我们因为需要在 `println!` 的语句有效，这样就需要 `string2` 就需要在外部域也要有效。Rust知道这个，就是因为我们注释了函数的参数的生命期限，以及返回值也用了同一个生命期限参数。
+
+作为人类，我们可以很明白，`string1` 比`string2`长，所以`result`会包含 `string1`的引用。因为 `string1` 没有超出作用域，所以 `string1` 的引用在 `println!` 的声明依然是有效的。但是，机器毕竟是机器，编译器依然看不到在这种情况下引用是有效的。我们告诉了编译器，返回值的生命周期是传入的参数的生命周期的较短的那个。因此，借用检查其不允许代码10-24中有无效的引用。
+
+尝试设计更多的试验，以改变传递给`longest`函数的引用值，以及生命期限，以及改变返回值的使用。假设你的代码是可以通过借用检查器的，然后进行编译再确定是否正确。
+
+## 3.6 思考生命期限的一生(Thinking in Terms of Lifetimes)
+你需要指定参数的生命期限取决于你函数功能。比如，如果你改变了 `longest` 函数的实现，改为返回第一个参数，而不是最长的字符串切片，我们就不需要指定 `y` 参数的生命期限了。下面这段代码是可以通过编译的。
+
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "efghijklmnopqrstuvwxyz";
+
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
+
+fn longest<'a>(x: &'a str, y: &str) -> &'a str {
+    x
+}
+```
+在这里例子中，我们为了参数 `x` 和 返回值 指定了生命期限参数 `'a`,但是没有给 参数`y`指定生命期限的参数，因为 `y` 的生命期限和参数 `x` 没有联系，和返回值也没有联系。
+
+当从一个函数的返回引用，这个返回类型的生命期限的参数要和参数其中之一的生命期限相同。如果返回的引用没有指向其中任何一个参数，它就要指向函数里的创建的额一个值，那么这个就有可能变成一个悬挂引用，因为这个值在函数结束的时候就要超出作用域(go out of scope)。下面这段代码没法编译 
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
+
+fn longest<'a>(x: &str, y: &str) -> &'a str {
+    let result = String::from("really long string");
+    result.as_str()
+}
+```
+这里，尽管我们指定了一个生命期限给了返回值，但是这段代码实现依然会编译失败，因为返回的生命期现和参数的生命期限一点关系都没有我们会得到一个错误信息：
+```shell
+$ cargo run
+   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
+error[E0515]: cannot return value referencing local variable `result`
+  --> src/main.rs:11:5
+   |
+11 |     result.as_str()
+   |     ------^^^^^^^^^
+   |     |
+   |     returns a value referencing data owned by the current function
+   |     `result` is borrowed here
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0515`.
+error: could not compile `chapter10`.
+
+To learn more, run the command again with --verbose.
+```
+核心的问题就是，这个result超出了它的作用域，然后在 `longest` 函数结束的是被清理了。我们一直想要返回这个`result`来自函数的引用，这是不可能的。我们无法修改悬空引用的生命期现的参数，Rust也不允许我们创建一个悬空引用。这种情况下，最好的解决方法就是返回一个有数据值，而不是一个引用。
+
+总的来说，生命期限的语法就是建立多个参数的和返回值的联系。一旦建立联系，Rust 就拥有了足够的信息以允许进行内存安全操作，并且禁止可能会创建悬挂引用或者违反内存安全的操作。
+
+## 3.7 结构体的定义的中的生命期限的注释(Lifetime Annotations in Struct Definitions)
 
 
-## 3.6 Thinking in Terms of Lifetimes
 
-
-## 3.7 Lifetime Annotations in Struct Definitions
-
-
-## 3.8 Lifetime Elision
+## 3.8 生命期限淘汰(Lifetime Elision)
 
 
 
 ## 3.9 Lifetime Annotations in Method Definitions
 
 
-
 ## 3.10 The Static Lifetime
-
-
 
 # 4 Generic Type Parameters, Trait Bounds, and Lifetimes Together
 
