@@ -1327,32 +1327,60 @@ fn longest<'a, 'b>(x: &'a str, y: &'b str) -> &str {
 ```
 这样第二规则就不能用了，因为输入生命期限超过了一个。第三规则也同样不适用了，因为这个还是函数而不是方法，所以没有一个参数是 `self`。参考完三个规则之后，我们依然没有找到弄清楚返回类型的生命期限。这就是为什么在代码10-21中报错的原因：编译器通过三个省略规则依然没有弄清楚在签名中的所有的参数的生命期限。
 
-因为第三条规则是用在方法上的，所以我们接下来看看在为什么第三条规则不用经常在方法的签名中声明生命期限。
+因为第三条规则是用在方法上的，所以我们接下来看看在为什么第三条规则可以帮助我们不用经常在方法的签名中声明生命期限。
 
 ## 3.9 方法定义中的生命期限注释(Lifetime Annotations in Method Definitions)
 当我们在结构体上实现带有生命期限的方法的时候，我们使用的是和代码10-11的泛型参数相同的语法。声明和使用生期限的位置取决于它们是否和结构体的字段和或者方法参数和返回值有联系。
 
 生命期限的在结构体中的名字要被声明在 `impl` 关键字的后面，以及在结构体的后面，因为这些都生命期限是结构类型的一部分。
 
-在 `impl`代码块的方法签名中，引用肯是与 结构体的字段的引用的生命期限相关的，或者它们可能是独立的。此外
-## 3.10 The Static Lifetime
+在 `impl`代码块的方法签名中，引用肯是与 结构体的字段的引用的生命期限相关的，或者它们可能是独立的。此外，生命周期省略会帮助我们节省这些方法的声明了。
+
+首先，我们用一个名字是 `level` 的方法，这个方法唯一传入的参数是一个对 `self` 的引用，返回值的类型是`i32`，不是任何引用：
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn level(&self) -> i32 {
+        3
+    }
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+}
+```
+在 `impl` 后面声明生命周期参数是必须的，而且在类型(`ImportantExcerpt`)的后面声明也是必须的，但是我们不需要在self的引用后声明生命期限参数，因为第一省略规则。
+
+下面有个第三生命期限的省略规则的使用：
+```rust
+impl<'a> ImportantExcerpt<'a> {
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention please: {}", announcement);
+        self.part
+    }
+}
+```
+有两个输入生命期限，所以可以用第一规则来，给 `&self` 和 `&str` 他们各自的生命期现参数。然后，因为其中一个参数是 `self`， 所以返回类型将会获得 `&self` 的生命期限，所有的生命期现都会被考虑到。
+
+## 3.10 静态域的生命期限(The Static Lifetime)
+一个特殊的生命期限我们需要考虑，就是`'static`，这就意味着这个引用在程序的整个过程中都有效。所有的字符串文字(string literals)都有 `'static` 的生命期现，就像下面这个代码：
+```rust
+let s:&'static str = "I have a static lifetime.";
+```
+这个字符串文本会直接存储在二进制的文件中，始终可用，所以，所有的字符串的文字(string literals) 的生命期限都是 `'static`.
+
+也你可能会在错误的消息中看到关于使用 `'static` 的建议。但是在指定 `'static`作为引用的生命期限之前，请思考一下是否你所拥有的引用在整个程序的生命期限内都有效。你也许会考虑是否真的希望它活的这么长，即便它可以活到这么长。在大多数的情况下，问题是由于尝试创建悬空引用或者和可用生命期限不匹配造成的。那么正解是解决这些问题，而不是指定成`'static`生命期限。
 
 # 4 Generic Type Parameters, Trait Bounds, and Lifetimes Together
 
 
 # 5 Summary
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
