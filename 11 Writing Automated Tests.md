@@ -24,6 +24,45 @@ $ cargo new adder --lib
     create library `adder` project
 $ cd adder
 ```
+*src/lib.rs* 的文件的内容看起就像代码11-1 一样
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+```
+代码11-1 用 `Cargo new` 自动生成的代码
+
+现在，让我先忽略前两行，然后专注在函数的代码上，先看看函数是如何工作的。注意，在函数的签名的上一行的`#[test]`的注释，这个注释就表明了这个是个测试函数，以及，测试的运行程序会知道这个函数是个测试用例。我们也可以在测试模块有非测试的函数的代码，来帮助我们创建常规的操作，所以我们才需要用 `#[test]` 属性来帮助我们指示谁才是测试函数。
+
+这个函数代码体用宏函数 `assert_eq!` 来确定是否 2 + 2 等于4。这个断言是用来作为典型的测试模本的示例。让我们来运行一下看看是否这个例子可以正常与西宁。
+
+```shell
+$ cargo test
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.57s
+     Running target/debug/deps/adder-92948b65e88960b4
+
+running 1 test
+test tests::it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests adder
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+
+```
+
+
+
+
 
 
 # 2 控制测试用例如何运行(Controlling How Tests Are Run)
