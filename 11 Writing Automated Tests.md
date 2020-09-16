@@ -56,14 +56,17 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
-
-
 ```
+代码11-2 运行自动生成的测试用例之后的输入
 
 
+## 1.2 Checking Results with the assert! Macro
 
+## 1.3 Testing Equality with the assert_eq! and assert_ne! Macros
 
+## 1.4 Adding Custom Failure Messages
 
+## 1.5 Using Result<T, E> in Tests
 
 # 2 控制测试用例如何运行(Controlling How Tests Are Run)
 
