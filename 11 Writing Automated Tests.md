@@ -140,18 +140,77 @@ error: test failed, to rerun pass '--lib'
 ```
 代码11-4 一个测试用例通过，一个失败的输出。
 
+`test tests::another ... FAILED` 表示用例失败了。每个结果的都出现了两个新的部分，第一部分显示了每个测试用例的细节。在这种情况下，`another` 因为 `panicked at 'Make this test fail'`而失败了，在 *src/lib* 文件的第10行的代码。下一部分仅仅列出了所有的失败测试用例的名称，这个在大量的测试和大量失败用例输出的时候是很有效的。我们可以用失败的用例的名字来运行，以便我们更好的debug他们，这个将会在下一节“Controlling How Tests Are Run” 中讨论
 
+在摘要的最后一行显示了：总的来说，我们的测试结果是失败了。一个成功，一次失败。
 
-## 1.2 Checking Results with the assert! Macro
+现在我们已经看到了在不同的情况下的测试用例输出，我们来看看除了`panic!`宏函数之外的有用宏函数。
+
+## 1.2 用宏函数`asser!`来检查结果(Checking Results with the assert! Macro)
+宏函数`assert!`是标准库提供的，当你要确保某些代码的结果是否在测试中是`true`。我们给`assert!` 一个参数来评估这个参数是不是布尔。如果结果是`true`，`assert!` 不会做什么，而且这个测试就通过了，但是如果是 `false`，那么 `assert!`就会报错，用`panic!`函数来报错，这就导致了测试用例的失败。
+
+在第5章，代码5-15，我们写了一个`Rectangle`结构体，以及`can_hold`方法，
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+```
+代码 11-5 再次用第5章的代码
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle {
+            width: 8,
+            height: 7,
+        };
+        let smaller = Rectangle {
+            width: 5,
+            height: 1,
+        };
+
+        assert!(larger.can_hold(&smaller));
+    }
+}
+```
+
 
 ## 1.3 Testing Equality with the assert_eq! and assert_ne! Macros
 
+
 ## 1.4 Adding Custom Failure Messages
 
-## 1.5 Using Result<T, E> in Tests
-e4
-# 2 控制测试用例如何运行(Controlling How Tests Are Run)
 
+## 1.5 Using Result<T, E> in Tests
+
+
+
+# 2 控制测试用例如何运行(Controlling How Tests Are Run)
 
 
 
