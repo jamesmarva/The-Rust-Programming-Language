@@ -65,6 +65,80 @@ Cargo 编译然后运行了测试用例。在 `Compiling`，`Finishing`，`Runni
 
 `0 measured`的统计信息是给用来给基准测试的，用来衡量性能的。在写这篇文章的时候，基准测试只在 nightly Rust 中提供。可以看文档 [the documentation about benchmark tests](https://doc.rust-lang.org/unstable-book/library-features/test.html)来获取更多的知识。
 
+输出的下一个部分是从`Doc-tests adder` 开始的，这个是任何一个测试文档的结果。我们还没有人一个测试文档，但是Rust可以编译任何一个我们API中的测试代码示例，这个可以帮助我们的文档和我们的代码同步。我们将会在第14章中讨论这个功能。
+
+让我们修改一下这个测试函数的名字，然后看看测试的输出。
+
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn exploration() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+```
+再次运行`cargo test`，输出结果显示了 `exploration` 代替了 `it_works`
+```shell
+$ cargo test
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.59s
+     Running target/debug/deps/adder-92948b65e88960b4
+
+running 1 test
+test tests::exploration ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests adder
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+让我们再添加一个另一个测试用例，但是这次我们会让这个测试用例失败。当函数的报错的时候，测试用例就会失败。每个测试用例就会在一个新的线程里运行，让主线程发现了这个线程死亡了，那么这个测试用例就会被标注为失败。在第9章中，我们就讨论了引起错误的最简单的方法，就是直接调用宏函数 `panic!`。添加到测试函数里。
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn exploration() {
+        assert_eq!(2 + 2, 4);
+    }
+
+    #[test]
+    fn another() {
+        panic!("Make this test fail");
+    }
+}
+```
+代码11-3 新增一个测试函数，这个函数会失败，因为我们调用了宏函数 `panic!`
+
+再次运行 `cargo test`，输出就在代码11-4，就是 `exploration`通过，但是`another`失败。
+```shell
+$ cargo test
+   Compiling adder v0.1.0 (file:///projects/adder)
+    Finished test [unoptimized + debuginfo] target(s) in 0.72s
+     Running target/debug/deps/adder-92948b65e88960b4
+
+running 2 tests
+test tests::another ... FAILED
+test tests::exploration ... ok
+
+failures:
+
+---- tests::another stdout ----
+thread 'main' panicked at 'Make this test fail', src/lib.rs:10:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
+
+
+failures:
+    tests::another
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out
+
+error: test failed, to rerun pass '--lib'
+```
+代码11-4 一个测试用例通过，一个失败的输出。
 
 
 
