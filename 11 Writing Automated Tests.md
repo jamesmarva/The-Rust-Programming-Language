@@ -57,7 +57,15 @@ running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ```
-代码11-2 运行自动生成的测试用例之后的输入
+代码11-2 运行自动生成的测试用例之后的输出
+
+Cargo 编译然后运行了测试用例。在 `Compiling`，`Finishing`，`Running`。下一行就显示了这个测试函数的名字`it_works`，也显示了运行了测试用例的结果，`ok`。接下来将会输出运行测试的总体的摘要。下一行 `test result: ok` 就意味着所有的测试用例都运行通过了，以及`1 passed; 0 failed` 就表示测试用例通过的数量或者失败的数量。
+
+因为我们没有标注忽略(ignored) 任何一个测试用例，所以摘要显示 `0 ignored`。我们也没有过滤任何一个测试用例，所以摘要就显示了`0 filtered out`。我们将会在下一小节[“Controlling How Tests Are Run.”](https://doc.rust-lang.org/book/ch11-02-running-tests.html#controlling-how-tests-are-run)讨论关于忽略和过滤测试用例。
+
+`0 measured`的统计信息是给用来给基准测试的，用来衡量性能的。在写这篇文章的时候，基准测试只在 nightly Rust 中提供。可以看文档 [the documentation about benchmark tests](https://doc.rust-lang.org/unstable-book/library-features/test.html)来获取更多的知识。
+
+
 
 
 ## 1.2 Checking Results with the assert! Macro
@@ -67,7 +75,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ## 1.4 Adding Custom Failure Messages
 
 ## 1.5 Using Result<T, E> in Tests
-
+e4
 # 2 控制测试用例如何运行(Controlling How Tests Are Run)
 
 
