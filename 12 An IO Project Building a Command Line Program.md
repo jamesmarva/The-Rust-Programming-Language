@@ -85,8 +85,7 @@ In file sample.txt
 ```
 程序跑起来了。我们需要吧参数值保存到正确的变量中，稍后我们将会添加一些错误来处理一些潜在错误，比如用户在不提供的参数的时候，会出错。不过现在我们将会忽略这种情况，而改为继续讨论读取文件的功能。
 # 2 读取文件(Reading a File)
-现在我们将会去读取指定命令行中的文件名的文件。
-
+现在我们将会添加功能来去读取指定命令行中的文件名的文件。首先，我们需要一个示例文件来进行测试：最好的用来确保 `minigrep` 工作的最好的文件类型就是在一个文本文件内有几行文字，并且含有重复的单词。Emily Dickinson的诗“I’m Nobody! Who are you?”就是很不错的例子。
 ```rust
 I’m nobody! Who are you?
 Are you nobody, too?
@@ -99,4 +98,83 @@ To tell your name the livelong day
 To an admiring bog!
 ```
 代码12-3：一首来自Emily Dickinson的诗
+
+填充好文本之后，编辑 `src/main.rs` 并且添加读取文件的代码
+```rust
+use std::env;
+use std::fs;
+
+fn main() {
+    // --snip--
+    let args: Vec<String> = env::args().collect();
+
+    let query = &args[1];
+    let filename = &args[2];
+
+    println!("Searching for {}", query);
+    println!("In file {}", filename);
+
+    let contents = fs::read_to_string(filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+```
+代码12-4 读取第二个参数指定文件的内容
+
+首先，我们增加另一个 `use` 表达式来引入标准库的相关的部分：我们需要 `std::fs` 来处理文件。
+
+在 `main` 函数中，我们再次添加了一个临时的`println!` 来输出文件内容，这样就可以验证程序是否是正确的。
+
+第一个参数无所谓，但是以 *poemtxt* 来作为第二个参数。
+```shell
+$ cargo run the poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep the poem.txt`
+Searching for the
+In file poem.txt
+With text:
+I’m nobody! Who are you?
+Are you nobody, too?
+Then there’s a pair of us - don’t tell!
+They’d banish us, you know.
+
+How dreary to be somebody!
+How public, like a frog
+To tell your name the livelong day
+To an admiring bog!
+```
+代码读取并且打印了文件的内容。但是代码有缺陷，`main`函数有太多的职责：通常，如果每个函数仅有一个职责，那么功能将会更加清晰，更加易于维护。另一个问题是我们没有尽全力的处理错误。这个程序依旧很小，这些问题还不是问题，但是随着程序的开发，很难彻底将其修复。最好在开发程序的时候就尽早开始重构，因为重构少量的代码就会让容易的多。我们将在下一步继续。
+
+# 3 重构以提高模块化和错误处理(Refactoring to Improve Modularity and Error Handling)
+为了改进我们的程序，我们将会修复和程序结构相关的问题以及潜在的问题。
+
+首先，我们的 `main` 函数现在执行两个任务：既要解析参数也要读取文件。对于这么小的程序，这都不是主要的问题。但是如果我们继续往 `main` 函数里扩展我们的程序，在 `main` 函数的处理的任务的数量将会增加。随着函数获取到更多的职能，在不破坏其单一的功能的情况下，就变得难以维护，难以测试。最好的做法就是将函数里的功能分开，以便每个功能都可以完成单一的职能。
+
+第二个问题也和第一个问题有关：尽管 `query` 和 `filename` 都是我们程序的配置变量，像 `contents`这样的变量是用与执行程序的逻辑的。随着 `main` 函数边长，越来越多的变量会需要出现在作用域。作用域的变量越多，那么跟踪每个变量的目的就会变得困难。最好将配置变量都集合到一个结构中，以明确其用途。
+
+第四个问题，我们反复用 `expect` 来处理不同的错误，如果用户没有传足够数量的参数给我们程序，他们将会得到一个 `index out of bounds` 的错误，但是这些问题还是没有得到很好的解释。
+
+让我们来通过重构项目来解决以上四个问题。
+##  3.1 在项目中的关注点的分离(Separation of Concerns for Binary Projects)
+把多个职能分配给 `main` 函数的代码组织问题在许多的项目中都很常见。Rust 社区开发了一种流程，当 `main` 函数开始变得臃肿的时候，将拆分成单个职能的函数的指南。这个拆分的过程有以下的步骤：
+- 把你的代码分成 *main.rs* 和 *lib.rs*，然后将你的程序的代码逻辑搬到 *lib.rs* 中。
+- 只要你的解析的参数的代码量够小，那么它就能保留在 *main.rs*
+- 当命令行的参数解析开始变的复杂的时候，请将他们提取到 *lib.rs* 中。
+
+在这个过程之后，保留在 `main` 函数中的代码要被限制于以下的各项：
+- 调用命令行的参数解析逻辑
+- 设置任何其他的配置
+- 在 *lib.rs* 调用 `run` 函数
+- 要处理  `run` 函数中出现的错误。
+
+这种模式是关于分类问题的：*main* 运行程序，而 *lib.rs* 用于处理手头的任务的所有的逻辑。因为你无法直接测试 `main` 的功能，所以只能把它们提取到 *lib.rs* 中进行测试。保留在 *main.rs* 中的代码量足够小，可以通过读代码来验证其正确性。让我们通过以下的步骤来重写我们的代码。
+
+## 3.2 提取参数解析(Extracting the Argument Parser)
+
+
+
+
+
 
