@@ -175,6 +175,98 @@ To an admiring bog!
 
 
 
+## 3.3 统一配置值(Grouping Configuration Values)
+
+
+## 3.4 Creating a Constructor for Config
+
+## 3.5 Fixing the Error Handling
+
+### 3.5.1 Improving the Error Message
 
 
 
+
+
+### 3.5.2 Returning a Result from new Instead of Calling panic!
+
+
+
+### 3.5.3 Calling Config::new and Handling Errors
+
+
+
+
+## 3.6 Extracting Logic from main
+
+
+## 3.7 Splitting Code into a Library Crate
+目前为止看起来，我们 `minigrep`看起来还好。现在我们将分割 *src/main.rs* 的代码，并且将代码放入 *src/lib.rs* 中，并且将对其进行测试，并且有了更少职责的 *src/main.rs*。
+
+让我们把不是 `main` 函数的代码都移动从 *src/main.rs* 到 *src/lib.rs*
+- `run` 函数的定义
+- 和 `use` 表达式相关的概念
+- `Config` 的定义
+- 函数 `Config::new` 的定义
+
+
+```rust
+use std::error::Error;
+use std::fs;
+
+pub struct Config {
+    pub query: String,
+    pub filename: String,
+}
+
+impl Config {
+    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+        // --snip--
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Ok(Config { query, filename })
+    }
+}
+
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    // --snip--
+    let contents = fs::read_to_string(config.filename)?;
+
+    println!("With text:\n{}", contents);
+
+    Ok(())
+}               
+```
+代码12-13 移动 `Config` 和 `run` 到 *src/lib.rs*
+
+```rust
+use std::env;
+use std::process;
+
+use minigrep::Config;
+
+fn main() {
+    // --snip--
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    if let Err(e) = minigrep::run(config) {
+        // --snip--
+        println!("Application error: {}", e);
+
+        process::exit(1);
+    }
+}
+```
