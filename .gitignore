@@ -310,4 +310,18 @@ code/ch12/listing_12_7/Cargo.lock
 code/ch12/listing_12_8/target
 code/ch12/listing_12_8/Cargo.lock
 
+code/ch12/listing_12_8/target
+code/ch12/listing_12_8/Cargo.lock
+
+
+code/ch12/listing_12_8/target
+code/ch12/listing_12_8/Cargo.lock
+
+code/ch12/listing_12_8/target
+code/ch12/listing_12_8/Cargo.lock
+
+code/ch12/listing_12_8/target
+code/ch12/listing_12_8/Cargo.lock
+
 *.lock
+.vscode/launch.json

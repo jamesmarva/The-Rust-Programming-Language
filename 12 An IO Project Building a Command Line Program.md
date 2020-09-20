@@ -298,7 +298,7 @@ impl Config {
 我们更新了 main 函数调用 `parse_config` 的位置。将 `parse_config` 名字改成 `new` 并且把它移动到 `impl` 代码块中，这个功能将和 `Config` 的关联，并且尝试再次编译这个代码，确保可以运行的。
 
 ## 3.5 新增错误处理(Fixing the Error Handling)
-
+现在，我们将会修复错误的处理。回想一下，如果vector中的元素少于三个，那么就会导致出现崩溃。在不带任何参数的情况下试运行一下。
 ```rust
 $ cargo run
    Compiling minigrep v0.1.0 (file:///projects/minigrep)
@@ -307,9 +307,101 @@ $ cargo run
 thread 'main' panicked at 'index out of bounds: the len is 1 but the index is 1', src/main.rs:27:21
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
-### 3.5.1 Improving the Error Message
+`index out of bounds: the len is 1 but the index is 1` 这样错误是针对程序员的错误。但是这个错误不会帮助我们到底发生了什么，也不会告诉我们应该做什么，接下来我们解决这个问题
+### 3.5.1 改进错误信息(Improving the Error Message)
+代码 12-8 我们在 `new` 函数中增加一个检查，这个检查可以确保这个vector中的元素至少三个。如果这个切片长度不够，那么程序在崩溃的时候会报错，并且会产生更好的错误信息。
+```rust
+use std::env;
+use std::fs;
 
-### 3.5.2 Returning a Result from new Instead of Calling panic!
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    // --snip--
+    fn new(args: &[String]) -> Config {
+        if args.len() < 3 {
+            panic!("not enough arguments");
+        }
+        // --snip--
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Config { query, filename }
+    }
+}
+```
+代码 12-8 增加参数数量的检查器
+
+这个代码和 [the Guess::new function we wrote in Listing 9-10]( s://doc.rust-lang.org/book/ch09-03-to-panic-or-not-to-panic.html#creating-custom-types-for-validation)有点像，当参数超过了有效的参数数量的范围的时候，程序就会报错。我们将会检查 `args` 的长度，至少为3个。其余的功能要在这个满足条件下才能运行。如果这个 `args` 少于三个元素的话，这个条件就会成立，我们就会调用 `panic!` 来立即结束程序。
+
+当我们在无参的情况下运行代码的时候，就会出现下面这个些错误。
+```rust
+$ cargo run
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep`
+thread 'main' panicked at 'not enough arguments', src/main.rs:26:13
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
+```
+这个输出无疑更好的：我们现在有了合理的错误消息，可是，我们也有不想给用户额外的消息。也许用代码9-10的技术不是最好的技术：调用一个 `panic!` 函数更像是个解决编程问题，而不是一个应用的问题。你可以用另一个技术来解决这个问题——返回一个 `Result` 对象来表示函数成功或是失败了。
+
+### 3.5.2 new函数返回一个Result对象，而不是调用 `panic!` Returning a Result from new Instead of Calling panic!
+
+
+```rust
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Ok(Config { query, filename })
+    }
+}
+```
 
 
 ### 3.5.3 Calling Config::new and Handling Errors
