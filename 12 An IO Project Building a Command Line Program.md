@@ -292,27 +292,30 @@ impl Config {
         Config { query, filename }
     }
 }
-
 ```
-## 3.5 Fixing the Error Handling
+代码12-7 把 `parse_config` 代码放入 `Config::new`
 
+我们更新了 main 函数调用 `parse_config` 的位置。将 `parse_config` 名字改成 `new` 并且把它移动到 `impl` 代码块中，这个功能将和 `Config` 的关联，并且尝试再次编译这个代码，确保可以运行的。
+
+## 3.5 新增错误处理(Fixing the Error Handling)
+
+```rust
+$ cargo run
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep`
+thread 'main' panicked at 'index out of bounds: the len is 1 but the index is 1', src/main.rs:27:21
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
+```
 ### 3.5.1 Improving the Error Message
 
-
-
-
-
 ### 3.5.2 Returning a Result from new Instead of Calling panic!
-
 
 
 ### 3.5.3 Calling Config::new and Handling Errors
 
 
-
-
 ## 3.6 Extracting Logic from main
-
 
 ## 3.7 Splitting Code into a Library Crate
 目前为止看起来，我们 `minigrep`看起来还好。现在我们将分割 *src/main.rs* 的代码，并且将代码放入 *src/lib.rs* 中，并且将对其进行测试，并且有了更少职责的 *src/main.rs*。
