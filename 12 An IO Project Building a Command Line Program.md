@@ -172,14 +172,128 @@ To an admiring bog!
 这种模式是关于分类问题的：*main* 运行程序，而 *lib.rs* 用于处理手头的任务的所有的逻辑。因为你无法直接测试 `main` 的功能，所以只能把它们提取到 *lib.rs* 中进行测试。保留在 *main.rs* 中的代码量足够小，可以通过读代码来验证其正确性。让我们通过以下的步骤来重写我们的代码。
 
 ## 3.2 提取参数解析(Extracting the Argument Parser)
+我们将会吧解析参数的功能提取到一个 `main` 函数将会调用的函数中。代码12-5 显示了定义了 `parse_config` 函数
+```rust
+use std::env;
+use std::fs;
 
+fn main() {
+    let args: Vec<String> = env::args().collect();
 
+    let (query, filename) = parse_config(&args);
 
+    // --snip--
+
+    println!("Searching for {}", query);
+    println!("In file {}", filename);
+
+    let contents = fs::read_to_string(filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+fn parse_config(args: &[String]) -> (&str, &str) {
+    let query = &args[1];
+    let filename = &args[2];
+
+    (query, filename)
+}
+```
+代码12-5 提取代码到 `parse_config` 
+
+我们仍然会将参数先收集到 Vector 中，但是却没有在 `main` 函数中把处于 index  1 的位置的值赋予 `query`，把index 2 的位置的元素赋予 `filename`，而是直接将整个vector传给函数 `parse_config`。函数 `parse_config` 包含了确定要将哪个参数返回给哪个变量的逻辑，以及将它们返回给 `main` 函数。我们继续在 `main` 函数中创建`query`和 `filename` 两个变量。但是main函数不在负责命令行的参数和变量会如何对应。
+
+对于这样的小程序而言，这样的重写似乎有点过了，但是我们正在逐步进行小型重构。在进行更改之后，再次运行程序确保这次参数解析的修改是ok的。经常检查你的程序是个好习惯，这样有助于你确定问题发生的原因。
 ## 3.3 统一配置值(Grouping Configuration Values)
+我们采用另一个方案来改进我们 `parse_config` 函数。目前，我们这个函数返回的是一个元祖，但是随后我们再次将元祖分解。这就表示我们还没有正确的将功能抽象。
 
+另一个可以改进的部分就是 函数 `parse_config` 的`config` 的部分，这样就意味着我们返回的两个值都是相关的，都是配置值的一部分。我们可以将他们放到一个数据结构中，然后给每个字段一个有意义的名称。这样有利于以后的开发人员维护代码的是明白每个值的含义，以及它们之间的关系。
 
-## 3.4 Creating a Constructor for Config
+> 注意，当复杂类型更加合适的时候，使用基本类型就被成为一种 *原始* 的反模式。
 
+```rust
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = parse_config(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    // --snip--
+
+    println!("With text:\n{}", contents);
+}
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+fn parse_config(args: &[String]) -> Config {
+    let query = args[1].clone();
+    let filename = args[2].clone();
+
+    Config { query, filename }
+}
+```
+代码 12-6 把 `parse_config` 的返回对象改为 `Config` 结构体。
+
+我们添加了一个名为 `Config` 的结构体，其中包含两个字段 `query` 和 `filename` 。现在函数`parse_config`表明了它会返回一个 `Config` 类型的值。在函数体 `parse_config` 中，我们曾经用返回字符串切片的数据作为返回值，我们现在定义了持有 `String` 类型得值的对象的结构体`Config`。`main` 函数是`agrs` 的所有者，并且允许 `parse_config` 函数来借用他们，这就意味着如果`Config` 尝试获取 `args` 中值的所有权，这将会违反 Rust 的借用规则。
+
+我们有很多种不通的方式来管理 String 数据，最简单，但是效率较低的方式就是，在String的值上调用 `Clone` 方法。这将为 `Config` 结构拥有一个完整的数据副本，这种做法比用引用的方式要花更多的时间和空间。可是，克隆数据的方式也让我们的代码看起来更加简单，因为这样就不用管理引用的生命期限(lifetime)了,在这种情况下，就是为了代码简单性而放弃了一些性能的妥协。
+
+> # 使用 clone 方法的权衡 (The Trade-Offs of Using clone)
+> 许多 Rustaceans 会避免用 `clone` 来解决所有权的问题，因为这种方案的运行成本很高。在第13章，你将会学到如何用更有效率的方式来处理这种情况。
+
+## 3.4 给结构体 `Config` 创建一个结构体 (Creating a Constructor for Config)
+目前为止，我们已经从 `main` 函数中提取了解析命令行参数的职能，并且把这个功能放到 `parse_config` 函数中。这样有利于我们看到的 `query` 和 `filename`的值是相关的，并且应该在我们的代码中传达这种关系。
+
+因此， 既然 `parse_config` 的目的是为了创建一个 `Config`实例，我们就可以把 `parse_config` 将一个普通的函数更改为结构体 `Config` 的一个名字是 `name` 的函数。这样的修改会让代码更加好用。通过将调用`Config::new` 来创建结构体`Config`的实例。
+```rust
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+
+    // --snip--
+}
+
+// --snip--
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Config {
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Config { query, filename }
+    }
+}
+
+```
 ## 3.5 Fixing the Error Handling
 
 ### 3.5.1 Improving the Error Message
