@@ -211,10 +211,22 @@ mod tests {
 
 
 # 2 控制测试用例如何运行(Controlling How Tests Are Run)
+就像命令 `cargo run` 会编译代码，然后运行生成的二进制文件一样，`cargo test` 在测试模式下也会编译代码，并且运行生成的二进制文件。你可以通过指定命令行的选项参数来改变 `cargo test` 的默认的行为。例如，`cargo test`会在并行的模式下运行所有的测试用例，并且截获运行测试时候的输出，让测试结果更加的易读。
+
+一些的选项参数是 `cargo test` 的，一些命令行选项参数是给生成的二进制文件用的。为了分隔这两种类型的参数，你要在传递给 `cargo test` 的参数用分隔符 `--`，然后在后面增加要传给二进制文件的命令。运行 `cargo test --help` 会显示出`cargo test` 可以用的参数，然后可以运行 `cargo test-- --help` 可以看到在 `--` 之后的参数。
+## 2.1 并行或者串行执行测试用例(Running Tests in Parallel or Consecutively)
+当你运行多个测试用例的时候，Rust会默认用多线程并行来执行这些用例。这样是为了可以更快执行完测试用例，并且得到代码是否正常运行的反馈。但是由于测试用例是同时运行的，所以开发者要保证测试用例不要互相依赖，没有共享状态，包括没有共享的环境，比如当前的工作目录，或者环境变量。
+
+
+
+## 2.2 Showing Function Output
+
+## 2.3 Running a Subset of Tests by Name
 
 
 
 # 3 测试的组织结构(Test Organization)
+
 
 
 # 4 总结 (Summary)
