@@ -366,7 +366,9 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 这个输出无疑更好的：我们现在有了合理的错误消息，可是，我们也有不想给用户额外的消息。也许用代码9-10的技术不是最好的技术：调用一个 `panic!` 函数更像是个解决编程问题，而不是一个应用的问题。你可以用另一个技术来解决这个问题——返回一个 `Result` 对象来表示函数成功或是失败了。
 
 ### 3.5.2 new函数返回一个Result对象，而不是调用 `panic!` Returning a Result from new Instead of Calling panic!
-我们可以返回一个 `Result` 值，这个值会在的成功的情况下返回一个包含 `Config` 对象的 `Result`值，会在失败的情况下返回一个带有问题描述的 `Result`对象。当我们调用 `Config::new` 的饿时候，就可以用这个 `Result` 来知晓返回的结果是否存在问题。
+我们可以返回一个 `Result` 值，这个值会在的成功的情况下返回一个包含 `Config` 对象的 `Result`值，会在失败的情况下返回一个带有问题描述的 `Result`对象。当我们调用 `Config::new` 的饿时候，就可以用这个 `Result` 来知晓返回的结果是否存在问题。然后，我们还可以更改在 `main` 函数中出现 `Err`，转换为更为实际的错误信息给用户。用这种方法可以避免调用 `panic!` 函数的时候在错误提示信息里的关于 `thread 'main'` 和 `RUST_BACKTRACE` 等内部信息。
+
+
 
 
 代码12-9 将 `Config::new` 返回值修改为 `Result`。
@@ -406,6 +408,8 @@ impl Config {
     }
 }
 ```
+代码12-9 函数`Config::new`返回一个 Result 对象
+
 
 
 ### 3.5.3 Calling Config::new and Handling Errors
