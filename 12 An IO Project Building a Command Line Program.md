@@ -152,27 +152,27 @@ To an admiring bog!
 
 首先，我们的 `main` 函数现在执行两个任务：既要解析参数也要读取文件。对于这么小的程序，这都不是主要的问题。但是如果我们继续往 `main` 函数里扩展我们的程序，在 `main` 函数的处理的任务的数量将会增加。随着函数获取到更多的职能，在不破坏其单一的功能的情况下，就变得难以维护，难以测试。最好的做法就是将函数里的功能分开，以便每个功能都可以完成单一的职能。
 
-第二个问题也和第一个问题有关：尽管 `query` 和 `filename` 都是我们程序的配置变量，像 `contents`这样的变量是用与执行程序的逻辑的。随着 `main` 函数边长，越来越多的变量会需要出现在作用域。作用域的变量越多，那么跟踪每个变量的目的就会变得困难。最好将配置变量都集合到一个结构中，以明确其用途。
+第二个问题也和第一个问题有关：尽管 `query` 和 `filename` 都是我们程序的配置变量，像 `contents`这样的变量是用与执行程序的逻辑的。随着 `main` 函数的代码量的增长，越来越多的变量会需要出现在作用域。作用域的变量越多，那么跟踪每个变量的目的就会变得困难。最好将配置变量都集合到一个结构中，以明确其用途。
 
-第四个问题，我们反复用 `expect` 来处理不同的错误，如果用户没有传足够数量的参数给我们程序，他们将会得到一个 `index out of bounds` 的错误，但是这些问题还是没有得到很好的解释。
+第四个问题，我们反复用 `expect` 来处理不同的错误，如果用户没有传足够数量的参数给我们程序，他们只会会得到一个提示信息是 `index out of bounds` 的Rust的内部错误，但是这些信息还是不足以知晓错误的原因。
 
 让我们来通过重构项目来解决以上四个问题。
 ##  3.1 在项目中的关注点的分离(Separation of Concerns for Binary Projects)
-把多个职能分配给 `main` 函数的代码组织问题在许多的项目中都很常见。Rust 社区开发了一种流程，当 `main` 函数开始变得臃肿的时候，将拆分成单个职能的函数的指南。这个拆分的过程有以下的步骤：
+把过多个功能，过多的职能的带你们放在 `main` 函数里的代码组织问题在许多的项目中都很常见。为了解决这个问题，Rust 社区开发了一种流程，当 `main` 函数开始变得臃肿的时候，将拆分成单个职能的函数的指南。这个拆分的过程有以下的步骤：
 - 把你的代码分成 *main.rs* 和 *lib.rs*，然后将你的程序的代码逻辑搬到 *lib.rs* 中。
-- 只要你的解析的参数的代码量够小，那么它就能保留在 *main.rs*
-- 当命令行的参数解析开始变的复杂的时候，请将他们提取到 *lib.rs* 中。
+- 只要你的解析的参数的代码量够小，那么它们就保留在 *main.rs*
+- 当命令行的参数解析的代码开始变的复杂的时候，请将他们提取到 *lib.rs* 中。
 
 在这个过程之后，保留在 `main` 函数中的代码要被限制于以下的各项：
-- 调用命令行的参数解析逻辑
+- 调用命令行的参数解析代码
 - 设置任何其他的配置
-- 在 *lib.rs* 调用 `run` 函数
+- 调用 *lib.rs* 的 `run` 函数
 - 要处理  `run` 函数中出现的错误。
 
-这种模式是关于分类问题的：*main* 运行程序，而 *lib.rs* 用于处理手头的任务的所有的逻辑。因为你无法直接测试 `main` 的功能，所以只能把它们提取到 *lib.rs* 中进行测试。保留在 *main.rs* 中的代码量足够小，可以通过读代码来验证其正确性。让我们通过以下的步骤来重写我们的代码。
+这种模式是关于分类问题的：*main* 运行程序，而 *lib.rs* 用于处理手头的任务的所有的逻辑。因为你无法直接测试 `main` 的功能，所以只能把它们提取到 *lib.rs* 中进行测试。保留在 *main.rs* 中的代码量足够小，小到可以直接通过读代码来验证其正确性。让我们通过以下的步骤来重写我们的代码。
 
 ## 3.2 提取参数解析(Extracting the Argument Parser)
-我们将会吧解析参数的功能提取到一个 `main` 函数将会调用的函数中。代码12-5 显示了定义了 `parse_config` 函数
+我们将要把解析参数功能的代码提取到一个 `main` 函数将会调用的单独的函数中，为了随后转移到 *src/lib.rs* 中做好准备。代码12-5 显示了定义了 `parse_config` 函数
 ```rust
 use std::env;
 use std::fs;
@@ -202,15 +202,15 @@ fn parse_config(args: &[String]) -> (&str, &str) {
 ```
 代码12-5 提取代码到 `parse_config` 
 
-我们仍然会将参数先收集到 Vector 中，但是却没有在 `main` 函数中把处于 index  1 的位置的值赋予 `query`，把index 2 的位置的元素赋予 `filename`，而是直接将整个vector传给函数 `parse_config`。函数 `parse_config` 包含了确定要将哪个参数返回给哪个变量的逻辑，以及将它们返回给 `main` 函数。我们继续在 `main` 函数中创建`query`和 `filename` 两个变量。但是main函数不在负责命令行的参数和变量会如何对应。
+我们仍然会将参数先收集到 Vector 中，但是却没有在 `main` 函数中把处于 索引1 的位置的值赋予 `query`，把索引为2 的位置的元素赋予 `filename`，而是直接将整个vector传给 `parse_config` 函数。函数 `parse_config` 包含了确定要将哪个参数返回给哪个变量的逻辑，以及将它们返回给 `main` 函数。我们继续在 `main` 函数中创建`query`和 `filename` 两个变量。但是main函数不在负责命令行的参数和变量会如何映射。
 
-对于这样的小程序而言，这样的重写似乎有点过了，但是我们正在逐步进行小型重构。在进行更改之后，再次运行程序确保这次参数解析的修改是ok的。经常检查你的程序是个好习惯，这样有助于你确定问题发生的原因。
-## 3.3 统一配置值(Grouping Configuration Values)
-我们采用另一个方案来改进我们 `parse_config` 函数。目前，我们这个函数返回的是一个元祖，但是随后我们再次将元祖分解。这就表示我们还没有正确的将功能抽象。
+对于这样的小程序而言，这样的重写似乎有点过了，但是重构工作正是要这样小型的，缓慢的前进的。在进行更改之后，再次运行程序确保这次参数解析的修改是ok的。经常检查你的程序是个好习惯，这样有助于你确定问题发生的原因。
+## 3.3 一统配置值(Grouping Configuration Values)
+我们采用另一个方案来改进我们 `parse_config` 函数。目前，我们这个函数返回的是一个元祖，但是在使用的时候我们再次将元组拆分。这就表示我们还没有正确的将功能抽象。
 
 另一个可以改进的部分就是 函数 `parse_config` 的`config` 的部分，这样就意味着我们返回的两个值都是相关的，都是配置值的一部分。我们可以将他们放到一个数据结构中，然后给每个字段一个有意义的名称。这样有利于以后的开发人员维护代码的是明白每个值的含义，以及它们之间的关系。
 
-> 注意，当复杂类型更加合适的时候，使用基本类型就被成为一种 *原始* 的反模式。
+> 注意，当复杂类型更加合适的时候，使用基本类型就被成为一种 *基本类型偏执(primitive obsession)* 的反模式(anti-pattern)。
 
 ```rust
 use std::env;
@@ -253,10 +253,12 @@ fn parse_config(args: &[String]) -> Config {
 > # 使用 clone 方法的权衡 (The Trade-Offs of Using clone)
 > 许多 Rustaceans 会避免用 `clone` 来解决所有权的问题，因为这种方案的运行成本很高。在第13章，你将会学到如何用更有效率的方式来处理这种情况。
 
-## 3.4 给结构体 `Config` 创建一个结构体 (Creating a Constructor for Config)
+
+
+## 3.4 给结构体 `Config` 创建一个构造器 (Creating a Constructor for Config)
 目前为止，我们已经从 `main` 函数中提取了解析命令行参数的职能，并且把这个功能放到 `parse_config` 函数中。这样有利于我们看到的 `query` 和 `filename`的值是相关的，并且应该在我们的代码中传达这种关系。
 
-因此， 既然 `parse_config` 的目的是为了创建一个 `Config`实例，我们就可以把 `parse_config` 将一个普通的函数更改为结构体 `Config` 的一个名字是 `name` 的函数。这样的修改会让代码更加好用。通过将调用`Config::new` 来创建结构体`Config`的实例。
+因此， 既然 `parse_config` 的目的是为了创建一个 `Config`实例，我们就可以把 `parse_config` 从一个普通的函数更改为结构体 `Config` 想关联的 `name` 的函数。这样的修改会让代码更加好用。通过将调用`Config::new` 来创建结构体`Config`的实例。
 ```rust
 use std::env;
 use std::fs;
@@ -295,7 +297,7 @@ impl Config {
 ```
 代码12-7 把 `parse_config` 代码放入 `Config::new`
 
-我们更新了 main 函数调用 `parse_config` 的位置。将 `parse_config` 名字改成 `new` 并且把它移动到 `impl` 代码块中，这个功能将和 `Config` 的关联，并且尝试再次编译这个代码，确保可以运行的。
+上面这段代码将 `main` 函数中原来调用`parse_config`函数的位置修改为调用`Config::new`。将 `parse_config` 名字改成 `new` 并且把它移动到 `impl` 代码块中，这个功能将和 `Config` 的关联，并且尝试再次编译这个代码，确保可以运行的。
 
 ## 3.5 新增错误处理(Fixing the Error Handling)
 现在，我们将会修复错误的处理。回想一下，如果vector中的元素少于三个，那么就会导致出现崩溃。在不带任何参数的情况下试运行一下。
@@ -307,7 +309,7 @@ $ cargo run
 thread 'main' panicked at 'index out of bounds: the len is 1 but the index is 1', src/main.rs:27:21
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ```
-`index out of bounds: the len is 1 but the index is 1` 这样错误是针对程序员的错误。但是这个错误不会帮助我们到底发生了什么，也不会告诉我们应该做什么，接下来我们解决这个问题
+`index out of bounds: the len is 1 but the index is 1` 这样错误是针对程序员的错误。但是这个错误不会帮助我们知晓到底发生了什么，也不会告诉我们应该做什么，接下来我们解决这个问题。
 ### 3.5.1 改进错误信息(Improving the Error Message)
 代码 12-8 我们在 `new` 函数中增加一个检查，这个检查可以确保这个vector中的元素至少三个。如果这个切片长度不够，那么程序在崩溃的时候会报错，并且会产生更好的错误信息。
 ```rust
@@ -350,7 +352,7 @@ impl Config {
 ```
 代码 12-8 增加参数数量的检查器
 
-这个代码和 [the Guess::new function we wrote in Listing 9-10]( s://doc.rust-lang.org/book/ch09-03-to-panic-or-not-to-panic.html#creating-custom-types-for-validation)有点像，当参数超过了有效的参数数量的范围的时候，程序就会报错。我们将会检查 `args` 的长度，至少为3个。其余的功能要在这个满足条件下才能运行。如果这个 `args` 少于三个元素的话，这个条件就会成立，我们就会调用 `panic!` 来立即结束程序。
+这个代码和 [the Guess::new function we wrote in Listing 9-10]( s://doc.rust-lang.org/book/ch09-03-to-panic-or-not-to-panic.html#creating-custom-types-for-validation)有点像，当参数超过了有效值的范围的时候，程序就会报错。我们将会检查 `args` 的长度，至少为3个。其余的功能要在这个满足条件下才能运行。如果这个 `args` 少于三个元素的话，这个条件就会成立，我们就会调用 `panic!` 来立即结束程序。
 
 当我们在无参的情况下运行代码的时候，就会出现下面这个些错误。
 ```rust
@@ -364,8 +366,10 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 这个输出无疑更好的：我们现在有了合理的错误消息，可是，我们也有不想给用户额外的消息。也许用代码9-10的技术不是最好的技术：调用一个 `panic!` 函数更像是个解决编程问题，而不是一个应用的问题。你可以用另一个技术来解决这个问题——返回一个 `Result` 对象来表示函数成功或是失败了。
 
 ### 3.5.2 new函数返回一个Result对象，而不是调用 `panic!` Returning a Result from new Instead of Calling panic!
+我们可以返回一个 `Result` 值，这个值会在的成功的情况下返回一个包含 `Config` 对象的 `Result`值，会在失败的情况下返回一个带有问题描述的 `Result`对象。当我们调用 `Config::new` 的饿时候，就可以用这个 `Result` 来知晓返回的结果是否存在问题。
 
 
+代码12-9 将 `Config::new` 返回值修改为 `Result`。
 ```rust
 use std::env;
 use std::fs;
