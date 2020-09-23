@@ -412,8 +412,9 @@ impl Config {
 
 
 
-### 3.5.3 Calling Config::new and Handling Errors
+### 3.5.3 调用 `Config::new` 并处理错误 Calling Config::new and Handling Errors
 
+为了处理错误并打印出对用户友好的信息，我们需要修改 `main` 函数代码来处理 `Config::new` 返回的 `Result` 类型的值，如代码12-10所示。
 
 ## 3.6 Extracting Logic from main
 
