@@ -368,10 +368,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
 ### 3.5.2 new函数返回一个Result对象，而不是调用 `panic!` Returning a Result from new Instead of Calling panic!
 我们可以返回一个 `Result` 值，这个值会在的成功的情况下返回一个包含 `Config` 对象的 `Result`值，会在失败的情况下返回一个带有问题描述的 `Result`对象。当我们调用 `Config::new` 的饿时候，就可以用这个 `Result` 来知晓返回的结果是否存在问题。然后，我们还可以更改在 `main` 函数中出现 `Err`，转换为更为实际的错误信息给用户。用这种方法可以避免调用 `panic!` 函数的时候在错误提示信息里的关于 `thread 'main'` 和 `RUST_BACKTRACE` 等内部信息。
 
-
-
-
-代码12-9 将 `Config::new` 返回值修改为 `Result`。
+代码12-9 将 `Config::new` 返回值修改为 `Result`。注意，这里的代码还不能编译，要到下一个示例修改了`main`函数的代码之后才能编译。
 ```rust
 use std::env;
 use std::fs;
@@ -410,12 +407,13 @@ impl Config {
 ```
 代码12-9 函数`Config::new`返回一个 Result 对象
 
+现在这个`new`函数返回的是一个 `Result` 类型的对象，在成功的时候返回一个 `Congfig` 实例，而在失败的时候带着一个 `&'static str`对象。
+
+`new`的函数体的代码有两个修改：当没有足够的参数传进来的私活，不在调用 `panic!`,而是返回一个 `Err` 值。如果条件满足，就会返回一个 包裹着 `Config` 对象的 `OK`。这些代码修改使得函数符合它现在的类型签名。
 
 
 ### 3.5.3 调用 `Config::new` 并处理错误 Calling Config::new and Handling Errors
-
 为了处理错误并打印出对用户友好的信息，我们需要修改 `main` 函数代码来处理 `Config::new` 返回的 `Result` 类型的值，如代码12-10所示。
-
 
 ```rust
 use std::env;
