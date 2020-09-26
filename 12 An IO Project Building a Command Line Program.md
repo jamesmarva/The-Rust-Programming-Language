@@ -413,8 +413,7 @@ impl Config {
 
 
 ### 3.5.3 调用 `Config::new` 并处理错误 Calling Config::new and Handling Errors
-为了处理错误并打印出对用户友好的信息，我们需要修改 `main` 函数代码来处理 `Config::new` 返回的 `Result` 类型的值，如代码12-10所示。
-
+为了处理错误并打印出对用户友好的信息，我们需要修改 `main` 函数代码来处理 `Config::new` 返回的 `Result` 类型的值，如代码12-10所示。我们还需要去实现原来的 `panic!` 实现的代码职责：用非0的错误码来退出程序。非零的错误码就一个信号，习惯用来告诉调用的程序：这个程序是错误状态退出的。
 ```rust
 use std::env;
 use std::fs;
@@ -459,9 +458,73 @@ impl Config {
 ```
 代码12-10 如果创建了 `Config` 失败了，就退出程序
 
+上面的程序用了之前没有用过的方法：`unwrap_or_else`，这个函数在标准库中 `Result<T, E>`中。用 `unwrap_or_else` 可以让我们定义一些自定义的，不带 `panic!`的错误处理。如果 `Result`是 `Ok` 的值，这个方法就类似于 `unwrap`：他会返回内部的值。然而，如果值是 `Err`的时候，那么这个方法就会调用一个*闭包(closure)*，which is an anonymous function we define and pass as an argument to unwrap_or_else. 我们将会在第13章讨论更多关于闭包的知识。只是现在你只要知道 `unwrap_or_else` 会把的`Err`的值，也就是`not enough arguments`，传给 两个竖杠的中间的 `err`。
+
+我们用 `use` 来引入 `process`。在错误的情况之后两行：我们打印了 `err`，然后直接调用了 `std::process::exit`。这个方法立即停止程序，并且将传给它的数字作为退出的状态码。这样就不会输出额外的输出了。
+```
+$ cargo run
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.48 secs
+     Running `target/debug/minigrep`
+Problem parsing arguments: not enough arguments
+```
+
+## 3.6 提取 `main` 函数的逻辑 Extracting Logic from main
+以上是就是我们完成的配置解析的重构，接下来继续程序的逻辑重构。就像我们在 “二进制项目的分离重点” 里面所讨论的那样，我们将会提取出不属于配置或者处理错误的所有逻辑。一旦完成这些，我们就可以直接看代码来验证代码的正确性了，而且可以能够为所有的的逻辑编写测试用例了。
+
+代码12-11 显示了提取出来的 `run` 函数。现在，我们仅仅写了一个小型的增量的提取函数。
+```rust
+use std::env;
+use std::fs;
+use std::process;
+
+fn main() {
+    // --snip--
+
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    run(config);
+}
+
+fn run(config: Config) {
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+// --snip--
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Ok(Config { query, filename })
+    }
+}
+```
+代码12-11 提取 一个 `run` 的函数的包含剩下的程序逻辑
 
 
-## 3.6 Extracting Logic from main
+
 
 ## 3.7 Splitting Code into a Library Crate
 目前为止看起来，我们 `minigrep`看起来还好。现在我们将分割 *src/main.rs* 的代码，并且将代码放入 *src/lib.rs* 中，并且将对其进行测试，并且有了更少职责的 *src/main.rs*。
