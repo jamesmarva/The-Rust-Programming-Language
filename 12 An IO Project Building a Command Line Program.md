@@ -577,9 +577,97 @@ impl Config {
 ```
 代码12-12 修改 `run` 函数的返回值为 `Result` 对象
 
+以上的代码主要有3处的改动。首先，我们把 `run` 函数的返回值的类型设置为`Result<(), Box<dyn Error>>`。函数之前返回的是空的元祖类型，这个类型被保存在下来在返回 `Ok` 的情况下使用。
+
+在错误情况下，我们使用 *trait Object `Box<dyn Error>`* (我们用use把 `std::error::Error` 引入了作用域)。在第17章会对 `trait` 对象进行详细讨论。现在，你只要知道 `Box<dyn Error>` 会返回一个实现了 `Error trait` 的类型，但是不需要指定具体 `trait` 类型。这就意味着我们可以在不同的错误场景下返回不同的错误类型，这表达式中的 `dyn` 关键字所表达的就是 “动态(dynamic)” 的意思。
+
+第二，我们在第9章讨论 `?` 取代了 `expect`关键字。和 `panic!` 宏函数来处理错误， `?` 可以将错误值返回给函数的调用者来进行处理。
+
+第三，`run` 函数在成功的情况下会返回一个 `Ok`值。由于函数签名中指定了运行成功时的数据类型是()，所以我们需要把空元组的值包裹在Ok变体中。
+
+```shell
+$ cargo run the poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+warning: unused `std::result::Result` that must be used
+  --> src/main.rs:19:5
+   |
+19 |     run(config);
+   |     ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_must_use)]` on by default
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+    Finished dev [unoptimized + debuginfo] target(s) in 0.71s
+     Running `target/debug/minigrep the poem.txt`
+Searching for the
+In file poem.txt
+With text:
+I’m nobody! Who are you?
+Are you nobody, too?
+Then there’s a pair of us - don’t tell!
+They’d banish us, you know.
+
+How dreary to be somebody!
+How public, like a frog
+To tell your name the livelong day
+To an admiring bog!
+```
 
 ### 3.6.2 处理从run 函数返回的错误 (Handling Errors Returned from run in main)
+我们会用到 类似于代码12-10里面那种处理`Config::new` 的技术来检查错误，处理错误，但是略有不同：
+```rust
+use std::env;
+use std::error::Error;
+use std::fs;
+use std::process;
 
+fn main() {
+    // --snip--
+
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    });
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    if let Err(e) = run(config) {
+        println!("Application error: {}", e);
+
+        process::exit(1);
+    }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
+
+    println!("With text:\n{}", contents);
+
+    Ok(())
+}
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Ok(Config { query, filename })
+    }
+}
+```
+我们用 `if let` 而不是用 `unwrap_or_else` 来检查 `run` 返回值，并且返回了 `Err` 值的下调用了 `process::exit(1)`。和 `Config::new` 返回一个 `Config` 对象不同
 
 
 ## 3.7 Splitting Code into a Library Crate
