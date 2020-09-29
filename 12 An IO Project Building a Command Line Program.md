@@ -583,8 +583,9 @@ impl Config {
 
 第二，我们在第9章讨论 `?` 取代了 `expect`关键字。和 `panic!` 宏函数来处理错误， `?` 可以将错误值返回给函数的调用者来进行处理。
 
-第三，`run` 函数在成功的情况下会返回一个 `Ok`值。由于函数签名中指定了运行成功时的数据类型是()，所以我们需要把空元组的值包裹在Ok变体中。
+第三，`run` 函数在成功的情况下会返回一个 `Ok`值。由于函数签名中指定了运行成功时的数据类型是()，所以我们需要把空元组的值包裹在Ok变体中。最开始看到这个 `Ok(())` 的这种写法可能会有些奇怪，但是，使用 `()` 会更加清晰的表达函数的意图：就是调用函数仅仅是为了使用函数的功能，我们不需要它返回值。
 
+当我们运行代码，会出现下面的警告。
 ```shell
 $ cargo run the poem.txt
    Compiling minigrep v0.1.0 (file:///projects/minigrep)
@@ -612,6 +613,9 @@ How public, like a frog
 To tell your name the livelong day
 To an admiring bog!
 ```
+Rust 告诉我们，我们的代码忽略了处理 `Result`的值，并且这个 `Result` 是有可能出现发生错误的。但是我们却没有检查这个结果是否为错误的结果，所以编译器就提醒我们需要在这里添加错误处理代码。现在我们就开始修复这个问题。
+
+在 `main` 函数中处理 `run` 函数的返回的错误。
 
 ### 3.6.2 处理从run 函数返回的错误 (Handling Errors Returned from run in main)
 我们会用到 类似于代码12-10里面那种处理`Config::new` 的技术来检查错误，处理错误，但是略有不同：
@@ -623,7 +627,6 @@ use std::process;
 
 fn main() {
     // --snip--
-
     let args: Vec<String> = env::args().collect();
 
     let config = Config::new(&args).unwrap_or_else(|err| {
@@ -636,7 +639,6 @@ fn main() {
 
     if let Err(e) = run(config) {
         println!("Application error: {}", e);
-
         process::exit(1);
     }
 }
@@ -667,8 +669,9 @@ impl Config {
     }
 }
 ```
-我们用 `if let` 而不是用 `unwrap_or_else` 来检查 `run` 返回值，并且返回了 `Err` 值的下调用了 `process::exit(1)`。和 `Config::new` 返回一个 `Config` 对象不同
+我们用 `if let` 而不是用 `unwrap_or_else` 来检查 `run` 返回值，并且返回了 `Err` 值的时候调用了 `process::exit(1)` 来退出。和 `Config::new` 返回一个 `Config` 对象不同，`run` 函数并不会返回一个需要进行 `unwrap` 的值，因为在成功运行的情况下，`run` 函数会返回的是 `()`。
 
+`if let` 和 `unwrap_or_else` 是有着同样的功能：输出错误，然后退出。
 
 ## 3.7 Splitting Code into a Library Crate
 目前为止看起来，我们 `minigrep`看起来还好。现在我们将分割 *src/main.rs* 的代码，并且将代码放入 *src/lib.rs* 中，并且将对其进行测试，并且有了更少职责的 *src/main.rs*。
@@ -679,7 +682,7 @@ impl Config {
 - `Config` 的定义
 - 函数 `Config::new` 的定义
 
-
+`src/lib.rs` 应该有像代码12-13 所示的签名(为了简洁，我们省略了函数体)。注意，只有在代码12-14中修改 src/main.rs 的时候，这个文件才会被编译。
 ```rust
 use std::error::Error;
 use std::fs;
@@ -712,7 +715,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     Ok(())
 }               
 ```
-代码12-13 移动 `Config` 和 `run` 到 *src/lib.rs*
+代码12-13 移动 `Config` 的代码和 `run` 的代码到 *src/lib.rs*
+
+
 
 ```rust
 use std::env;
