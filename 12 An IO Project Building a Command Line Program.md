@@ -717,8 +717,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 ```
 代码12-13 移动 `Config` 的代码和 `run` 的代码到 *src/lib.rs*
 
+我们用了 `pub` 关键字：在 `Config` 结构体上，在结构体的字段上，在 `new` 方法上，在 `run` 函数上。现在我们有了一个可以用来测试的API的库了。
 
-
+现在需要在 `src/main.rs` 中引入 `src/lib.rs`。
 ```rust
 use std::env;
 use std::process;
