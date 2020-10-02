@@ -19,10 +19,10 @@ impl Config {
     }
 }
 
-pub fn run(config: Config) -> Reuslt<(), Box<dyn Error>> {
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
     println!("contents: {}", contents);
-    Ok(());
+    Ok(())
 }
 
 

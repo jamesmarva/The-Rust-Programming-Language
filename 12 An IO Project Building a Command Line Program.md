@@ -741,8 +741,16 @@ fn main() {
     if let Err(e) = minigrep::run(config) {
         // --snip--
         println!("Application error: {}", e);
-
         process::exit(1);
     }
 }
 ```
+代码12-14 把 `minigrep` 引入 `src/main.rs` 作用域中
+
+我们增加了一行 `use minigrep::Config`，这行就把 `Config` 类型引入作用域了，用我们的 `crate` 的名字来作为 `run` 函数的前缀。现在所有的功能都已经连接，并且是可以工作的。用 `cargo run` 来运行程序并且确保程序是可以正确运行。
+
+以上我们做了大量的工作，这些工作为我们将来的成功打下基础。现在处理错误将会更加容易。同时代码也更加模块化。现在开始，几乎所有的工作都在 *src/lib.rs* 
+
+用这次的新发现的模块化的特性，在就代码中很难，但是在新代码中去很容易完成的事情：编写测试用例。
+
+
