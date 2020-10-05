@@ -754,3 +754,24 @@ fn main() {
 用这次的新发现的模块化的特性，在就代码中很难，但是在新代码中去很容易完成的事情：编写测试用例。
 
 
+# 4 用测试驱动完善库的功能(Developing the Library’s Functionality with Test-Driven Development)
+
+
+在这一章节，我们将会遵循 `测试驱动开发(Test Driven Development, TDD)` 的模式来逐步增加 `minigrep` 的搜索逻辑，这是一项软件开发的思想，它遵循以下步骤；
+1. 
+2. 
+3. 
+4. 
+## 4.1 写一个失败的测试用例(Writing a Failing Test)
+
+
+## 4.2 写一个可以通过的测试用例(Writing Code to Pass the Test)
+
+
+
+# 5 Working with Environment Variables
+
+# 6 Writing Error Messages to Standard Error Instead of Standard Output
+
+
+ # Summary
