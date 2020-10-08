@@ -752,24 +752,47 @@ fn main() {
 以上我们做了大量的工作，这些工作为我们将来的成功打下基础。现在处理错误将会更加容易。同时代码也更加模块化。现在开始，几乎所有的工作都在 *src/lib.rs* 
 
 用这次的新发现的模块化的特性，在就代码中很难，但是在新代码中去很容易完成的事情：编写测试用例。
-
-
 # 4 用测试驱动完善库的功能(Developing the Library’s Functionality with Test-Driven Development)
 
 
 在这一章节，我们将会遵循 `测试驱动开发(Test Driven Development, TDD)` 的模式来逐步增加 `minigrep` 的搜索逻辑，这是一项软件开发的思想，它遵循以下步骤；
-1. 
+1. 敲一个会失败的测试用例，并且运行它，保证这个用例的失败原因是你所期望的。
 2. 
 3. 
 4. 
 ## 4.1 写一个失败的测试用例(Writing a Failing Test)
 
 
+```shell
+    Finished test [unoptimized + debuginfo] target(s) in 0.64s
+     Running target\debug\deps\listing_12_16-9c914d2a16287c9d.exe
+
+running 1 test
+test tests::one_result ... FAILED
+
+failures:
+
+---- tests::one_result stdout ----
+thread 'tests::one_result' panicked at 'assertion failed: `(left == right)`
+  left: `["safe, fast, productive."]`,
+ right: `[]`', src\lib.rs:44:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::one_result
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out
+
+error: test failed, to rerun pass '--lib'
+```
+这个测试用例失败了，这正是我们所期望的失败。接下来我们修改代码让测试用例通过吧。
+
 ## 4.2 写一个可以通过的测试用例(Writing Code to Pass the Test)
+之前的测试之所以会失败是因为我们返回了一个空的 vector。
 
 
-
-# 5 Working with Environment Variables
+# 5 处理环境变量(Working with Environment Variables)
 
 # 6 Writing Error Messages to Standard Error Instead of Standard Output
 
