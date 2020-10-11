@@ -915,11 +915,13 @@ $ cargo run monomorphization poem.txt
 
 ## 5.2 Implementing the search_case_insensitive Function
 
-# 6 Writing Error Messages to Standard Error Instead of Standard Output
+# 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
+到目前为止，我们都将错误用 `println!` 输出到标准输出。
 
-## 6.1 Checking Where Errors Are Written
+## 6.1 检查错误的输出的位置(Checking Where Errors Are Written)
 
-## 6.2 Printing Errors to Standard Error
+## 6.2 输出错误到标准错误(Printing Errors to Standard Error)
 
 
- # Summary
+# 7 总结 (Summary)
+
