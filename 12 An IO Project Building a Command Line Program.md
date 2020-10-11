@@ -789,7 +789,78 @@ error: test failed, to rerun pass '--lib'
 这个测试用例失败了，这正是我们所期望的失败。接下来我们修改代码让测试用例通过吧。
 
 ## 4.2 写一个可以通过的测试用例(Writing Code to Pass the Test)
-之前的测试之所以会失败是因为我们返回了一个空的 vector。
+之前的测试之所以会失败是因为我们返回了一个空的 vector。为了解决这个失败，以及实现 `search` 函数，我们的程序需要完成以下步骤：
+1. 遍历文本内容的每一行内容
+2. 检查这行是否包含需要查询的内容
+3. 如果这行包含这个关键字，那么添加这一行到我们将会返回的变量中。
+4. 如果没有，什么也不做。
+5. 返回匹配到的结果列表
+
+一步一步来，从遍历每行开始。
+### 4.2.1 用 lines 方法来迭代里行(Iterating Through Lines with the lines Method)
+Rust 有一个有助于一行一行遍历字符串的方法
+
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    for line in contents.lines() {
+        // do something with line
+    }
+}
+```
+代码12-17 遍历 `contents` 的每一行
+
+
+
+### 4.2.2 在每行寻找关键字(Searching Each Line for the Query)
+
+### 4.2.3 保存匹配到的行(Storing Matching Lines)
+我们还要一个方法来保存有查询的字符串的行。为了存储数据，可以在 for 循环之前创建一个 把匹配的到的行 存储到一个 Vector 变量里。在for循环之后返回这个变量。
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+```
+代码12-19 保存所有匹配到的行并且返回
+
+现在我们返回的行数据都是包含查询关键字的数据，这样我们的测试用力就可以通过了。
+```
+$ cargo test
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished test [unoptimized + debuginfo] target(s) in 1.22s
+     Running target/debug/deps/minigrep-4672b652f7794785
+
+running 1 test
+test tests::one_result ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running target/debug/deps/minigrep-caf9dbee196c78b9
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests minigrep
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+测试用例通过了
+
+这个时候，我们就可以考虑重构搜索功能的时机了，并且保持测试来保证功能。在search函数的代码不算差，只不过没有用到迭代器的高级功能。我们将会在第13章回到这个例子，然后讨论如何改进这段代码。
+
+
+### 4.2.4 在 run 函数里使用 search 函数(Using the search Function in the run Function)
+
 
 
 # 5 处理环境变量(Working with Environment Variables)
