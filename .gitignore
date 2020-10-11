@@ -360,7 +360,7 @@ code/ch12/listing_12_23/target
 code/ch12/listing_12_23/Cargo.lock
 
 code/ch12/listing_12_24/target
-code/ch12/listing_12_24  /Cargo.lock
+code/ch12/listing_12_24/Cargo.lock
 
 *.lock
 .vscode/launch.json
