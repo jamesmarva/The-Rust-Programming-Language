@@ -798,8 +798,7 @@ error: test failed, to rerun pass '--lib'
 
 一步一步来，从遍历每行开始。
 ### 4.2.1 用 lines 方法来迭代里行(Iterating Through Lines with the lines Method)
-Rust 有一个有助于一行一行遍历字符串的方法
-
+Rust 有一个有助于一行一行遍历字符串的方法，为了方便记忆，取名为 `lines`，就像代码12-17 里面锁展示的那样，注意，这里还不能编译。
 ```rust
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     for line in contents.lines() {
@@ -809,10 +808,19 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 ```
 代码12-17 遍历 `contents` 的每一行
 
-
-
+`lines` 方法返回了一个迭代器。
 ### 4.2.2 在每行寻找关键字(Searching Each Line for the Query)
-
+接下来，我们将会检查每行的文字是否包含我们所查询的关键字。幸运的是，字符串的对象有个名字是 `contains` 的方法就有这个功能。这里我们将这个方法添加到我们的代码里，注意，依然不能编译。
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    for line in contents.lines() {
+        if line.contains(query) {
+            // do something with line
+        }
+    }
+}
+```
+代码12-18 新增一个是否包含 `query` 字符串的功能
 ### 4.2.3 保存匹配到的行(Storing Matching Lines)
 我们还要一个方法来保存有查询的字符串的行。为了存储数据，可以在 for 循环之前创建一个 把匹配的到的行 存储到一个 Vector 变量里。在for循环之后返回这个变量。
 ```rust
@@ -858,14 +866,60 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 这个时候，我们就可以考虑重构搜索功能的时机了，并且保持测试来保证功能。在search函数的代码不算差，只不过没有用到迭代器的高级功能。我们将会在第13章回到这个例子，然后讨论如何改进这段代码。
 
-
 ### 4.2.4 在 run 函数里使用 search 函数(Using the search Function in the run Function)
+现在这里的 `search` 函数可以运行并且通过测试了，我们需要在 `run` 函数中调用这个 `search` 函数。我们需要吧查询关键字和 `run` 函数中所读取的内容传递给 `search` 函数，然后输出 `search` 所返回的结果
+```rust
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
 
+    for line in search(&config.query, &contents) {
+        println!("{}", line);
+    }
 
+    Ok(())
+}
+```
+这里用了 `for` 循环来获取每个元素的内容，然后输出
 
+现在整个程序都可以运行了，让我们尝试一下，先使用会在 Emily Dickinson 的诗里返回恰好返回一行的 单词 `frog`。
+```rust
+$ cargo run frog poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.38s
+     Running `target/debug/minigrep frog poem.txt`
+How public, like a frog
+```
+接着使用返回多行的单词“body”
+```rust
+$ cargo run body poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep body poem.txt`
+I’m nobody! Who are you?
+Are you nobody, too?
+How dreary to be somebody!
+```
+最后用不会在诗里面出现单词作为测试。
+```
+$ cargo run monomorphization poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep monomorphization poem.txt`
+```
+好了，我们创建了一个属于我们自己的迷你版的工具，并且学习了很多关于如何组织程序的知识。我们还学习了一点关于文件输入、输出，生命期限，测试用例，以及解析命令行。
+
+为了完善这个项目，我们将会演示如何去使用环境变量，并且输出标准的错误信息的功能，这些在编写命令行程序的时候都非常有用。
 # 5 处理环境变量(Working with Environment Variables)
 
+## 5.1 Writing a Failing Test for the Case-Insensitive search Function
+
+## 5.2 Implementing the search_case_insensitive Function
+
 # 6 Writing Error Messages to Standard Error Instead of Standard Output
+
+## 6.1 Checking Where Errors Are Written
+
+## 6.2 Printing Errors to Standard Error
 
 
  # Summary
