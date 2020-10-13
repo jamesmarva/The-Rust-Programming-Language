@@ -910,8 +910,45 @@ $ cargo run monomorphization poem.txt
 
 为了完善这个项目，我们将会演示如何去使用环境变量，并且输出标准的错误信息的功能，这些在编写命令行程序的时候都非常有用。
 # 5 处理环境变量(Working with Environment Variables)
+我们通过给程序新增额外的功能来改进 `minigrep`：用户可以通过设置 环境变量(environment variable)来选择是否启用搜索的时候的大小写敏感。当然，我们也可以把这个作为命令行的参数的功能，让用户在每次使用的时候都带上这个参数，但是这次我们只要做为环境参数就行。这样做的允许用户在设置了环境变量一次之后就可以在所有的终端的搜索中大小写不敏感。
+## 5.1 写一个大小写不敏感的 `search` 函数的失败例子(Writing a Failing Test for the Case-Insensitive search Function)
+新增一个新函数 `search_case_insensitive `，当大小写不敏感的开关开的时候就调用这个函数。这里我们遵循 TDD 的过程，第一步就是编写错误的测试。我们把 `one_result` 改名为 `case_sensitive`，用这样的方法来更加清楚两个测试的区别。
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-## 5.1 Writing a Failing Test for the Case-Insensitive search Function
+    #[test]
+    fn case_sensitive() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Duct tape.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+    }
+
+    #[test]
+    fn case_insensitive() {
+        let query = "rUsT";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Trust me.";
+
+        assert_eq!(
+            vec!["Rust:", "Trust me."],
+            search_case_insensitive(query, contents)
+        );
+    }
+}
+```
+代码12-20 写的大小写的不敏感的错误的例子。
+
+
 
 ## 5.2 Implementing the search_case_insensitive Function
 
