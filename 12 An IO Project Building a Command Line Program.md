@@ -935,7 +935,7 @@ Duct tape.";
         let query = "rUsT";
         let contents = "\
 Rust:
-safe, fast, productive.
+saf e, fast, productive.
 Pick three.
 Trust me.";
 
@@ -948,9 +948,32 @@ Trust me.";
 ```
 代码12-20 写的大小写的不敏感的错误的例子。
 
+注意，这里我们也修改了老的测试里的 `contents`的值。还在文本里新增了一行 `"Duct tape."`,这个行里有个大写的 `D`，这样在大小写敏感的搜索就会搜索不出来。用这样的方式来修改测试用例，不会破坏已经实现的大小写敏感的搜索功能。
+
+大小写不敏感的测试是用 `rUsT` 作为查询关键字的。在即将要实现的 `search_case_insensitive` 函数中，用`"rUsT"`这个查询关键字可以查找到带有 `"Rust:"` 和 `"Trust me."` 这两行文本，尽管这两行和关键字不是完全匹配的。因为我们还没实现 `search_case_insensitive` ，所以这个测试样例还不能被编译。
 
 
-## 5.2 Implementing the search_case_insensitive Function
+## 5.2 实现 `search_case_insensitive` 函数 (Implementing the search_case_insensitive Function)
+如 代码12-21 所示，大部分代码和 `search` 函数相同。唯一的不同就在在于这个函数里，我们把 `query` 和 每行的文本 都转化为小写了这样不管是大写还是小写，检查的时候都会变成小写匹配
+```rust
+pub fn search_case_insensitive<'a>(
+    query: &str,
+    contents: &'a str,
+) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.to_lowercase().contains(&query) {
+            results.push(line);
+        }
+    }
+    results
+}
+```
+代码12-21 定义 `search_case_insensitive` 函数，在比较每一行之前都把他们转为小写。
+
+
 
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
 到目前为止，我们都将错误用 `println!` 输出到标准输出。
