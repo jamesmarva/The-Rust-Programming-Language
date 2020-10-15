@@ -948,9 +948,9 @@ Trust me.";
 ```
 代码12-20 写的大小写的不敏感的错误的例子。
 
-注意，这里我们也修改了老的测试里的 `contents`的值。还在文本里新增了一行 `"Duct tape."`,这个行里有个大写的 `D`，这样在大小写敏感的搜索就会搜索不出来。用这样的方式来修改测试用例，不会破坏已经实现的大小写敏感的搜索功能。
+注意，这里我们也修改了老的测试里的 `contents`的值。还在文本里新增了一行 `"Duct tape."`,这个行里有个大写的 `D`，这样在大小写敏感的搜索就会搜索不出来。用这样的方式来修改测试用例，不会破坏已经实现的大小写敏感的搜索功能。这个测试例子是会通过的。
 
-大小写不敏感的测试是用 `rUsT` 作为查询关键字的。在即将要实现的 `search_case_insensitive` 函数中，用`"rUsT"`这个查询关键字可以查找到带有 `"Rust:"` 和 `"Trust me."` 这两行文本，尽管这两行和关键字不是完全匹配的。因为我们还没实现 `search_case_insensitive` ，所以这个测试样例还不能被编译。
+大小写不敏感的测试是用 `rUsT` 作为查询关键字的。在即将要实现的 `search_case_insensitive` 函数中，用`"rUsT"`这个查询关键字可以查找到带有 `"Rust:"` 和 `"Trust me."` 这两行文本，尽管这两行和关键字不是完全匹配的。目前因为我们还没实现 `search_case_insensitive` 函数，所以这个测试样例还不能被编译。
 
 
 ## 5.2 实现 `search_case_insensitive` 函数 (Implementing the search_case_insensitive Function)
@@ -973,7 +973,7 @@ pub fn search_case_insensitive<'a>(
 ```
 代码12-21 定义 `search_case_insensitive` 函数，在比较每一行之前都把他们转为小写。
 
-
+首先，我们把整个 `query` 字符转化为小写，并且把它存进有相同名称的影子变量中。在进行查询的时候是必须要调用 `to_lowercase`，这样用户在查询的时候不管是查 `rust`、 `RUST`还是 `Rust`，我们都可以把查询的字符串看成是 `"Rust"`。尽管 `to_lowercase` 会处理成基础的 unicode 格式，不会完全100%转换准确。如果我们是在写一个真实场景的应用的话，那么我们将会做更多的工作，但是这里我们仅仅是探究关于环境变量，而不是探究关于unicode的知识的，所以我们就把这个 `to_lowercase` 操作留在这里了。
 
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
 到目前为止，我们都将错误用 `println!` 输出到标准输出。
