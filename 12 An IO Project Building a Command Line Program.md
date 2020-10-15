@@ -975,6 +975,64 @@ pub fn search_case_insensitive<'a>(
 
 首先，我们把整个 `query` 字符转化为小写，并且把它存进有相同名称的影子变量中。在进行查询的时候是必须要调用 `to_lowercase`，这样用户在查询的时候不管是查 `rust`、 `RUST`还是 `Rust`，我们都可以把查询的字符串看成是 `"Rust"`。尽管 `to_lowercase` 会处理成基础的 unicode 格式，不会完全100%转换准确。如果我们是在写一个真实场景的应用的话，那么我们将会做更多的工作，但是这里我们仅仅是探究关于环境变量，而不是探究关于unicode的知识的，所以我们就把这个 `to_lowercase` 操作留在这里了。
 
+注意，因为调用 `to_lowercase` 函数会产生一个新的额数据而不是引用已经存在的数据，所以这里的变量 `query` 是个 `String` 类型，而不是一个字符串切片(string slice)的类型。假设查询的字符串是 `"rUsT"`，作为一个例子，这个字符串是不在小写的 `U`和 `T` 的，所以就必须分配一个 `"rust"` 字符串到变量。现在当我们将 `query` 做为一个参数传递给 `contains` 方法的时候，我们必须增加一个 `&`，因为 `contains` 方法的签名的参数是一个字符串切片（String slice）的类型。
+
+接下来，在检查每行是否包含 `query` 这个字符串之前，我们给每行都增加了调用 `to_lowercase` 函数，为了保证每行的字符串都是小写的。目前为止，我们都把每行的文本和查询的文本都转化为小写，我们可以进行不管大小写的匹配查询了。
+
+来看看是否这个实现可以通过测试：
+```powershell
+$ cargo test
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished test [unoptimized + debuginfo] target(s) in 1.33s
+     Running target/debug/deps/minigrep-4672b652f7794785
+
+running 2 tests
+test tests::case_insensitive ... ok
+test tests::case_sensitive ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running target/debug/deps/minigrep-caf9dbee196c78b9
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests minigrep
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+很好，通过了。让我们在 `main` 函数里面调用`search_case_insensitive` 函数。首先，我们要在结构体`Config` 里面新增一个变量来判断是否开启大小写敏感查询。
+```rust
+pub struct Config{
+    pub query: String,
+    pub filename: String,
+    pub case_sensitive: bool,
+}
+```
+注意，这里我们新增了一个字段 `case_sensitive`来确定报错一个 Boolean 类型的数据。下一步，我们需要 `run` 函数检查这个 `case_sensitive` 来决定我们是否开启大小写敏感的查询。
+
+```
+pub fn run(config: COnfig) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.filename)?;
+    let results = if config.case_sensitive {
+        search(&config.query, &contents)
+    } else {
+        search_case_insensitive(&config.query, &contents)
+    }
+
+    for line in results{
+        println!("{}", line);
+    }
+}
+```
+代码12-22 是否应开启大小写敏感查询取决于 `config.case_sensitive`
+
+最后，我们需要检查实际的环境变量。
+
+
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
 到目前为止，我们都将错误用 `println!` 输出到标准输出。
 
