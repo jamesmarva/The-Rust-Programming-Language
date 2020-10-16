@@ -1030,7 +1030,50 @@ pub fn run(config: COnfig) -> Result<(), Box<dyn Error>> {
 ```
 代码12-22 是否应开启大小写敏感查询取决于 `config.case_sensitive`
 
-最后，我们需要检查实际的环境变量。
+最后，我们需要检查实际的环境变量。用来处理环境变量的函数在标准库里的`env` 模块，我们可以用 `use std::env` 语句把这个模块引入到我们的作用域中。然后我们用 `env` 模块的 `var` 函数来产检环境变量 `CASE_INSENSITIVE` 就像代码12-23那样。
+```rust
+use std::use;
+// --snip--
+
+impl Config {
+    pub fn new (args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+    
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
+
+        Ok(Config {
+            query,
+            filename,
+            case_sensitive,
+        })
+    }
+}
+```
+代码12-23 检查名为 `CASE_INSENSITIVE` 的环境变量
+
+这里我创建了一个新的变量 `case_sensitive`，为了设置这个值，我们调用了 `env::var` 这个函数，以及将 `CASE_INSENSITIVE` 这个环境变量传给它。这个函数会返回一个 `Result` 的类型的变量，在环境变量已经被设置的情况下，它会返回一个包含其值的 `Ok` 变量，并且在环境变量没有被设置的时候返回一个 `Err` 变量。
+ 
+我们用 `Result` 里的 `is_err` 方法来检查是否这是 `Error`，也就是意味着这个环境变量没有被设置，这就是表示这里的要用的是大小写敏感的搜索。如果这个 `CASE_INSENSITIVE` 环境变量被设置了一些东西，那么这个方法 `is_err` 就会返回 false，然后这个程序就会启用大小写不敏感的搜索。我们不管这个 `CASE_INSENSITIVE` 环境变量被设置了什么值，只要管它是否被设置了，所以我们只要用 `is_err` 函数而不是用 `unwrap`，或者 `expect` 来查看 `Result` 的值。
+
+我们把这个 `case_sensitive` 的值传递给 `Config` 实例，这样 `run` 函数就会读取他的值，并且决定是否是调用 `search`函数还是调用`search_case_insensitive`.
+
+来试试我们的程序吧，首先我们在没有设置环境变量的情况下，用查询关键字 `to` 来进行查询，可以看到所有包含小写的`to` 的行都被打印出来了。
+
+```powershell
+$ cargo run to poem.txt
+   Compiling minigrep v0.1.0 (file:///projects/minigrep)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep to poem.txt`
+Are you nobody, too?
+How dreary to be somebody!
+```
+
+
 
 
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
