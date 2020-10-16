@@ -1072,6 +1072,24 @@ $ cargo run to poem.txt
 Are you nobody, too?
 How dreary to be somebody!
 ```
+没有设置环境变量的情况下，这个程序依然可以运行的，让我们设置一下变量，然后继续用相同的查询 `to`
+
+我们可以当看到所有的包含 `to` 的行：
+```
+$ CASE_INSENSITIVE=1 cargo run to poem.txt
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0s
+     Running `target/debug/minigrep to poem.txt`
+Are you nobody, too?
+How dreary to be somebody!
+To tell your name the livelong day
+To an admiring bog!
+```
+很好，我们也同时获取了包含“To”，我们的 `minigrep` 可以通过环境变量来控制是否启用大小写敏感的搜索了。
+
+一些程序会为了相同的配置同时使用参数和环境变量。这种情况下就需要程序来控制参数的优先级了。给你一个测试，在同时收到命令行的参数和环境变量的情况下进行控制是否启用大小写敏感搜索。
+
+`std::env` 模块有很多有用的特性来处理环境变量，在文档中查看它们吧。
+
 
 
 
