@@ -1089,11 +1089,6 @@ To an admiring bog!
 一些程序会为了相同的配置同时使用参数和环境变量。这种情况下就需要程序来控制参数的优先级了。给你一个测试，在同时收到命令行的参数和环境变量的情况下进行控制是否启用大小写敏感搜索。
 
 `std::env` 模块有很多有用的特性来处理环境变量，在文档中查看它们吧。
-
-
-
-
-
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
 到目前为止，我们都将错误用 `println!` 输出到标准输出。
 
