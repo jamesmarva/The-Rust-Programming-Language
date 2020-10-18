@@ -952,7 +952,6 @@ Trust me.";
 
 大小写不敏感的测试是用 `rUsT` 作为查询关键字的。在即将要实现的 `search_case_insensitive` 函数中，用`"rUsT"`这个查询关键字可以查找到带有 `"Rust:"` 和 `"Trust me."` 这两行文本，尽管这两行和关键字不是完全匹配的。目前因为我们还没实现 `search_case_insensitive` 函数，所以这个测试样例还不能被编译。
 
-
 ## 5.2 实现 `search_case_insensitive` 函数 (Implementing the search_case_insensitive Function)
 如 代码12-21 所示，大部分代码和 `search` 函数相同。唯一的不同就在在于这个函数里，我们把 `query` 和 每行的文本 都转化为小写了这样不管是大写还是小写，检查的时候都会变成小写匹配
 ```rust
@@ -1090,12 +1089,57 @@ To an admiring bog!
 
 `std::env` 模块有很多有用的特性来处理环境变量，在文档中查看它们吧。
 # 6 把错误信息输出到标准错误而不是输出到标准输出(Writing Error Messages to Standard Error Instead of Standard Output)
-到目前为止，我们都将错误用 `println!` 输出到标准输出。
+目前为止，我们都将错误用 `println!` 输出到了终端。大部分的终端都有提供了两种输出：给一般的信息提供**标准输出（standard output， `stdout` ）**，给错误信息提供 **错误输出(standard error， `stderr`)**。这样的区别是允许用户选择把成功的信息输出到文件，然后把错误的信息输出到屏幕上的。
+
+`println!` 仅仅实现了标准的输出，我们需要找到其他的方法来打印错误输出。
 
 ## 6.1 检查错误的输出的位置(Checking Where Errors Are Written)
+首先，先来观察一下目前的项目是如何进行标准输出的，包括那些本来应该进行标准错误输出的内容是怎么被处理的。因为我们没有重定向标准错误的输出，所以任何标准错误的输出都输出到屏幕上。
+
+命令行程序希望把错误信息发送到标准错误输出流中，这样即使在标准输出流重定向在文件中，我们也可以在屏幕中看到错误的信息。当然目前我们的程序还没有完成这个功能：目前只能看到错误的信息会被把保存到文件中。
+
+我们新增的 `>` 的和文件名`output.txt` 来运行程序，我们希望重定向标准输出到文件中。以下，我们用这个命令来运行一下程序：
+```
+$ cargo run > output.txt 
+```
+`>` 就是表示将标准输出到 *output.txt* 文件中，而不是屏幕上。因为上面的这个命令没有带着参数所以就会在文件中查看到一句错误。
 
 ## 6.2 输出错误到标准错误(Printing Errors to Standard Error)
+来看看代码12-24中的是如何改变标准错误的输出的。得益于之前的代码重构，所有的输出错误信息都在一个函数里面。我们这里用的都是宏函数 `println` 来输出信息。用标准库里提供的 `eprintln!` 来替换原来的 `println!`的输出：
+```rust
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    })
+    if let Err(e) = minigrep::run(config) {
+        eprintln!("Application error: {}", e);
+        process::exit(1);
+    }
+}
+```
+代码12-24 把错误信息用标准错误输出而不是标准输出。
 
+代码修改完成之后，再次用无参的方式来运行程序，可以看到错误输出到终端。
+```
+$ cargo run > output.txt 
+Problem parsing arguments: not enough arguments 
+```
+我看到错误信息在屏幕上，但是在 *output.txt* 里面没有内容。再用参数的情况来
+```
+$ cargo run to poem.txt > output.txt 
+```
+可以看到在终端没有任何输出，在output.txt 有信息。
+```
+Are you nobody, too? 
+How dreary to be somebody! 
+```
+我们替换了之后的输出效果。
 
 # 7 总结 (Summary)
+这章我们回顾了之前一些章节的知识，以及用Rust如何进行I/O操作。以及通过使用命令行参数，文件，环境变量以及标准错误输出来的 `eprintln!`的宏函数，现在你已经可以编写命令行的程序了。
+
+接下来，我们将会探索Rust中的函数式的特性：闭包和迭代。
+
 
