@@ -77,10 +77,28 @@ fn generate_workout(intensity: u32, random_number: u32) {
 代码13-3 程序的业务逻辑，根据输入的 `simulated_expensive_calculation` 来生成健身计划的业务逻辑代码
 
 
-## 1.2 用函数来重构代码(Refactoring Using Functions)
+### 1.1.1 用函数来重构代码(Refactoring Using Functions)
+```rust
+fn generate_workout(intensity: u32, random_number: u32) {
+    let expensive_result = simulated_expensive_calculation(intensity);
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!", expensive_result);
+        println!("Next, do {} situps!", expensive_result);
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", expensive_result);
+        }
+    }
+}
+```
+代码13-4 用 `simulated_expensive_calculation` 调换一个位置，并且把结果存在变量中。
 
 
-## 1.3 重构的时候使用闭包储存代码 (Refactoring with Closures to Store Code)
+
+### 1.1.2 重构的时候使用闭包储存代码 (Refactoring with Closures to Store Code)
 
 
 ```rust
@@ -114,7 +132,14 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 }
 ```
-代码13-6 
+代码13-6 调用定义的 `expensive_closure` 
+
+现在这个耗时的计算仅仅出现在一个地方，
+
+但是我们又出现了代码13-3 的问题，就是在一个 `if` 代码块里调用了两次闭包，这两次的调用让用户多等了一倍的时间。可以在 `if` 的代码块里创建一个变量来存储这个计算结果，但是闭包还是可以有另一个解决方案。稍后的我们将会讨论这个解决方案。不过先让我们来讨论为什么在闭包的定义和所涉及的 `trait` 里面没有类声明。
+## 1.2 闭包的类型推断和注释(Closure Type Inference and Annotation)
+
+
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
