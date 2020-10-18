@@ -9,12 +9,10 @@ Rust从很多现存的语言中吸取了灵感。其中一个比较明显的影�
 4. 两个特性的性能。
 
 Rust还有其他特性，比如，matching 模式以及枚举，这个我们在别的章节已经涉及了。精通闭包和迭代器是编写高性能的函数式编程的关键，我们将花费一整章来介绍他们。
+# 1 闭包：可以捕获环境参数的匿名函数(Closures: Anonymous Functions that Can Capture Their Environment)
+Rust的闭包是可以被保存进一个变量，以及传递给另一个函数的匿名函数。你可以在创建闭包之后，在下文中使用闭包计算。和函数不同的是，闭包是允许捕获调用者作用域中的参数的，我们将会展示如何定义闭包以及如何使用这些功能。
+## 1.1 创建闭包，以及定义一个它的抽象行为(Creating an Abstraction of Behavior with Closures)
 
-
-
-# 1 Closures: Anonymous Functions that Can Capture Their Environment
-
-## 1.1 Creating an Abstraction of Behavior with Closures
 ## 1.2 Refactoring Using Functions
 ## 1.3 重构的时候使用闭包储存代码 (Refactoring with Closures to Store Code)
 
