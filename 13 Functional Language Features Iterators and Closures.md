@@ -1,3 +1,15 @@
+Rust从很多现存的语言中吸取了灵感。其中一个比较明显的影响就是 *函数式编程(functional programming)*。函数式编程用函数作为参数，以及作为其他函数的返回值使用，然后把函数赋值给变量进行使用。
+
+这章我们不讨论函数式编程是什么的问题，而是展示 `Rust` 一些功能上被其他的认为是函数式类似的特性。
+
+接下来我们将会涉及：
+1. 闭包。可以存储在变量里的类函数的结构
+2. 迭代器，处理元素序列的方式
+3. 如何用上面的两个特性进行改进 I/O 项目
+4. 两个特性的性能。
+
+Rust还有其他特性，比如，matching 模式以及枚举，这个我们在别的章节已经涉及了。精通闭包和迭代器是编写高性能的函数式编程的关键，我们将花费一整章来介绍他们。
+
 
 
 # 1 Closures: Anonymous Functions that Can Capture Their Environment
@@ -5,6 +17,7 @@
 ## 1.1 Creating an Abstraction of Behavior with Closures
 ## 1.2 Refactoring Using Functions
 ## 1.3 重构的时候使用闭包储存代码 (Refactoring with Closures to Store Code)
+
 
 ```rust
 let expensive_closure = |num| {
