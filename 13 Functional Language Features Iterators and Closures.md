@@ -96,7 +96,9 @@ fn generate_workout(intensity: u32, random_number: u32) {
 ```
 代码13-4 用 `simulated_expensive_calculation` 调换一个位置，并且把结果存在变量中。
 
+这个修改统一了所有的调用，都把这些耗时的调用封装到了 `simulated_expensive_calculation` 函数中了，这样就解决了在第一个 `if` 的代码块中的必须要要调用两次的问题。但是不幸的是，这样的解决方式会让不必要条件下依然触发调用函数，比如在第二个的 `if` 的代码块中是没有必要调用函数的。
 
+我们想要在我们的程序某处中定义我们的代码，但是仅仅在需要的时候调用。这就是闭包的应用场景之一了。
 
 ### 1.1.2 重构的时候使用闭包储存代码 (Refactoring with Closures to Store Code)
 
@@ -139,10 +141,14 @@ fn generate_workout(intensity: u32, random_number: u32) {
 但是我们又出现了代码13-3 的问题，就是在一个 `if` 代码块里调用了两次闭包，这两次的调用让用户多等了一倍的时间。可以在 `if` 的代码块里创建一个变量来存储这个计算结果，但是闭包还是可以有另一个解决方案。稍后的我们将会讨论这个解决方案。不过先让我们来讨论为什么在闭包的定义和所涉及的 `trait` 里面没有类声明。
 ## 1.2 闭包的类型推断和注释(Closure Type Inference and Annotation)
 
-### 1.2.1 
+## 1.3 Storing Closures Using Generic Parameters and the Fn Traits
 
 
-### 1.2.2 
+## 1.4 Limitations of the Cacher Implementation
+
+
+## 1.5 Capturing the Environment with Closures
+
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
