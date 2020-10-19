@@ -9,11 +9,13 @@ fn main() {
 }
 
 fn generate_workout(intensity: u32, random_number: u32) {
+   
     let expensive_closure = |num| {
-        println!("calculating slowly.");
-        thread::sleep(Duration::from_secs(1));
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
         num
     };
+    
     if intensity < 25 {
         println!("Today, do {} pushups!", expensive_closure(intensity));
         println!("Next, do {} situps!", expensive_closure(intensity));

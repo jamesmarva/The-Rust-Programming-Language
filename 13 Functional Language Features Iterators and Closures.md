@@ -139,7 +139,10 @@ fn generate_workout(intensity: u32, random_number: u32) {
 但是我们又出现了代码13-3 的问题，就是在一个 `if` 代码块里调用了两次闭包，这两次的调用让用户多等了一倍的时间。可以在 `if` 的代码块里创建一个变量来存储这个计算结果，但是闭包还是可以有另一个解决方案。稍后的我们将会讨论这个解决方案。不过先让我们来讨论为什么在闭包的定义和所涉及的 `trait` 里面没有类声明。
 ## 1.2 闭包的类型推断和注释(Closure Type Inference and Annotation)
 
+### 1.2.1 
 
+
+### 1.2.2 
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
