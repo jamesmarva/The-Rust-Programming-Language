@@ -166,9 +166,35 @@ let add_one_v3 = |x| x + 1;
 ```
 第一行是个函数的定义，第二行就是完整的有类型声明的闭包的定义。第三行则是闭包省略了类型声明的定义，第四行是在去掉了大括号的定义，因为整个闭包体只有一行代码。后三行都是闭包的定义，并且都有相同的行为。
 
+闭包定义将为每个参数和返回值推断出具体的类型。比如代码13-8 的这个简短的定义。这个闭包仅仅是作为返回传递给它的参数的值。实际的情况中，这个闭包其实没什么用，仅仅是做为一个例子。注意，这里的闭包没有增加类型声明，如果我们调用两次这个闭包，第一次是将 `String` 类型作为参数的，第二次是将 `u32` 作为参数的，就会得到一个错误。
+```
+let example_closure = |x| x;
+let s = example_closure(String::from("hell")):
+let n = example_closure(5);
+```
+代码13-8 尝试调用一个参数被推断为两个不同类型的闭包。
 
+编译器会给我们一个错误信息：
+```
+$ cargo run
+   Compiling closure-example v0.1.0 (file:///projects/closure-example)
+error[E0308]: mismatched types
+ --> src/main.rs:5:29
+  |
+5 |     let n = example_closure(5);
+  |                             ^
+  |                             |
+  |                             expected struct `std::string::String`, found integer
+  |                             help: try using a conversion method: `5.to_string()`
 
+error: aborting due to previous error
 
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `closure-example`.
+
+To learn more, run the command again with --verbose.
+```
+第一次的调用，编译器会推断闭包的参数和返回值的类型都是`String`。这些类型会被锁定到闭包中，如果再次调用的时候用了不同的类型，就会出错。
 ## 1.3 Storing Closures Using Generic Parameters and the Fn Traits
 
 
