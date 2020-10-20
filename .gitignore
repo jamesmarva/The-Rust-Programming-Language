@@ -395,6 +395,12 @@ code/ch13/code_13_10/Cargo.lock
 code/ch13/code_13_11/target
 code/ch13/code_13_11/Cargo.lock
 
+code/ch13/code_13_12/target
+code/ch13/code_13_12/Cargo.lock
+
+code/ch13/code_13_13/target
+code/ch13/code_13_13/Cargo.lock
+
 code/ch13/code_13_14/target
 code/ch13/code_13_14/Cargo.lock
 
@@ -424,8 +430,6 @@ code/ch13/code_13_21/Cargo.lock
 
 code/ch13/code_13_22/target
 code/ch13/code_13_22/Cargo.lock
-
-
 
 *.lock
 .vscode/launch.json

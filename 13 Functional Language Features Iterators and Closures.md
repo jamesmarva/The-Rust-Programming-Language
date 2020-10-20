@@ -195,14 +195,12 @@ error: could not compile `closure-example`.
 To learn more, run the command again with --verbose.
 ```
 第一次的调用，编译器会推断闭包的参数和返回值的类型都是`String`。这些类型会被锁定到闭包中，如果再次调用的时候用了不同的类型，就会出错。
-## 1.3 Storing Closures Using Generic Parameters and the Fn Traits
+## 1.3 用一个一个有泛型参数和 `Fn` trait将闭包保存起来(Storing Closures Using Generic Parameters and the Fn Traits)
 
 
-## 1.4 Limitations of the Cacher Implementation
-
+## 1.4 利用Cacher的限制(Limitations of the Cacher Implementation)
 
 ## 1.5 Capturing the Environment with Closures
-
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
