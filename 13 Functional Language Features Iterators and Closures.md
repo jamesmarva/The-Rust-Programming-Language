@@ -195,7 +195,20 @@ error: could not compile `closure-example`.
 To learn more, run the command again with --verbose.
 ```
 第一次的调用，编译器会推断闭包的参数和返回值的类型都是`String`。这些类型会被锁定到闭包中，如果再次调用的时候用了不同的类型，就会出错。
-## 1.3 用一个一个有泛型参数和 `Fn` trait将闭包保存起来(Storing Closures Using Generic Parameters and the Fn Traits)
+## 1.3 用一个有泛型参数和 `Fn` trait将闭包保存起来(Storing Closures Using Generic Parameters and the Fn Traits)
+回到我们的生成健身计划的APP，在代码13-6里，我们的代码依然调用了昂贵的计算的闭包。解决这个问题的方法就是在多次的闭包的地方用一个变量把计算的结果都记录下来，但是这样导致的问题就是会有很多个重复保存变量的地方。
+
+幸运的是，仍然还有一个可用方案可以用。我们可以创建一个结构体来保存闭包，然后缓存了调用了闭包的值，这样接下里的代码就不用保存这些结果到变量中了。你也许已经知道了这个模式了，就是*memoization* 或者 *lazy evaluation（惰性求值）* 
+
+```rust
+struct Cacher<T> 
+    where T: Fn(u32) -> u32
+{
+    calculation: T,
+    value: Option<u32>,
+}
+```
+代码13-9 定义一个 `Cacher` 结构体来存放闭包到 `calcalution` 变量中，保存 `Option<T>` 到变量 value 中。
 
 
 ## 1.4 利用Cacher的限制(Limitations of the Cacher Implementation)
