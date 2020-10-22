@@ -2,6 +2,10 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
+
+    let simulate_intensity = 11;
+    let simulate_random = 7;
+    
     
 }
 
