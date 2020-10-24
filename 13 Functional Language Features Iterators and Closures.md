@@ -210,10 +210,10 @@ struct Cacher<T>
 ```
 代码13-9 定义一个 `Cacher` 结构体来存放闭包到 `calcalution` 变量中，保存 `Option<T>` 到变量 value 中。
 
-
 ## 1.4 利用Cacher的限制(Limitations of the Cacher Implementation)
+值的缓存是个使用很广的实用行为，我们也许希望在代码中的别的闭包也使用他们。可是，目前 `Cacher` 的实现仍然存在两个小问题，这就使得在不同的上下文中复用变得很困难。
 
-## 1.5 Capturing the Environment with Closures
+## 1.5 使用闭包来使用环境的变量(Capturing the Environment with Closures)
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
