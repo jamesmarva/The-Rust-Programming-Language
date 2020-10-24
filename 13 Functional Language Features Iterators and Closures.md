@@ -213,6 +213,50 @@ struct Cacher<T>
 ## 1.4 利用Cacher的限制(Limitations of the Cacher Implementation)
 值的缓存是个使用很广的实用行为，我们也许希望在代码中的别的闭包也使用他们。可是，目前 `Cacher` 的实现仍然存在两个小问题，这就使得在不同的上下文中复用变得很困难。
 
+第一个问题是，`Chcher` 的实例对于 `value` 放来的任何参数都是返回相同的值，也就说下面的这个测试例子会失败：
+```rust
+fn main() {
+    let mut c = Cacher::new(|a| a);
+     
+     let v1 = c.value(1);
+     let v2 = c.value(2);
+
+     assert_eq!(v2, 2);
+}
+```
+这个测试用返回传递给它的参数作为返回值的闭包来创建了一个新的 `Cacher`。用 1 和 2 分别调用 `Cacher` 实例的 `value` 方法，我们希望使用 2 的时候，value会返回一个 2。
+
+使用代码13-9 和 代码13-10 的 `Cacher` 实现进行测试，它会在调用 `asser_eq!` 的时候失败。
+```
+$ cargo test
+   Compiling cacher v0.1.0 (file:///projects/cacher)
+    Finished test [unoptimized + debuginfo] target(s) in 0.72s
+     Running target/debug/deps/cacher-4116485fb32b3fff
+
+running 1 test
+test tests::call_with_different_values ... FAILED
+
+failures:
+
+---- tests::call_with_different_values stdout ----
+thread 'main' panicked at 'assertion failed: `(left == right)`
+  left: `1`,
+ right: `2`', src/lib.rs:43:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace.
+
+
+failures:
+    tests::call_with_different_values
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out
+
+error: test failed, to rerun pass '--lib'
+```
+这里的问题是我们第一次用 1 来调用 `c.value` 的时候，`Cacher` 就把 `Some(1)` 保存到了 `self.value` 中了。之后不管传什么值，调用value，返回都会返回1.
+
+尝试修改 `Cacher`，用一个 hash map 来代替单独的一个值。hashmap 的 key是传递进来的 arg的值，但是value则是对应的 key 的闭包返回的值。之前我们会用 `self.value` 来看是 `Some` 还是 `None`，但是现在我们会用去map中找值，如果存在就返回，如果不存在就调用闭包，把结果保存map 对应 `arg` 的位置。
+
+当前的 `Cacher` 实现的第二个问题是，我们只能传入一个 `u32` 的值，并且返回一个 `u32` 的值的闭包。举个栗子，我们想要能够缓存一个 传入字符串切片(string slice)，然后返回这个切片长度的闭包的结果。为了解决这个问题，尝试引入更多的泛型参数来增加 `Cacher` 的灵活性。
 ## 1.5 使用闭包来使用环境的变量(Capturing the Environment with Closures)
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
