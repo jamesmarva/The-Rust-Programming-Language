@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn main() {
     
 }
@@ -8,5 +10,5 @@ struct Cacher<T>
 {
 
     calcalution: T,
-    value: Map<u32, u32>
+    value: HashMap<u32, u32>
 }

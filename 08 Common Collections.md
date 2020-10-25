@@ -262,7 +262,7 @@ fn main() {
 ```
 ↑ Listing 8-15: Appending a string slice to a String using the push_str method
 
-变量 `s` 的字符串就变成了 `foobar`。`push_str`方法会使用字符串切片，这种情况比较适用于，我们只想要这个数据的值，不用非的获取参数的所有权的情况。比如，如果在代码 8-16 中，如果把 `s2` 被添加到 `s1` 就无法使用就是很坑的。
+变量 `s` 的字符串就变成了 `foobar`。`push_str`方法会使用字符串切片(string slice)，这种情况比较适用于，我们只想要这个数据的值，不用非的获取参数的所有权的情况。比如，如果在代码 8-16 中，如果把 `s2` 被添加到 `s1` 就无法使用就是很坑的。
 ```rust
 fn main() {
     let mut s1 = String::from("foo");
