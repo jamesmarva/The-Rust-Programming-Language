@@ -10,3 +10,4 @@ impl<T> MyBox<T> {
         MyBox(x)
     }
 }
+
