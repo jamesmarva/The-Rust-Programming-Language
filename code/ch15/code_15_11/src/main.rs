@@ -4,6 +4,10 @@ fn main() {
     
 }
 
+fn hello(name: &str) {
+    println!("hello, {}", name);
+}
+
 struct MyBox<T> (T);
 
 
