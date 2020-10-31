@@ -8,7 +8,6 @@ enum List {
 use crate::List::{Cons, Nil};
 
 fn main() {
-
     let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
     println!("count after creating  a = {}", Rc::strong_count(&a));
 
@@ -24,4 +23,10 @@ fn main() {
 
     }
     println!("count after droping  c = {}", Rc::strong_count(&a));
+
+    let d = Rc::new(Cons(1, Rc::new(Cons(2, Nil))));
+    println!("count d {}", d.strong_count());
+    let e = Cons(3, Rc::clone(d));
+    let f = Cons(4, Rc::clone(d));
+
 }
