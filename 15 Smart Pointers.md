@@ -89,9 +89,42 @@ fn main() {
 
 
 
+## 4.1 使用 Rc<T> 共享数据(Using Rc<T> to Share Data)
 
+## 4.2 克隆 Rc<T> 会增加引用计数(Cloning an Rc<T> Increases the Reference Count)
 
+```
+enum List {
+    Cons(i32, Rc<List>),
+    Nil,
+}
 
+use crate::List::{Cons, Nil};
+use std::rc::Rc;
 
+fn main() {
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!("count after creating a = {}", Rc::strong_count(&a));
+    let b = Cons(3, Rc::clone(&a));
+    println!("count after creating b = {}", Rc::strong_count(&a));
+    {
+        let c = Cons(4, Rc::clone(&a));
+        println!("count after creating c = {}", Rc::strong_count(&a));
+    }
+    println!("count after c goes out of scope = {}", Rc::strong_count(&a));
+}
+```
+代码15-19 输出引用计数
+
+```
+$ cargo run
+   Compiling cons-list v0.1.0 (file:///projects/cons-list)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.45s
+     Running `target/debug/cons-list`
+count after creating a = 1
+count after creating b = 2
+count after creating c = 3
+count after c goes out of scope = 2
+```
 
 
