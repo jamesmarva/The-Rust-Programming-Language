@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 enum List {
     Cons(i32, Rc<List>),
-    Nil
+    Nil,
 }
 
 use crate::List::{Cons, Nil};
@@ -24,9 +24,10 @@ fn main() {
     }
     println!("count after droping  c = {}", Rc::strong_count(&a));
 
-    let d = Rc::new(Cons(1, Rc::new(Cons(2, Nil))));
-    println!("count d {}", d.strong_count());
-    let e = Cons(3, Rc::clone(d));
-    let f = Cons(4, Rc::clone(d));
-
+    let d = Rc::new(Cons(1, Rc::new(Cons(2, Rc::new(Nil)))));
+    println!("count d {}", Rc::strong_count(&d));
+    let e = Cons(3, Rc::clone(&d));
+    println!("count d {}", Rc::strong_count(&d));
+    let f = Cons(4, Rc::clone(&d));
+    println!("count d {}", Rc::strong_count(&d));
 }
