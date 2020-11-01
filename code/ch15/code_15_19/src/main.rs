@@ -10,7 +10,7 @@ use crate::List::{Cons, Nil};
 fn main() {
     let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
     println!("count after creating  a = {}", Rc::strong_count(&a));
-
+    
     let b = Cons(3, Rc::clone(&a));
     println!("count after creating  b = {}", Rc::strong_count(&a));
 
@@ -23,6 +23,11 @@ fn main() {
 
     }
     println!("count after droping  c = {}", Rc::strong_count(&a));
+
+    let cc = &a;
+    let dd = &a;
+    let ee = &a;
+    println!("--------------------  c = {}", Rc::strong_count(&a));
 
     let d = Rc::new(Cons(1, Rc::new(Cons(2, Rc::new(Nil)))));
     println!("count d {}", Rc::strong_count(&d));
