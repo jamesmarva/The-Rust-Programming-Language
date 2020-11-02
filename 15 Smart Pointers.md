@@ -159,8 +159,54 @@ To learn more, run the command again with --verbose.
 ```
 可是，在某些情况下，一个值可以在它的方法里修改它的值，但是在别的代码中，它还是不变的，这种特性还是很有用的。在这个值的方法之外的代码是无法改变其值的。`RefCell<T>` 是一个可以获取内部可变的特性的方法。 但是 `RefCell<T>` 还是没有完全绕来借用规则：编译器中的借用检查器还是可以允许通过这些内内部可变性的，并且在运行的时候检查这种借用规则。如果编写的代码违反了这些规则，那么就会报 `panic!` 而不是编译错误。
 
+让我们通过实际操作来看看什么何处可以用内部可变这个特性是有用的，以及为什么有用。
 
-### 5.2.1 A Use Case for Interior Mutability: Mock Objects
+### 5.2.1 内部可变的用武之地：mock 对象(A Use Case for Interior Mutability: Mock Objects)
+*测试替身(test double)* 是一个通用的编程理念，就是表示在测试的时候代替某个类型以用来测试。 *mock 对象（Mock objects）* 就是就类型的替身，它们可以用来记录测试过程中发生了什么，以及你可以断言哪些操作是对的。
+
+```rust
+#![allow(unused)]
+pub trait Messenger {
+    fn send(&self, msg: &str);
+}
+
+pub struct LimitTracker<'a, T: Messenger> {
+    messenger: &'a T,
+    value: usize,
+    max: usize,
+}
+
+impl<'a, T> LimitTracker<'a, T>
+where
+    T: Messenger,
+{
+    pub fn new(messenger: &T, max: usize) -> LimitTracker<T> {
+        LimitTracker {
+            messenger,
+            value: 0,
+            max,
+        }
+    }
+
+    pub fn set_value(&mut self, value: usize) {
+        self.value = value;
+
+        let percentage_of_max = self.value as f64 / self.max as f64;
+
+        if percentage_of_max >= 1.0 {
+            self.messenger.send("Error: You are over your quota!");
+        } else if percentage_of_max >= 0.9 {
+            self.messenger
+                .send("Urgent warning: You've used up over 90% of your quota!");
+        } else if percentage_of_max >= 0.75 {
+            self.messenger
+                .send("Warning: You've used up over 75% of your quota!");
+        }
+    }
+}
+```
+代码 15-20 
+
 
 
 
