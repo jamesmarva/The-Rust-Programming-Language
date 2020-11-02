@@ -547,22 +547,35 @@ code/ch15/code_15_19/Cargo.lock
 code/ch15/code_15_20/target
 code/ch15/code_15_20/Cargo.lock
 
-code/ch15/code_15_13/target
-code/ch15/code_15_13/Cargo.lock
+code/ch15/code_15_21/target
+code/ch15/code_15_21/Cargo.lock
 
-code/ch15/code_15_13/target
-code/ch15/code_15_13/Cargo.lock
+code/ch15/code_15_22/target
+code/ch15/code_15_22/Cargo.lock
 
-code/ch15/code_15_13/target
-code/ch15/code_15_13/Cargo.lock
+code/ch15/code_15_23/target
+code/ch15/code_15_23/Cargo.lock
 
-code/ch15/code_15_13/target
-code/ch15/code_15_13/Cargo.lock
+code/ch15/code_15_24/target
+code/ch15/code_15_24/Cargo.lock
 
-code/ch15/code_15_13/target
-code/ch15/code_15_13/Cargo.lock
+code/ch15/code_15_25/target
+code/ch15/code_15_25/Cargo.lock
 
+code/ch15/code_15_26/target
+code/ch15/code_15_26/Cargo.lock
 
+code/ch15/code_15_27/target
+code/ch15/code_15_27/Cargo.lock
+
+code/ch15/code_15_28/target
+code/ch15/code_15_28/Cargo.lock
+
+code/ch15/code_15_29/target
+code/ch15/code_15_29/Cargo.lock
+
+code/ch15/code_15_30/target
+code/ch15/code_15_30/Cargo.lock
 
 
 *.lock
