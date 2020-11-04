@@ -9,14 +9,14 @@ fn main() {
     
     for i in &row {
         match i {
-            SpreadsheetCell::Int(int32) => {
-                println!("Int : {}", int32);
+            SpreadsheetCell::Int(val) => {
+                println!("Int : {}", val);
             },
-            SpreadsheetCell::Float(float64) => {  
-                println!("Float : {}", float64);
+            SpreadsheetCell::Float(val) => {  
+                println!("Float : {}", val);
             },
-            SpreadsheetCell::Text(text) => {
-                println!("Text : {}", text);
+            SpreadsheetCell::Text(val) => {
+                println!("Text : {}", val);
             }   
         }
     }
