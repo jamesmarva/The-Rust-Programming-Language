@@ -207,11 +207,13 @@ where
 ```
 代码 15-20 
 
+### 5.2.2 用 `RefCell<T>` 在运行时跟踪借用Keeping Track of Borrows at Runtime with RefCell<T>
 
 
 
-### 5.2.2 
+## 5.3 用 `Rc<T>` `RefCell<T>` 来使可变数据有多个持有者(Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>)
 
 
-## 5.3 
+
+# 5 Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>
 # 6 Reference Cycles Can Leak Memory
