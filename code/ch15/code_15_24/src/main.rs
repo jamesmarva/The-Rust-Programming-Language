@@ -6,8 +6,9 @@ enum List {
     Cons(Rc<RefCell<i32>>, Rc<List>), 
     Nil,
 }
-
+// 多个持有的可变的对象
 use crate::List::{Cons, Nil};
+
 fn main() {
 
     let value = Rc::new(RefCell::new(5));
@@ -19,7 +20,6 @@ fn main() {
     let c = Cons(Rc::new(RefCell::new(7)), Rc::clone(&a));
 
     *value.borrow_mut() += 10;
-
     
     println!("a after = {:?}", a);
     println!("b after = {:?}", b);
