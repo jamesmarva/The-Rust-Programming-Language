@@ -6,7 +6,7 @@ fn main() {
         println!("{}", i);
     }
     println!("-----------------------");
-    for i in &mut v {
+    for i in &v {
         println!("{}", i);
     }
 }

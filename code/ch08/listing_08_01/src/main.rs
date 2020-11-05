@@ -13,4 +13,14 @@ fn main() {
     v1.push(6);
 
 
+    // 创建
+    let mut string_vec: Vec<String> = Vec::new();
+    string_vec.push(String::from("adfadfs"));
+    use_vec_in_function(string_vec);
+}
+
+fn use_vec_in_function(v: Vec<String>) {
+    for i in v.iter() {
+        println!("i: {}", i);
+    }
 }
