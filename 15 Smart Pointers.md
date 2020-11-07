@@ -207,14 +207,100 @@ where
 ```
 代码 15-20 
 
-### 5.2.2 用 `RefCell<T>` 在运行时跟踪借用Keeping Track of Borrows at Runtime with RefCell<T>
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::RefCell;
+
+    struct MockMessenger {
+        sent_messages: RefCell<Vec<String>>,
+    }
+
+    impl MockMessenger {
+        fn new() -> MockMessenger {
+            MockMessenger {
+                sent_messages: RefCell::new(vec![]),
+            }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            self.sent_messages.borrow_mut().push(String::from(message));
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        // --snip--
+      let mock_messenger = MockMessenger::new();
+        let mut limit_tracker = LimitTracker::new(&mock_messenger, 100);
+
+        limit_tracker.set_value(80);
+
+        assert_eq!(mock_messenger.sent_messages.borrow().len(), 1);
+    }
+}
+```
+代码15-22 用 `RefCell<T>` 来修改一个不可变的引用的内部值
+
+现在的字段 `sent_message` 字段已经是 `RefCell<Vec<String>>` 类型而不是 `Vec<String>` 类型了。在函数 `new` 中，我用空 vector 来创建了一个 `RefCell<Vec<String>>` 对象。
+
+`send` 方法的实现代码中，第一个参数 `self` 仍然是一个不可变的借用，这样是符合 trait 定义的。我们可以调用 `borrow_mut()` 方法来获取 `self.sent_message` 的 `RefCell` 的值 `Vec<String>`。然后就可以在可变的引用中调用 `push` 方法来记录发送的消息。
+
+最后就是新增一个断言：为了看看内部的vector有多少的数据，要调用 `RefCell` 的 `borrow()` 来获取不可变的引用。
+
+现在你已经知道了如何使用 `RefCell<T>` 了，下一步来深入研究一下是如何工作的。
+
+### 5.2.2 用 `RefCell<T>` 在运行时跟踪借用(Keeping Track of Borrows at Runtime with RefCell<T>)
 
 
+```rust
+impl Messenger for MockMessenger {
+    fn send(&self, msg: &str) {
+        let mut first_borrow = self.sent_message.borrow_mut();
+        let mut second_borrow = self.sent_message.borrow_mut();
+        first_borrow.push(String::from(msg));
+        second_borrow.push(String::from(msg));
+    }
+}
+```
+代码15-23 在同一个作用域中创建两个可变的引用，会引发 `panic`
 
 ## 5.3 用 `Rc<T>` `RefCell<T>` 来使可变数据有多个持有者(Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>)
+```rust
+#[derive(Debug)]
+enum List {
+    Cons(Rc<RefCell<i32>>, Rc<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+fn main() {
+    let value = Rc::new(RefCell::new(5));
+
+    let a = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil)));
+
+    let b = Cons(Rc::new(RefCell::new(3)), Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(4)), Rc::clone(&a));
+
+    *value.borrow_mut() += 10;
+
+    println!("a after = {:?}", a);
+    println!("b after = {:?}", b);
+    println!("c after = {:?}", c);
+}
+```
+代码15-24 用 `Rc<RefCell<i32>>` 来创建一个我们可以修改的 `List` 对象
 
 
+# 6 循环引用导致的内存泄漏(Reference Cycles Can Leak Memory)
 
-# 5 Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>
+## 6.1 写一个循环引用(Creating a Reference Cycle)
 
-# 6 Reference Cycles Can Leak Memory
+## 6.2 

@@ -23,7 +23,7 @@ impl MockMessenger {
 impl Messenger for MockMessenger {
     fn send(&self, message: &str) {
         let mut one_borrow = self.sent_messages_vec.borrow_mut();
-        // let mut two_borro = self.sent_messages_vec.borrow_mut();
+        // let mut two_borrow = self.sent_messages_vec.borrow_mut();
     }
 }
 
@@ -34,6 +34,5 @@ mod tests {
     fn it_sends_an_over_75_percent_warning_message() {
         let mock_messenger = MockMessenger::new();
         mock_messenger.send("asfasfdasfas");
-
     }
 }
