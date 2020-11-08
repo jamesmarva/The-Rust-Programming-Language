@@ -298,9 +298,130 @@ fn main() {
 ```
 代码15-24 用 `Rc<RefCell<i32>>` 来创建一个我们可以修改的 `List` 对象
 
-
 # 6 循环引用导致的内存泄漏(Reference Cycles Can Leak Memory)
 
-## 6.1 写一个循环引用(Creating a Reference Cycle)
 
-## 6.2 
+
+## 6.1 写一个循环引用(Creating a Reference Cycle)
+```rust
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+enum List {
+    Cons(i32, RefCell<Rc<List>>),
+    Nil,
+}
+
+impl List {
+    fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+        match self {
+            Cons(_, item) => Some(item),
+            Nil => None,
+        }
+    }
+}
+```
+代码15-25 Cons 定义：持有一个 `RefCell<T>`，这样就可以修改 Cons 变量的指向了
+
+
+```rust
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+enum List {
+    Cons(i32, RefCell<Rc<List>>),
+    Nil,
+}
+
+impl List {
+    fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+        match self {
+            Cons(_, item) => Some(item),
+            Nil => None,
+        }
+    }
+}
+
+fn main() {
+    let a = Rc::new(Cons(5, RefCell::new(Rc::new(Nil))));
+
+    println!("a initial rc count = {}", Rc::strong_count(&a));
+    println!("a next item = {:?}", a.tail());
+
+    let b = Rc::new(Cons(10, RefCell::new(Rc::clone(&a))));
+
+    println!("a rc count after b creation = {}", Rc::strong_count(&a));
+    println!("b initial rc count = {}", Rc::strong_count(&b));
+    println!("b next item = {:?}", b.tail());
+
+    if let Some(link) = a.tail() {
+        *link.borrow_mut() = Rc::clone(&b);
+    }
+
+    println!("b rc count after changing a = {}", Rc::strong_count(&b));
+    println!("a rc count after changing a = {}", Rc::strong_count(&a));
+
+    // Uncomment the next line to see that we have a cycle;
+    // it will overflow the stack
+    // println!("a next item = {:?}", a.tail());
+}
+```
+代码15-26 通过把 `List` 互相指向对方来创建一个引用循环
+
+
+```
+$ cargo run
+   Compiling cons-list v0.1.0 (file:///projects/cons-list)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.53s
+     Running `target/debug/cons-list`
+a initial rc count = 1
+a next item = Some(RefCell { value: Nil })
+a rc count after b creation = 2
+b initial rc count = 1
+b next item = Some(RefCell { value: Cons(5, RefCell { value: Nil }) })
+b rc count after changing a = 2
+a rc count after changing a = 2
+```
+
+## 6.2 避免引用循环：变 `Rc<T>` 为 `Weak<T>` (Preventing Reference Cycles: Turning an Rc<T> into a Weak<T>)
+
+
+
+
+
+### 6.2.1  创建树形数据结构：带有子节点的 `Node`(Creating a Tree Data Structure: a Node with Child Nodes)
+```
+use std::cell::RefCell;
+use std::rc::Rc;
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    children: RefCell<Vec<Rc<Node>>>,
+}
+```
+
+### 6.2.2 增加从子到父的引用(Adding a Reference from a Child to Its Parent)
+
+# 7 总结 （summary）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
