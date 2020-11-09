@@ -595,6 +595,9 @@ code/ch16/code_16_4/Cargo.lock
 code/ch16/code_16_5/target
 code/ch16/code_16_5/Cargo.lock
 
+code/ch16/code_16_5_error/target
+code/ch16/code_16_5_error/Cargo.lock
+
 code/ch16/code_16_6/target
 code/ch16/code_16_6/Cargo.lock
 

@@ -1,3 +1,11 @@
+use std::thread;
+
+
 fn main() {
-    println!("Hello, world!");
+
+    let v = vec![1, 3, 4];
+
+    let handle = thread::spawn(||{
+        println!("vector : {:?}", v);
+    });
 }
