@@ -1,3 +1,8 @@
+use std::sync::mpsc;
 fn main() {
-    println!("Hello, world!");
+    let (t, r) = mpsc::channel();
+
+    t.send("hhhh").unwrap();
+    let s = r.recv().unwrap();
+    println!("Got: {}", s);
 }

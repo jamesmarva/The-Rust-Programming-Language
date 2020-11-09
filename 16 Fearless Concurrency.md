@@ -11,13 +11,78 @@
 
 ```
 
-## 1.2 
+## 1.2 Waiting for All Threads to Finish Using join Handles
 
 
+## 1.3 Using move Closures with Threads
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3];
+
+    let handle = thread::spawn(|| {
+        println!("Here's a vector: {:?}", v);
+    });
+
+    handle.join().unwrap();
+}
+```
+
+```
+$ cargo run
+   Compiling threads v0.1.0 (file:///projects/threads)
+error[E0373]: closure may outlive the current function, but it borrows `v`, which is owned by the current function
+ --> src/main.rs:6:32
+  |
+6 |     let handle = thread::spawn(|| {
+  |                                ^^ may outlive borrowed value `v`
+7 |         println!("Here's a vector: {:?}", v);
+  |                                           - `v` is borrowed here
+  |
+note: function requires argument type to outlive `'static`
+ --> src/main.rs:6:18
+  |
+6 |       let handle = thread::spawn(|| {
+  |  __________________^
+7 | |         println!("Here's a vector: {:?}", v);
+8 | |     });
+  | |______^
+help: to force the closure to take ownership of `v` (and any other referenced variables), use the `move` keyword
+  |
+6 |     let handle = thread::spawn(move || {
+  |                                ^^^^^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0373`.
+error: could not compile `threads`.
+
+To learn more, run the command again with --verbose.
+```
 
 
+```rust
+use std::thread;
 
+fn main() {
+    let v = vec![1, 2, 3];
 
+    let handle = thread::spawn(|| {
+        println!("Here's a vector: {:?}", v);
+    });
+
+    drop(v); // oh no!
+
+    handle.join().unwrap();
+}
+
+```
+
+# 2 用消息在线程指尖传递消息（Using Message Passing to Transfer Data Between Threads）
+有个越来越流行的用来保证并发安全的方式：*消息传递(message passing)*，线程或者使用者(actors)通过发送带有数据的消息来进行交流沟通。这个思想是来自 “Go 语言编程文档” 的slogan，不要通过共享内存来交换数据，用传递消息的是让来交换数据（Do not communicate by sharing memory; instead, share memory by communicating.）
+
+Rust 实现消息传递的主要工具是 *通道（channel）*。
 
 
 
