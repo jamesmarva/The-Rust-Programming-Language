@@ -617,7 +617,19 @@ code/ch16/code_16_11/target
 code/ch16/code_16_11/Cargo.lock
 
 code/ch16/code_16_12/target
-code/ch16/code_16_12/Cargo.lock
+
+code/ch16/code_16_13/target
+
+
+code/ch16/code_16_14/target
+
+
+code/ch16/code_16_15/target
+code/ch16/code_16_16/target
+code/ch16/code_16_17/target
+code/ch16/code_16_18/target
+code/ch16/code_16_19/target
+code/ch16/code_16_20/target
 
 
 *.lock
