@@ -611,10 +611,10 @@ code/ch16/code_16_9/target
 code/ch16/code_16_9/Cargo.lock
 
 code/ch16/code_16_10/target
-code/ch16/code_16_10/Cargo.lock
+
+code/ch16/code_16_10_error/target
 
 code/ch16/code_16_11/target
-code/ch16/code_16_11/Cargo.lock
 
 code/ch16/code_16_12/target
 
@@ -625,6 +625,7 @@ code/ch16/code_16_14/target
 
 
 code/ch16/code_16_15/target
+code/ch16/code_16_15_deadlock/target
 code/ch16/code_16_16/target
 code/ch16/code_16_17/target
 code/ch16/code_16_18/target
