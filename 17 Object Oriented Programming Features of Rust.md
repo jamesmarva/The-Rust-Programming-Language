@@ -58,7 +58,11 @@ impl AveragedCollection {
 
 ## 1.3 Inheritance as a Type System and as Code Sharing
 
-
+> 多态(polymorphism)
+>
+>
+> 
+> 
 
 # 2 Using Trait Objects That Allow for Values of Different Types
 
