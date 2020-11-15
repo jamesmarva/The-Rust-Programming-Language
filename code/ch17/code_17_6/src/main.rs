@@ -18,6 +18,7 @@ impl<T> Screen<T>
             c.draw();
         }
     }
+    
 }
 
 #[derive(Debug)]

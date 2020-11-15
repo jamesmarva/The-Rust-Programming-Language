@@ -64,11 +64,119 @@ impl AveragedCollection {
 > 
 > 
 
-# 2 Using Trait Objects That Allow for Values of Different Types
+# 2 为不同的值而设计的 Trait 对象（Using Trait Objects That Allow for Values of Different Types）
+
+## 2.1 为通用的行为定义一个Trait（Defining a Trait for Common Behavior）
+```rust
+pub trait Draw {
+    fn draw(&self);
+}
+```
+代码17-3 定义一个 `Draw` trait
 
 
 
+```rust
+pub struct Screen {
+    pub components: Vec<Box<dyn Draw>>,
+}
+```
+代码 17-4 定义
 
+
+```rust
+impl Screen {
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+```
+
+
+```rust
+pub struct Screen<T: Draw> {
+    pub components: Vec<T>,
+}
+
+impl<T> Screen<T>
+where
+    T: Draw,
+{
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+```
+
+## 2.2 实现 Trait （Implementing the Trait）
+```rust
+pub struct Button {
+    pub width: u32,
+    pub height: u32,
+    pub label: String,
+}
+
+impl Draw for Button {
+    fn draw(&self) {
+        // code to actually draw a button
+    }
+}
+```
+17-7 
+
+
+
+```rust
+use gui::Draw;
+
+struct SelectBox {
+    width: u32,
+    height: u32,
+    options: Vec<String>,
+}
+
+impl Draw for SelectBox {
+    fn draw(&self) {
+        // code to actually draw a select box
+    }
+}
+```
+17-8 
+
+
+```rust
+use gui::{Button, Screen};
+fn main() {
+    let screen = Screen {
+        components: vec![
+            Box::new(SelectBox {
+                width: 75,
+                height: 10,
+                options: vec![
+                    String::from("Yes"),
+                    String::from("Maybe"),
+                    String::from("No"),
+                ],
+            }),
+            Box::new(Button {
+                width: 50,
+                height: 10,
+                label: String::from("OK"),
+            }),
+        ],
+    };
+    screen.run();
+}
+```
+17-9 
+
+## 2.3 Trait Objects Perform Dynamic Dispatch
+
+## 2.4 Object Safety Is Required for Trait Objects
 # 3 Implementing an Object-Oriented Design Pattern
 
 
