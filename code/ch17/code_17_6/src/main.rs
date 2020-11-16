@@ -1,12 +1,8 @@
-
-
-
 pub trait Draw {
     fn draw(&self);
 }
 
 pub struct Screen<T: Draw> {
-
     components: Vec<Box<T>>,
 }
 
@@ -18,7 +14,6 @@ impl<T> Screen<T>
             c.draw();
         }
     }
-    
 }
 
 #[derive(Debug)]

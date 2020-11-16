@@ -3,7 +3,7 @@ pub trait Draw {
 }
 
 pub struct Screen {
-    pub components: vec<Box<dyn Draw>>,
+    pub components: Vec<Box<dyn Draw>>,
 }
 
 impl Screen {
@@ -11,8 +11,10 @@ impl Screen {
         for component in self.components.iter() {
             component.draw();           
         }
+    }
 
-
+    pub fn add(&mut self, d: Draw) {
+        self.components.push(d);
 
     }
 }

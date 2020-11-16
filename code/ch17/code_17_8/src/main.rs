@@ -1,3 +1,7 @@
+pub trait 
+
 fn main() {
-    println!("Hello, world!");
+
+
+
 }
