@@ -93,7 +93,7 @@ impl Screen {
     }
 }
 ```
-
+代码 17-5 
 
 ```rust
 pub struct Screen<T: Draw> {
@@ -111,6 +111,12 @@ where
     }
 }
 ```
+代码17-6 一种 `Screen` 的替代实现，用 trait 以及 trait bound
+
+上面这样的实现，限制了Screen 的实例必须全是 `Button` 或者 全都是 `TextFiled`类型的组件列表。如果你只要一个只有相同类型的集合，用泛型还有 trait bound 是可取的，因为定义在编译的时候会用根据具体的类型进行单态化（monomorphized）
+
+另一方面，在使用 trati object 的方案下，一个 `Screen` 实例可以持有同时持有`Box<Button>` 以及 `Box<TextFiled>`。来看看这个方案是如何实现的，以及运行时候的性能影响。
+
 
 ## 2.2 实现 Trait （Implementing the Trait）
 ```rust

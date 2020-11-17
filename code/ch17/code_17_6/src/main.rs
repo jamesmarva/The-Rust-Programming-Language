@@ -14,17 +14,20 @@ impl<T> Screen<T>
             c.draw();
         }
     }
+
+    pub fn add(&mut self, draw: T) {
+        self.components.push(Box::new(draw));
+    }
 }
 
 #[derive(Debug)]
 pub struct Button {
-    pub width: u32,
-    pub height: u32,
-    pub label: String,
+    width: u32,
+    height: u32,
+    label: String,
 }
 
 impl Draw for Button {
-
     fn draw(&self) {
         println!("draw Button {:?}", self);
     }
@@ -54,7 +57,12 @@ fn main() {
                     String::from("maybe"),
                     String::from("no"),
                 ],
-            })
+            }),
+            Box::new(Button {
+                width: 50,
+                height: 10,
+                label: String::("button1"),
+            }),
         ]
     };
     screen.run();
