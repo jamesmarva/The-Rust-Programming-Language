@@ -180,9 +180,42 @@ fn main() {
 ```
 17-9 
 
-## 2.3 Trait Objects Perform Dynamic Dispatch
+```rust
+use gui::Screen;
 
-## 2.4 Object Safety Is Required for Trait Objects
+fn main() {
+    let screen = Screen {
+        components: vec![
+            Box::new(String::from("hi")),
+        ],
+    };
+}
+```
+17-10 尝试使用一种没有实现 `Draw` 的对象。
+
+```
+$ cargo run
+   Compiling gui v0.1.0 (file:///projects/gui)
+error[E0277]: the trait bound `std::string::String: gui::Draw` is not satisfied
+ --> src/main.rs:5:26
+  |
+5 |         components: vec![Box::new(String::from("Hi"))],
+  |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `gui::Draw` is not implemented for `std::string::String`
+  |
+  = note: required for the cast to the object type `dyn gui::Draw`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `gui`.
+
+To learn more, run the command again with --verbose.
+```
+## 2.3 Trait Objects 实现的动态分发(Trait Objects Perform Dynamic Dispatch)
+
+
+## 2.4 使用 Trait Objects 需要 对象安全（Object Safety）Object Safety Is Required for Trait Objects
+
 # 3 Implementing an Object-Oriented Design Pattern
 
 

@@ -24,11 +24,21 @@ pub struct Button {
 }
 
 impl Draw for Button {
+    
     fn draw(&self) {
         println!("Button : {:?}", self);
     }
 }
 
+impl Button {
+    fn new(&self, width: u32, height: u32, label: String) -> Button {
+        return Button {
+            width,
+            height, 
+            label,
+        };
+    }
+}
 pub struct Screen {
     components: Vec<Box<dyn Draw>>
 }
@@ -39,12 +49,14 @@ impl Screen{
             c.draw();
         }
     }
+
+    fn add(&mut self, ele: Box<dyn Draw>) {
+        self.components.push(ele);
+    }
 }
 
 fn main() {
-
-
-    let screen = Screen {
+    let mut screen = Screen {
         components: vec![
             Box::new(SelectBox {
                 width: 75,
@@ -62,6 +74,12 @@ fn main() {
             }),
         ],
     };
+
+    screen.add(Box::new(Button{
+        width:20, 
+        height:10, 
+        label: String::from("cancel"),
+    }));
 
     screen.run();
 }
