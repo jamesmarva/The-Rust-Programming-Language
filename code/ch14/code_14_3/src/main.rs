@@ -1,3 +1,10 @@
+use code_14_3::kinds::PrimaryColor;
+use code_14_3::utils::mix;
+
+
 fn main() {
-    println!("Hello, world!");
+
+    let red = PrimaryColor::Red;
+    let yellow = PrimaryColor::Yellow;
+    mix(red, yellow);
 }

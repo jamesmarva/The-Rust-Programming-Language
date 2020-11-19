@@ -25,17 +25,26 @@ pub fn add_one(x: i32) -> i32 {
 
 
 
-可以运行 `cargo doc` 来生产文档注释的html文件
+可以运行 `cargo doc` 来生产文档注释的html文件，用 `cargo doc --open` 来查看文档
 
-# 3 Cargo Workspaces
-
-
-# 4 Installing Binaries from Crates.io with cargo install
+# 3 Cargo 工作空间（Cargo Workspaces）
 
 
+## 3.1 创建工作空间
 
 
-# 5 Extending Cargo with Custom Commands
+
+
+# 4 用 `cargo install` 来安装来自Crago.io 的二进制包（Installing Binaries from Crates.io with cargo install）
+
+
+
+
+
+# 5 用自定义的命令扩展（Extending Cargo with Custom Commands）
+
+# 总结(Summary)
+
 
 
 

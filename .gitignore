@@ -496,6 +496,12 @@ code/ch14/code_14_10/target
 code/ch14/code_14_11/target
 code/ch14/code_14_12/target
 
+code/ch14/add/target
+code/ch14/add/adder/target
+
+code/ch14/add/add-one/target
+code/ch14/add/add-two/target
+
 code/ch15/code_15_1/target
 code/ch15/code_15_1/Cargo.lock
 
