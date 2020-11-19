@@ -1,9 +1,10 @@
 
 
-# 1 Customizing Builds with Release Profiles
+# 1 自定义发布和开发的时候的配置（caidingCustomizing Builds with Release Profiles）
 
 
-# 2 Publishing a Crate to Crates.io
+
+# 2 发布 crate 到 `Crates.io`Publishing a Crate to Crates.io
 
 
 

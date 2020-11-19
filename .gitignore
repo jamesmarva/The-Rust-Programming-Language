@@ -482,6 +482,20 @@ code/ch13/code_13_22/Cargo.lock
 code/ch13/example/target
 code/ch13/example/Cargo.lock
 
+
+code/ch14/code_14_1/target
+code/ch14/code_14_2/target
+code/ch14/code_14_3/target
+code/ch14/code_14_4/target
+code/ch14/code_14_5/target
+code/ch14/code_14_6/target
+code/ch14/code_14_7/target
+code/ch14/code_14_8/target
+code/ch14/code_14_9/target
+code/ch14/code_14_10/target
+code/ch14/code_14_11/target
+code/ch14/code_14_12/target
+
 code/ch15/code_15_1/target
 code/ch15/code_15_1/Cargo.lock
 
