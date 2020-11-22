@@ -13,7 +13,20 @@ fn main() {
     dummy.next = Some(Box::new(x));
     let mut f = &dummy;
     let mut s = &dummy;
-    f = &*(f.next.unwrap());
+    
+    // cannot move out of `f.next` 
+    // which is behind a shared reference
+
+    // move occurs because `f.next` has type 
+    //`std::option::Option<std::boxed::Box<ListNode>>`,
+    //  which does not implement the `Copy` trait
+    // f = &(*(f.next.unwrap()));
+    
+    f = &(*(f.next.as_ref().unwrap()));
+    f = &(*(f.next.as_ref().unwrap()));
+    // if 
+    s = &(*(s.next.as_ref().unwrap()));
+
 
     
 }
