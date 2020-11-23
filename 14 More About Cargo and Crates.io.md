@@ -43,7 +43,7 @@ pub fn add_one(x: i32) -> i32 {
 
 # 5 用自定义的命令扩展（Extending Cargo with Custom Commands）
 
-# 总结(Summary)
+# 6 总结(Summary)
 
 
 
