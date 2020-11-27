@@ -1,9 +1,39 @@
-pub mod blogs;
-
 use std::boxed::Box;
-use blogs::Post;
 
+pub struct Post {
+    content: String,
+    state: Option<Box<dyn State>>,
+}
 
+impl Post {
+
+    pub fn new() -> Post {
+        Post{
+            state: Some(Box::new(Draft{})),
+            content: String::new(),
+        }
+    }
+
+    pub fn request_review(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.request_review())
+        }
+    }
+
+    pub fn approve(&mut self)  {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.approve())
+        }
+    }
+
+    pub fn add_text(&mut self, str: &str) {
+        self.content.push_str(str);
+    }
+
+    pub fn content(&self) -> &str {
+        ""
+    }
+}
 
 trait State {
     fn request_review(self: Box<Self>) -> Box<dyn State>;
@@ -44,20 +74,4 @@ impl State for Published {
     fn approve(self: Box<Self>) -> Box<dyn State> {
         self
     }
-}
-
-fn main() {
-
-    let mut post = Post::new();
-
-    post.add_text("I ate a salad for lunch today");
-    assert_eq!("", post.content());
-
-    post.request_review();
-    assert_eq!("", post.content());
-
-    post.approve(); 
-    assert_eq!("I ate a salad for lunch today", post.content()); 
-
-
 }
