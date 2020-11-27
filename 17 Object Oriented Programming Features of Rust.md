@@ -313,13 +313,18 @@ impl Post {
 我们的目标是保持在结构体 `State` 里的实现，然后调用字段 `state` 的 `content` 方法来，并且传 Post 实例作为参数，然后会返回字段 `state` 的`content` 方法作为返回值。
 
 这里调用 `Option` 的 `as_ref` 来返回一个 `Option` 中的值的引用，而不是返回其的值。因为 `state` 是个 `Option<Box<dyn State>>` 的类型，所以调用 `as_ref` 方法会返回一个 `Option<&Box<dyn State>>` 类型。如果不调用的话就会报错，因为不能从一个 `&self` 中把 state 给 move 出来。
-> 注: 上面的这段意思可以这么理解
+> 注: 上面的这段意思可以理解为，`self.as_ref().unwrap().content(self)`，可以看成下面的代码，先创建一个临时的变量 `tmp` 类型为 `&Box<dyn State>`，用来存放一个临时的值，代码如下：
 > ```
 > pub fn content(&self) -> &str {
->     let tmp: &Box<dyn State> = self.as_ref().unwrap();// tmp    
+>     let tmp: &Box<dyn State> = self.state.as_ref().unwrap();// tmp is borrower
 >     tmp.content(self)
 > }
 > ```
+> 1 post 取完 content之后还是要可以取的，所以这里只能是 `&self`
+> 2 既然是借用，那么就不能从 `self` 里面 `move` 出 `state` 变量。
+> 3 所以这里的只能借用 `state` 变量，所以 `tmp` 是个 `&Box<dyn State>` 类型，是个 borrower。
+> 4 所以必须要用 `as_ref` 方法来得到一个 `borrower`
+
 ```
 trait State {
     // --snip--
