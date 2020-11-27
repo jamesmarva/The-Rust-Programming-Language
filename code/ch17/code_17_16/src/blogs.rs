@@ -26,8 +26,6 @@ impl Post {
         }
     }
 
-
-
     pub fn add_text(&mut self, str: &str) {
         self.content.push_str(str);
     }
