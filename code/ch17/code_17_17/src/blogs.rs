@@ -126,8 +126,10 @@ impl Post {
 
     pub fn content(&self) -> &str {
         // self.state.as_ref().unwrap().content(self);
-        let tmp: &Box<dyn State> = self.state.as_ref().unwrap();
-        return tmp.content(self);
+        // let tmp: &Box<dyn State> = self.state.as_ref().unwrap();
+        // return tmp.content(self);
+        let tmp: Box<dyn State> = self.state.unwrap();
+        tmp.content(self)
     }
 
     pub fn check_state(&self) -> &str {

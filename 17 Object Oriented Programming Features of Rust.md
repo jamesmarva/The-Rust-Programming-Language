@@ -218,6 +218,20 @@ To learn more, run the command again with --verbose.
 
 # 3 Implementing an Object-Oriented Design Pattern
 
+
+## 3.1 Defining Post and Creating a New Instance in the Draft State
+
+
+## 3.2 Storing the Text of the Post Content
+
+
+## 3.3 Ensuring the Content of a Draft Post Is Empty
+
+
+## 3.4 Adding the approve Method that Changes the Behavior of content
+
+
+
 ```rust
 pub struct Post {
     state: Option<Box<dyn State>>,
@@ -324,8 +338,17 @@ impl Post {
 > 2 既然是借用，那么就不能从 `self` 里面 `move` 出 `state` 变量。
 > 3 所以这里的只能借用 `state` 变量，所以 `tmp` 是个 `&Box<dyn State>` 类型，是个 borrower。
 > 4 所以必须要用 `as_ref` 方法来得到一个 `borrower`
+>
+> 比如下面这种代码，编译器就会报错的：
+> ```
+> pub fn content(&self) -> &str {
+>     let tmp: Box<dyn State> = self.state.unwrap();
+>     tmp.content(self)      
+> }
+> ```
+> 不能把state的move出来，只能是用as_ref 的得到借用的对象
 
-```
+```rust
 trait State {
     // --snip--
     fn content<'a>(&self, post: &'a Post) -> &'a str {
@@ -344,6 +367,39 @@ impl State for Published {
 }
 ```
  17-18 给 `State` 的trait新增 `content` 方法
+
+这里在 `State` trait 新增了一个默认的实现的方法 `content`，这个方法返回一个空的字符串切片(string slice)。这就意味着我们不需要在 `Draft` 和 `PendingReview` 的结构体中实现 `content` 方法了。`Published` 结构体实现的 `content` 方法会覆盖原来的默认的实现，并且会返回 `post.content` 的值。
+
+## 3.5 状态模式的取舍（Trade-offs of the State Pattern）
+
+
+用状态模式实现的代码很有利于扩展，为了更好的理解这个模式下维护代码的简洁性，请试试下面的功能实现：
+- 1 新增一个 `reject` 方法，把状态`PendingReview`转变为 `Draft`
+- 2 在转换为 `Published` 之前需要调用两次 `approve` 方法
+- 3 只允许用户在状态 `Draft` 的新增内容，提示：让状态对象负责可以发生什么改变，但是不负责改变 `Post`
+
+
+
+## 3.6 把行为和状态编码为类型（Encoding States and Behavior as Types）
+
+
+
+
+
+
+## 3.7 Implementing Transitions as Transformations into Different Types
+
+
+# 4 Summary
+
+
+
+
+
+
+
+
+
 
 
 
