@@ -1,12 +1,21 @@
 
 
 
+The other reason to use inheritance relates to the type system: to enable a child type to be
+used in the same places as the parent type. This is also called polymorphism, which means
+that you can substitute multiple objects for each other at runtime if they share certain
+characteristics.
 
 # 1 面向对象语言的特点（Characteristics of Object-Oriented Languages）
 
 ```rust
 
 ```
+
+The other reason to use inheritance relates to the type system: to enable a child type to be
+used in the same places as the parent type. This is also called polymorphism, which means
+that you can substitute multiple objects for each other at runtime if they share certain
+characteristics.
 ## 1.1 对象包含数据以及行为（Objects Contain Data and Behavior）
 
 
