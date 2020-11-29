@@ -123,5 +123,15 @@ To learn more, run the command again with --verbose.
 ## 1.6 方法参数（Function Parameters）
 
 
+# 3 所有的模式匹配语法
 
+
+## 3.1 匹配字面量（）
+
+### 3.5.2 解构枚举（Destructuring Enums）
+
+
+### 3.5.3 解构嵌套的结构体和枚举
+
+### 3.5. 
 

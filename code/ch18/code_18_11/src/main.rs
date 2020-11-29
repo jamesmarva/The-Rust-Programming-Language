@@ -26,4 +26,12 @@ fn main() {
         6..=10 => println!("six through ten"),
         _ => println!("something else"),
     }
+
+    let x = 'c';
+
+    match x {
+        'a'..='j' => println!("early ASCII letter"),
+        'k'..='z' => println!("late ASCII letter"),
+        _ => println!("default"),
+    }
 }

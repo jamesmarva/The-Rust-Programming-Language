@@ -1,3 +1,14 @@
 fn main() {
-    println!("Hello, world!");
+    let p = Point{x: 0, y: 7};
+
+    // let new_point: Point = p;
+
+    let Point{x, y} = p;
+    assert_eq!(0, x);
+    assert_eq!(7, y);
+}
+
+struct Point {
+    x: i32,
+    y: i32,
 }
