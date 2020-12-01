@@ -283,7 +283,103 @@ fn main() {
 18-24 仅仅匹配元组里的第一个值和最后一个值，然后忽略其他的值。
 
 ```rust
+fn main() {
+    let numbers = (2, 4, 8, 16, 32);
 
+    match numbers {
+        (.., second, ..) => println!("Some numbers: {}", second),
+    }
+}
+```
+18-25 尝试用不明确的方式来使用 `..`
 
 ```
-### 3.6.5 
+$ cargo run
+   Compiling patterns v0.1.0 (file:///projects/patterns)
+error: `..` can only be used once per tuple pattern
+ --> src/main.rs:5:22
+  |
+5 |         (.., second, ..) => {
+  |          --          ^^ can only be used once per tuple pattern
+  |          |
+  |          previously used here
+
+error: aborting due to previous error
+
+error: could not compile `patterns`.
+
+To learn more, run the command again with --verbose.
+
+```
+
+## 3.7  Extra Conditionals with Match Guards
+
+```rust
+fn main() {
+    let num = Some(4);
+
+    match num {
+        Some(x) if x < 5 => println!("less than five: {}", x),
+        Some(x) => println!("{}", x),
+        None => (),
+    }
+}
+```
+18-26 给 Pattern 新增一个 匹配守卫（match guard）
+
+```rust
+fn main() {
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(n) if n == y => println!("Matched, n = {}", n),
+        _ => println!("Default case, x = {:?}", x),
+    }
+
+    println!("at the end: x = {:?}, y = {}", x, y);
+}
+```
+18-27 用 匹配守卫（match guard）来测试匹配外部的变量
+
+```rust
+fn main() {
+    let x = 4;
+    let y = false;
+    match x {
+        4 | 5 | 6 | if y = > println!("yes"),
+        _=> println!("no"),
+    }
+}
+```
+18-28 联结多个pattern和一个匹配守卫（match guard）
+
+上面的这个判断式等于 
+```
+(4 | 5 | 6) if y
+```
+
+## 3.8 `@` Bindings
+```rust
+fn main() {
+    enum Message {
+        Hello{id: i32},
+    }
+    let msg = Message::Hello{id: 5};
+
+    match msg {
+        Message::Hello {
+            id: id_variable @ 3..=7,
+        } => println!("Found an id in range: {}", id_variable),
+        Message::Hello {
+            id: 10..=12
+        } => println!("Found an id in another range"),
+        Message::Hello{id: x} => println!("Found some other id", x),
+    }
+}
+```
+18-29 用 `@` 在pattern来绑定一个值，同时测试它
+
+
+
