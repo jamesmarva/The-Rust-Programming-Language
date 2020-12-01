@@ -1,3 +1,9 @@
 fn main() {
-    println!("Hello, world!");
+    let numbers = (2, 4, 8, 16, 32);
+
+    match numbers {
+        (first, _, third, _, fifth) => {
+            println!("Some number: {}, {}, {}", first, third, fifth);
+        }
+    }
 }

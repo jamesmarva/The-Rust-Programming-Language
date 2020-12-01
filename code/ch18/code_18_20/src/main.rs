@@ -1,3 +1,4 @@
 fn main() {
-    println!("Hello, world!");
+    let _x = 5;
+    let _y = 10;
 }

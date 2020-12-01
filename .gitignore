@@ -706,6 +706,17 @@ code/ch18/code_18_18/target
 code/ch18/code_18_19/target
 code/ch18/code_18_20/target
 
+code/ch18/code_18_21/target
+code/ch18/code_18_22/target
+code/ch18/code_18_23/target
+code/ch18/code_18_24/target
+code/ch18/code_18_25/target
+code/ch18/code_18_26/target
+code/ch18/code_18_27/target
+code/ch18/code_18_28/target
+code/ch18/code_18_29/target
+code/ch18/code_18_30/target
+
 
 *.lock
 .vscode/launch.json
