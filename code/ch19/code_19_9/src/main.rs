@@ -1,3 +1,6 @@
 fn main() {
-    println!("Hello, world!");
+
+
 }
+
+fn split_at_mut(slice: )

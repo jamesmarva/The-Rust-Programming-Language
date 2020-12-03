@@ -1,3 +1,4 @@
 fn main() {
-    println!("Hello, world!");
+    let adderss = 0x012345usize;
+    let r = adderss as *const i32;
 }
