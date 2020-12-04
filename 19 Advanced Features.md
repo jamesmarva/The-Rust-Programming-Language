@@ -53,6 +53,60 @@ fn main() {
 
 
 
+```rust
+fn split_at_mut(slice: mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
+    let len = slice.len();
+    
+    assert!(mid <= len);
+
+    (&mut slice[..mid],
+    &mut slice[mid..])
+}
+```
+19-5 尝试使用 safe 的代码来实现 `split_at_mut`
+
+当我们编译 19-5 的代码的时候，会得到下面的这个错误：
+```shell
+$ cargo run
+   Compiling unsafe-example v0.1.0 (file:///projects/unsafe-example)
+error[E0499]: cannot borrow `*slice` as mutable more than once at a time
+ --> src/main.rs:6:30
+  |
+1 | fn split_at_mut(slice: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
+  |                        - let's call the lifetime of this reference `'1`
+...
+6 |     (&mut slice[..mid], &mut slice[mid..])
+  |     -------------------------^^^^^--------
+  |     |     |                  |
+  |     |     |                  second mutable borrow occurs here
+  |     |     first mutable borrow occurs here
+  |     returning this value requires that `*slice` is borrowed for `'1`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0499`.
+error: could not compile `unsafe-example`.
+
+To learn more, run the command again with --verbose.
+```
+
+
+```rust
+use std::slice;
+
+fn split_at_mut(slice: &mut [i32], mid: usize) {
+    let len = slice.len();
+    let ptr = slice.as_mut_ptr();
+    
+    assert!(mid <= len);
+
+    unsafe {
+        (slice::from_raw_parts_mut(ptr, mid),
+        slice::from_raw_parts_mut(ptr.add(mid), len))
+    }
+}
+```
+19-6 在 split_at_mut 中使用不安全的代码
 ### 1.3.2 Using extern Functions to Call External Code
 
 
