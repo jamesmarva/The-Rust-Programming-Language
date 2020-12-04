@@ -102,12 +102,45 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 
     unsafe {
         (slice::from_raw_parts_mut(ptr, mid),
-        slice::from_raw_parts_mut(ptr.add(mid), len))
+        slice::from_raw_parts_mut(ptr.add(mid), len - mid))
     }
 }
 ```
 19-6 在 split_at_mut 中使用不安全的代码
-### 1.3.2 Using extern Functions to Call External Code
+
+上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 中。
+
+
+```rust
+use std::slice;
+
+let address = 0x01234usize;
+
+let r = address as *mut i32;
+
+let slice: &[i32] = unsafe {
+    slice::from_raw_parts_mut(r, 1000);
+}
+```
+19-7 通过任意内存地址来创建slice
+
+
+### 1.3.2 用 `extern` 函数来调用外部的代码（Using `extern` Functions to Call External Code）
+
+
+```rust
+extern "C" {
+    fn abs(input: i32) -> i32;
+}
+
+fn main() {
+    unsafe {
+      println!("Absolute value of -3 according to C: {}", abs(-3));
+    }
+}
+```
+19-8 
+
 
 
 ## 1.4 Accessing or Modifying a Mutable Static Variable
