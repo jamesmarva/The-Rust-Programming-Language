@@ -114,8 +114,7 @@ fn test5() {
 fn test6() {
     let arr: [i32; 3] = [1, 2, 3];
     let raw_ptr_arr = arr.as_ptr();
-    let james: [i32; 100] = unsafe{
-        *(slice::from_raw_parts(raw_ptr_arr, 100))
-    };
-
+    // let james: [i32; 100] = unsafe{
+    //     // *(slice::from_raw_parts(raw_ptr_arr, 100))
+    // };
 }

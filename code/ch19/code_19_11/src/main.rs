@@ -1,3 +1,13 @@
 fn main() {
-    println!("Hello, world!");
+
+
+
+}
+
+unsafe trait Foo {
+    // me
+}
+
+unsafe trait Foo for i32 {
+    
 }

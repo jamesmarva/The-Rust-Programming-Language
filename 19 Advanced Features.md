@@ -143,7 +143,36 @@ fn main() {
 
 
 
-## 1.4 Accessing or Modifying a Mutable Static Variable
+## 1.4 访问或者修改一个可变的静态变量（Accessing or Modifying a Mutable Static Variable）
+```rust
+static HELLO_WORLD: &str = "hello world!";
+fn main() {
+    println!("name is: {}", HEllO_WORLD);
+}
+```
+19-9 
+
+
+```rust
+static mut COUNTER: u32 = 0;
+
+fn add_to_count(inc: u32) {
+    unsafe {
+        COUNTER += inc;
+    }
+}
+
+fn main() {
+    add_to_count(3);
+
+    unsafe {
+        println!("COUNTER:{}", COUNTER);
+    }
+}
+```
+19-10 Reading from or writing to a mutable static variable is unsafe.
+
+
 
 ## 1.5 Implementing an Unsafe Trait
 
