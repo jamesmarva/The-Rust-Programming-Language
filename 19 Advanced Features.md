@@ -20,7 +20,7 @@
 
 
 ## 1.2 Dereferencing a Raw Pointer
-在第四章 “悬挂引用” 的部分，我们提到，编译器要保证没给给引用都是有效的。Unsafe Rust 有两个新的类型被称之为 裸指针（Raw Pointer），这个和引用（Reference）很像。和引用一样，裸指针额可以是可变（mutable）的或者不可变（immutable）的。
+在第四章 “悬挂引用” 的部分，我们提到，编译器要保证没给给引用都是有效的。Unsafe Rust 有两个新的类型被称之为 裸指针（Raw Pointer），这个和引用（Reference）很像。和引用一样，裸指针额可以是可变（mutable）的或者不可变的（immutable）。
 不同于引用（Reference）和 智能指针（smart points），裸指针：
 - 允许忽略借用元祖，可以同时有可变的和不可变的指针，或者多个指针同时指向一个位置
 - 不保证指向一个有效的内存
