@@ -7,13 +7,17 @@
 # 1 不安全Rust （Unsafe Rust）
 到目前为止，我们所有涉及的代码都是在编译期就强制保证了内存安全的。
 
-## 1.1 Unsafe Superpowers
+## 1.1 unsafe 的力量 （Unsafe Superpowers）
+如果你想写出Rust的不安全的代码，那么就要用关键字 `unsafe`，然后用一个新的块来放置不安全的代码。在 unsafe Rust中，你可以执行以下的五个操作，这些都操作被称之为 *unsafe superpower*，当然这些操作在 safe Rust 中是不能通过编译的。
+- 解一个裸指针（Dereference a raw pointer）
+- 调用不安全的函数或者方法（Call an unsafe function or method）
+- 读取或者修改一个可变的静态变量（Access or modify a mutable static variable）
+- 实现一个不全的trait（Implement an unsafe trait）
+- 读取一个 `union` 的字段（field）（Access fields of `unions`）
 
-- Dereference a raw pointer
-- 调用不安全的函数或者方法
-- 读取或者修改一个可变的静态变量
-- 实现一个不全的trait
-- 读取一个 `union` 的字段（field）
+如果你在 `unsafe` 的代码区域里使用了一个引用的话，这个引用仍然会被借用检查器检查。
+你要知道的是，`unsafe` 关键字仅仅是让你使用以上五种特性的时候不会被编译器检查是否内存安全。在unsafe的代码块里你会仍然会获得一定程度的 safety。
+
 
 ## 1.2 Dereferencing a Raw Pointer
 
