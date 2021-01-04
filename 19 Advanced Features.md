@@ -18,25 +18,35 @@
 如果你在 `unsafe` 的代码区域里使用了一个引用的话，这个引用仍然会被借用检查器检查。
 你要知道的是，`unsafe` 关键字仅仅是让你使用以上五种特性的时候不会被编译器检查是否内存安全。在unsafe的代码块里你会仍然会获得一定程度的 safety。
 
-
 ## 1.2 Dereferencing a Raw Pointer
-在第四章 “悬挂引用” 的部分，我们提到，编译器要保证没给给引用都是有效的。Unsafe Rust 有两个新的类型被称之为 裸指针（Raw Pointer），这个和引用（Reference）很像。和引用一样，裸指针额可以是可变（mutable）的或者不可变的（immutable）。
-不同于引用（Reference）和 智能指针（smart points），裸指针：
-- 允许忽略借用元祖，可以同时有可变的和不可变的指针，或者多个指针同时指向一个位置
+在第四章 “悬挂引用” 的部分，我们提到，编译器要保证没给给引用都是有效的。Unsafe Rust 有两个新的类型被称之为 裸指针（Raw Pointer），这个和引用（Reference）很像。和引用一样，裸指针可以是可变（mutable）的或者不可变的（immutable），分别写作`*const T`和 `*mut T`。这个星号（asterisk） 不是解引用的操作；它是类型名字的一部分。在 裸指针（raw pointer）的使用中，不可变就意味着在解引用之后，指针就不能被重新的赋值。
+引用（Reference）与智能指针（smart points）和 裸指针 三者的不同点：
+- 允许忽略借用规则，可以同时有可变的和不可变的指针，或者多个指针同时指向一个位置
 - 不保证指向一个有效的内存
 - 允许裸指针是 null
-- 不会自动清理
+- 不会自动被清理
+
+通过放弃Rust的以上的强制规范，你可以放弃安全来换取更好的性能（greater performance），或者使用别的语言的接口或者硬件的接口。
 
 ```rust
 fn main() {
     let mut num = 5;
 
     let r1 = &num as *const i32;
-    let r2 = &mut num as &mut i32;
+    let r2 = &mut num as *mut i32;
 }
 ```
-19-1 
+19-1 如何从一个引用创建可变的裸指针和不可变的裸指针，用as关键字
 
+注意，这里我们并没有用 `unsafe` 关键字，我们可以在 safe 代码里创建裸指针；只不过我们不能在unsafe代码之外解裸指针（dereference raw pointer）。
+
+
+接下来
+```rust
+let address = 0x12345usize;
+let r = address as *const i32;
+
+```
 
 ## 1.3 Calling an Unsafe Function or Method
 
