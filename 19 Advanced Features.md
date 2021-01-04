@@ -41,13 +41,27 @@ fn main() {
 注意，这里我们并没有用 `unsafe` 关键字，我们可以在 safe 代码里创建裸指针；只不过我们不能在unsafe代码之外解裸指针（dereference raw pointer）。
 
 
-接下来
+接下来，我们将会创建一个无法确其有效性的裸指针。在代码19-2展示了如何创建指向任意位置的裸指针。因为是尝试去使用一个未定义的随机的内存：这个有可能是有数据的，也有可能是没有数据的。编译器优化代码之后，这样很可能访问不到数据，或者程序会因为分段出现错误。通常来说，编译写这样的代码可不是好的程序员，但是的确有可能写这样的代码。
 ```rust
 let address = 0x12345usize;
 let r = address as *const i32;
 
 ```
 
+
+```rust
+fn main() {
+    let mut n = 5;
+
+    let r1 = &n as *const i32;
+    let r2 = &mut n as *mut i32;
+
+    unsafe {
+        println!("r1 is: {}", *r1);
+        println!("r2 is: {}", *r2);
+    }
+}
+```
 ## 1.3 Calling an Unsafe Function or Method
 
 
