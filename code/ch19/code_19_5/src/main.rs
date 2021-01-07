@@ -13,9 +13,19 @@ fn main() {
 // }
 
 
-fn split_at_mut<'a>(slice: &'a mut [i32], mid: usize) -> (&'a mut [i32], &'a mut [i32]) {
+// fn split_at_mut<'a>(slice: &'a mut [i32], mid: usize) -> (&'a mut [i32], &'a mut [i32]) {
+//     let len = slice.len();
+//     let l1 = mid;
+//     let l2 = len - mid;
+//     return (&mut [1, 2, 3], &mut [1, 2, 3]);
+// }
+
+
+fn split_at_mut(slice: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
     let len = slice.len();
-    let l1 = mid;
-    let l2 = len - mid;
-    
+    assert!(mid <= len);
+    (
+        &mut slice[..mid],
+        &mut slice[mid..]
+    )
 }
