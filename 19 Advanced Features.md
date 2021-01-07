@@ -150,8 +150,6 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 19-6 在 split_at_mut 中使用不安全的代码
 
 上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 中。
-
-
 ```rust
 use std::slice;
 
