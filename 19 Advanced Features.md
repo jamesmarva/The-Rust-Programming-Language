@@ -51,6 +51,8 @@ let r = address as *const i32;
 arbitrary：任意的
 validity ：有效期
 
+
+
 ```rust
 fn main() {
     let mut n = 5;
@@ -66,11 +68,17 @@ fn main() {
 ```
 19-3 在 `unsafe`代码块中解裸指针（raw pointer）
 
+注意19-1会19-3的代码，我们创建一个 `*const i32` 类型和 `*mut i32`类型的裸指针，这两个裸指针都值指向了同一个内存位置，`num`的值存放的内存而为之。如果不是用裸指针，而是创建一个可变的引用和不可变的引用来指向数据，那么会编译不通过的。我们创建了可变的和不可变的裸指针指向一个内存位置，然后可以通过可变的裸指针来修改数据，但是也会潜在 造成数据竞争。
 
-## 1.3 Calling an Unsafe Function or Method
+既然有危险，为什么依然要使用裸指针（raw pointers）？其中一个最大的作用的情境就是要调用 c 的代码。下一小节 “调用一个unsafe 函数或者方法”。另一个场景就是创建一个借用检查器无法理解的安全抽象。
+
+## 1.3 调用 Unsafe 函数或者方法 （Calling an Unsafe Function or Method）
+unsafe 函数和方法本身看起来和常规的函数和方法没啥区别，只不过多一个额外的关键字声明 `unsfe`。在 `unsafe`就表示在代码所处的语境中，我们需要自己保证函数的安全需求，而Rust不保证我们会按照他们的要求来保持安全。用了关键字`unsafe` 来调用代码，就表示我们已经知道了这个函数功能，并且已经知道了函数的所需的等等。保证我们已经知道了调用函数的不可靠性。
+
 
 
 ### 1.3.1 Creating a Safe Abstraction over Unsafe Code
+如果仅仅是因为函数里面有unsafe的代码，那么不至于把整个函数都是用 unsafe 关键字来声明。事实上，在一个安全的函数里包裹不安全的代码是个很常见的抽象的概念。举个例子，来看看标注包里的`split_at_mut`,这个函数就有用到一些不安全的代码，今天让我们来看看如何实现。
 ```rust
 fn main() {
     let mut v = vec![1, 2, 3, 4, 5, 6];
@@ -142,8 +150,6 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 19-6 在 split_at_mut 中使用不安全的代码
 
 上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 中。
-
-
 ```rust
 use std::slice;
 
