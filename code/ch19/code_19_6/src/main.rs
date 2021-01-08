@@ -46,6 +46,7 @@ fn split_at_mut_slice(s: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
     unsafe {
         (
             slice::from_raw_parts_mut(ptr, mid),
+            // add 我理解的是一种指针的移动的操作，会根据现在的地址然后add变量后得到一个新的地址
             slice::from_raw_parts_mut(ptr.add(mid), len)
         )
     }
