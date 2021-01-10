@@ -40,7 +40,6 @@ fn main() {
 
 注意，这里我们并没有用 `unsafe` 关键字，我们可以在 safe 代码里创建裸指针；只不过我们不能在unsafe代码之外解裸指针（dereference raw pointer）。
 
-
 接下来，我们将会创建一个无法确其有效性的裸指针。在代码19-2展示了如何创建指向任意位置的裸指针。因为是尝试去使用一个未定义的随机的内存：这个有可能是有数据的，也有可能是没有数据的。编译器优化代码之后，这样很可能访问不到数据，或者程序会因为分段出现错误。通常来说，不会有充分的理由来支撑我们写这样的代码，但是现实中也的确有可能出现这样的代码。
 ```rust
 let address = 0x12345usize;
@@ -149,7 +148,9 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 ```
 19-6 在 split_at_mut 中使用不安全的代码
 
-上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 中。
+上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 变量中。
+
+`slice::from_raw_parts_mut` 函数是个非安全的函数
 ```rust
 use std::slice;
 
