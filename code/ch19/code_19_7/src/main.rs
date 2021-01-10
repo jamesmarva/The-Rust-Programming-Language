@@ -21,7 +21,24 @@ fn main() {
     // test2();
     // test3();
     // test4() ;
-    test5()
+    // test5()
+    unsafe {
+        test0()
+    }
+    
+}
+
+unsafe fn test0() {
+    let add = 112;
+    let ptr = add as *mut i32;
+    
+    let s: &mut [i32] = unsafe {
+        slice::from_raw_parts_mut(ptr, 11)
+    };
+
+    for i in s.iter() {
+        println!("i : {}", i);
+    }
 }
 
 

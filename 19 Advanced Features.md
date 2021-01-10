@@ -151,14 +151,20 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 在这个例子中，我们用一个可变的slice 来指向一个存放`i32` 类型数字的数组，`as_mut_ptr` 方法会返回一个裸指针，这个指针是个 `*mut i32` 类型的裸指针，我们将这个裸指针存在变量 `ptr`中。
 注意：这里裸指针的类型 `*mut i32` 的i32是因为slice指向的是数组的存放的值的类型是i32，`*mut` 是因为 `as_mut_ptr`的原因。
 
-`slice::from_raw_parts_mut` 函数是个非安全的函数
+我们先确定mid是小于slice的长度。然后我们调用一个非安全的代码，`slice::from_raw_parts_mut`函数有两个参数，一个是裸指针，以及一个 `length`，返回一个`slice`。用这个方法可以创建一个从 `ptr` 指针开始的，`mid` 长度的 `slice`。接着我们调用 `add` 方法来返回一个新的值裸指针，然后在用 `len - mid` 的值来返回一个slice。
+
+`slice::from_mut_parts_mut` 函数是`unsafe`的，因为这个函数调用了一个裸指针，而且必须确保这个裸指针是个有效的裸指针，但是这个指针本身是否有效这个不是Rust来保证的。同理，`add` 方法也是非安全的，因为确保add的参数是有效的，就是要保证在偏移之后的值是有效内存地址。通过增加一个`mid<len`的断言，我们可以确保在偏移之后的内存位置也是在slice之内的。确保正确是 `unsafe` 的一个可以接受以及适当的用法。
+
+注意，这里我们不想要把`split_at_mut`声明为 `unsafe`，在safe Rust的代码里，我们可以调用这个方法。我们创建了一个 safe的函数，这个函数是调用了 `unsafe` 在 safe的模式下，因为我们确保了裸指针只想到内存位置都是有效的。
+
+相比之下，下面这段代码在使用slice就有一定的概率出现错误，我们不能确保这个裸指针指向的位置是有效的。这个指针是指向的一个随意的值的地址。所以很可能有无效的地址出现。
+
 ```rust
 use std::slice;
 
 let address = 0x01234usize;
 
 let r = address as *mut i32;
-
 let slice: &[i32] = unsafe {
     slice::from_raw_parts_mut(r, 1000);
 }
