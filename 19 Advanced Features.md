@@ -148,7 +148,8 @@ fn split_at_mut(slice: &mut [i32], mid: usize) {
 ```
 19-6 在 split_at_mut 中使用不安全的代码
 
-上面的代码，在这种情况下，因为有个保存数据类型是 `i32` 的可变的slice，所以，`as_mut_ptr` 会返回一个类型是 `*mut i32` 的裸指针（row pointer），存储在 `ptr` 变量中。
+在这个例子中，我们用一个可变的slice 来指向一个存放`i32` 类型数字的数组，`as_mut_ptr` 方法会返回一个裸指针，这个指针是个 `*mut i32` 类型的裸指针，我们将这个裸指针存在变量 `ptr`中。
+注意：这里裸指针的类型 `*mut i32` 的i32是因为slice指向的是数组的存放的值的类型是i32，`*mut` 是因为 `as_mut_ptr`的原因。
 
 `slice::from_raw_parts_mut` 函数是个非安全的函数
 ```rust
