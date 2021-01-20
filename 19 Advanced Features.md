@@ -18,7 +18,7 @@
 如果你在 `unsafe` 的代码区域里使用了一个引用的话，这个引用仍然会被借用检查器检查。
 你要知道的是，`unsafe` 关键字仅仅是让你使用以上五种特性的时候不会被编译器检查是否内存安全。在unsafe的代码块里你会仍然会获得一定程度的 safety。
 
-## 1.2 Dereferencing a Raw Pointer
+## 1.2 解裸指针（Dereferencing a Raw Pointer）
 在第四章 “悬挂引用” 的部分，我们提到，编译器要保证没给给引用都是有效的。Unsafe Rust 有两个新的类型被称之为 裸指针（Raw Pointer），这个和引用（Reference）很像。和引用一样，裸指针可以是可变（mutable）的或者不可变的（immutable），分别写作`*const T`和 `*mut T`。这个星号（asterisk） 不是解引用的操作；它是类型名字的一部分。在 裸指针（raw pointer）的使用中，不可变就意味着在解引用之后，指针就不能被重新的赋值。
 引用（Reference）与智能指针（smart points）和 裸指针 三者的不同点：
 - 允许忽略借用规则，可以同时有可变的和不可变的指针，或者多个指针同时指向一个位置
@@ -73,8 +73,6 @@ fn main() {
 
 ## 1.3 调用 Unsafe 函数或者方法 （Calling an Unsafe Function or Method）
 unsafe 函数和方法本身看起来和常规的函数和方法没啥区别，只不过多一个额外的关键字声明 `unsfe`。在 `unsafe`就表示在代码所处的语境中，我们需要自己保证函数的安全需求，而Rust不保证我们会按照他们的要求来保持安全。用了关键字`unsafe` 来调用代码，就表示我们已经知道了这个函数功能，并且已经知道了函数的所需的等等。保证我们已经知道了调用函数的不可靠性。
-
-
 
 ### 1.3.1 Creating a Safe Abstraction over Unsafe Code
 如果仅仅是因为函数里面有unsafe的代码，那么不至于把整个函数都是用 unsafe 关键字来声明。事实上，在一个安全的函数里包裹不安全的代码是个很常见的抽象的概念。举个例子，来看看标注包里的`split_at_mut`,这个函数就有用到一些不安全的代码，今天让我们来看看如何实现。
@@ -191,6 +189,16 @@ fn main() {
 
 
 ## 1.4 访问或者修改一个可变的静态变量（Accessing or Modifying a Mutable Static Variable）
+静态变量，在Rust中也称之为 全局变量，用关键字`static`关键字来声明的变量。
+作用：被多个根部的函数访问value或者修改。
+How？
+- 如果仅仅是访问的话，那么问题不大，不需要用unsafe关键字进行包裹，就好像下面这个19-9 的这个例子一样。
+- 但是如果涉及修改的话，那么情况就复杂了，首先是声明，如果涉及有的函数需要修改变量的话，那么就需要在关键字`static` 后面加上`mut`，这样的静态变量就是个可以被多个函数修改的变量了，而不是仅仅用来只读。但是相应的，当然我们想要修改或者访问这个变量的时候就必须在unsafe的代码块里来使用这个变量了。
+
+为什么要用unsafe关键字?
+因为会触发数据竞争（data race）的问题，简单来说就是静态变量被改动导致了结果出现问题，那么Rust编译器不背锅，这就是你自己非要这么写导致的，你自己要保证它是安全的就行。
+
+
 ```rust
 static HELLO_WORLD: &str = "hello world!";
 fn main() {
@@ -221,7 +229,9 @@ fn main() {
 
 
 
-## 1.5 Implementing an Unsafe Trait
+## 1.5 实现非安全的Trait（Implementing an Unsafe Trait）
+A trait is unsafe when at least one of its methods has some invariant that the compiler can’t verify
+当至少有一个方法有一些不变量是编译器无法验证的时候，trait是不安全的
 
 ## 1.6 Accessing Fields of a Union
 
