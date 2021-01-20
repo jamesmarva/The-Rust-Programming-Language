@@ -238,5 +238,10 @@ A trait is unsafe when at least one of its methods has some invariant that the c
 ## 1.7  When to Use Unsafe Code
 
 # 2 高级 Trait （Advanced Traits）
+非限定语法
+why？如果实现的Trait和结构体出现了相同签名方法，而按照一般语结构体的语法，会调用结构体的方法， `Dog::baby_name()`。
+而如果想要调用结构体实现的trait的那个方法的话，那么就要用到 非限定语法 `<Dog as Animal>::baby_name()`。
+
+非限定语法是为了解决想要在实现Trait的结构体中调用Trait里
 
 ## 2.1 Specifying Placeholder Types in Trait Definitions with Associated Types
