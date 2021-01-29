@@ -364,9 +364,62 @@ impl Wizard for Human {
 ```
 那么如果想要的调用别的trait的方法，。在方法的前面指定trait的名称就可以让Rust知道到底要调用结构体中的哪个放了
 
-可是关联函数也是trait语法的一部分，并且没有默认的self的方法。没了 self 作为参数，那么rust就不知道是调用结构体里的哪个方法了，这个时候就要用到完全限定句法（Fully Qualified Syntax）
- 
-而如果想要调用结构体实现的trait的那个方法的话，那么就要用到 非限定语法 `<Dog as Animal>::baby_name()`。
+可是关联函数也是trait语法的一部分，并且没有默认的self的方法。没了 self 作为参数，那么rust就不知道是调用结构体里的哪个方法了，这个时候就要用到完全限定句法（Fully Qualified Syntax），比如下面这个例子：
+```rust
+fn main() {
+    println!("{}", PetDog::name());
+}
 
-限定语法是为了解决想要在实现Trait的结构体中调用Trait里
+trait Animal {
+    fn name() ->  String;
+}
 
+struct PetDog;
+
+impl PetDog {
+    fn name() -> String {
+        String::from("moon（明月）")
+    }
+}
+
+impl Animal for PetDog {
+    fn name() -> String{
+        String::from("Alaskan Malamute（阿拉斯加雪橇犬）")
+    }
+}
+```
+一只宠物狗一般来说有主人命名的名字，比如 `moon（明月）`，身为动物的他们也有一个作为动物的种类名字，比如 `Alaskan Malamute（阿拉斯加雪橇犬）`）。按照上面的使用 `Pet_Doy::name()`的代码，我们只能用结构体的实现的方法，但是如何去使用trait的实现的方法？完全限定句法就是答案。
+```rust
+fn main() {
+    println!("{}", <PetDog as Animal>::name())
+}
+
+trait Animal {
+    fn name() ->  String;
+}
+
+struct PetDog;
+
+impl PetDog {
+    fn name() -> String {
+        String::from("moon（明月）")
+    }
+}
+
+impl Animal for PetDog {
+    fn name() -> String{
+        String::from("Alaskan Malamute（阿拉斯加雪橇犬）")
+    }
+}
+```
+`<PetDog as Animal>::name()`这行代码就可以实现调用实现trait的那个实现方法。
+
+总结一下，fully qualified syntax 的具体格式是下面这样的：
+```rust
+<Type as  Trait>::function(recevier_if_method, next_arg, ...)
+```
+
+
+## 2.4 Using Supertraits to Require One Trait’s Functionality Within Another Trait
+
+## 2.5 Using the Newtype Pattern to Implement External Traits on External Types
