@@ -238,10 +238,135 @@ A trait is unsafe when at least one of its methods has some invariant that the c
 ## 1.7  When to Use Unsafe Code
 
 # 2 高级 Trait （Advanced Traits）
-非限定语法
-why？如果实现的Trait和结构体出现了相同签名方法，而按照一般语结构体的语法，会调用结构体的方法， `Dog::baby_name()`。
+## 2.1用关联类型指定一个占位符类型（Specifying Placeholder Types in Trait Definitions with Associated Types）
+
+相比较这章的其他的内容而言，关联类型(accociated type)的出现的场景反而更多些。
+
+## 2.2 默认泛型类型和操作符重载（Default Generic Type Parameters and Operator Overloading）
+在使用泛型类型参数这个功能的时候，我们可以指定一个默认的泛型参数。
+
+使用默认泛型参数这个功能，最好的的例子就是操作符的重载（operator overloading）。Rust是不允许你创建自己的操作符的，而且你也不能自己随意重载一个操作符。你可以重载的操作符是有限制的，开发者仅仅能重载`std::ops` 中所列出的特性（trait）。比如，在代码19-14 中，我们重载了 Add（+）操作符，而且把两个 Point 实例相加到一起。
+```rust
+use std::ops::Add;
+
+#[derive(Debug, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Add for Point {
+    type Output = Point;
+
+    fn add(self, other: Point) -> Point {
+        Point {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+fn main() {
+    assert_eq!(
+        Point { x: 1, y: 0 } + Point { x: 2, y: 3 },
+        Point { x: 3, y: 3 }
+    );
+}
+```
+`Add` 特性有个关联类型的变量叫做 `Output`，这个变量是用来明确 add 方法返回的类型的。
+
+在 Add trait的默认泛型类型的定义
+```rust
+#[doc(alias = "+")]
+pub trait Add<Rhs = Self> {
+    /// The resulting type after applying the `+` operator.
+    #[stable(feature = "rust1", since = "1.0.0")]
+    type Output;
+
+    /// Performs the `+` operation.
+    #[must_use]
+    #[stable(feature = "rust1", since = "1.0.0")]
+    fn add(self, rhs: Rhs) -> Self::Output;
+}
+```
+
+上面这段代码里里面比较模式的就是 `Rhs=Self`了，这种句法被称之为默认类型变量。`Rhs` 这个泛型类型参数（简称右边`Right hand side`）定义了 `Rhs` 参数的类型。如果在实现 Add trait 的时候没有给Rhs 指定一个具体的类型，那么Rhs也就默认是 Self 的类型，也就是实现 Add的类型。
+
+之前用Point 实现 Add trait 的时候，就没有指定一个具体的类型，因为两个相同的类型，不存在结果用什么类型来保存的问题。那么如果是两个不同的类型进行相加，那么就会有结果到底用什么类型来保存的问题了。比如，假设有两个变量分别是米和毫米，两个相加，最后要保存为以毫米为单位的结果，那么要怎么实现？
+```rust
+use std::ops:Add;
+
+struct Millimeters(u32);
+struct Meters(u32);
+
+impl Add<Meters> for Millimeters {
+    type Output = Millimeters;
+
+    fn add(self, o: Meters) -> Millimeters {
+        Millimeter(self.0 + o.0 * 1000)
+    }
+}
+
+impl Add<Millimeters> for Meters {
+    type Output = Millimeters;
+
+    fn add(self, o: Millimeters) -> Millimeters {
+        Millimeters(self.0 * 1000 + o.0)
+    }
+}
+```
+在两个编码的实现中可能你会用到默认类型参数：
+- 在不破坏现有的代码的情况下，扩展一个类型。
+- 为了可以在某些特别的场景满足定义类型，但是在大部分的场景都用默认的类型就够了。
+
+标准库里的 `Add` 就是第二种的实现，在大部分的场景中，都是两个相近的类型进行相加，但是在此之上，也依然提供了自定义的能力来完成两个不同类型的相加
+
+第一种的目的看起来和第二中的很相似，但是相反：如果你想要给一个已经存在的trait新增一个类型参数，这样就可以在不破坏已有的代码的前提下完成扩展trait的功能的目的了。
+
+## 2.3 完全限定句法来消除歧义：用相同的名字来调用方法（Fully Qualified Syntax for Disambiguation: Calling Methods with the Same Name）
+
+限定语法
+why？
+如果实现的Trait的方法和结构体的方法出现了相同签名方法，那么当你去用一般的方法去调用方法的时候，默认会调用结构里的方法，比如下面的代码，
+```rust
+fn main() {
+    let h = Human;
+    h.fly();
+}
+
+trait Pilot {
+    fn fly(&self);
+}
+
+trait Wizard {
+    fn fly(&self);
+}
+
+// struct 
+struct Human;
+
+impl Human {
+    fn fly(&self) {
+        println!("*waving arms furiously*");
+    }
+}
+impl Pilot for Human {
+    fn fly(&self) {
+        println!("This is your captain speaking.");
+    }
+}
+
+impl Wizard for Human {
+    fn fly(&self) {
+        println!("Up!");
+    }
+}
+```
+那么如果想要的调用别的trait的方法，。在方法的前面指定trait的名称就可以让Rust知道到底要调用结构体中的哪个放了
+
+可是关联函数也是trait语法的一部分，并且没有默认的self的方法。没了 self 作为参数，那么rust就不知道是调用结构体里的哪个方法了，这个时候就要用到完全限定句法（Fully Qualified Syntax）
+ 
 而如果想要调用结构体实现的trait的那个方法的话，那么就要用到 非限定语法 `<Dog as Animal>::baby_name()`。
 
-非限定语法是为了解决想要在实现Trait的结构体中调用Trait里
+限定语法是为了解决想要在实现Trait的结构体中调用Trait里
 
-## 2.1 Specifying Placeholder Types in Trait Definitions with Associated Types

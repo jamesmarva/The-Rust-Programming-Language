@@ -1,6 +1,10 @@
 fn main() {
-
-
+    let mut v: Vec<u32> = Vec::new();
+    v.push(1212);
+    v.push(12122);
+    for i in v.iter() {
+        println!("{}", i);
+    }
 }
 
 struct Counter {
