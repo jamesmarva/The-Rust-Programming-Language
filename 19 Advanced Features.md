@@ -421,5 +421,65 @@ impl Animal for PetDog {
 
 
 ## 2.4 Using Supertraits to Require One Trait’s Functionality Within Another Trait
+当有个trait想用别的trait的未实现的trait的时候，语法应该是怎样的？
+比如有个想要将输出格式变换一下，比如有个方法想要打印：
+```shell
+***************
+*             *
+* (1111, 222) *
+*             *
+***************
+```
+这种是依赖Display的 `to_string` 方法的。那么应该如何使用别的trait的里的方法？
+```rust
+use std::fmt::{Display, Formatter, Result};
+
+trait OnlinePrint: Display {
+    fn online_print(&self) {
+        let str = self.to_string();
+        let len = str.len();
+        println!("{}", "*".repeat(len + 4)); 
+        println!("*{}*", " ".repeat(len + 2)); 
+        println!("* {} *", str);
+        println!("*{}*", " ".repeat(len + 2)); 
+        println!("{}", "*".repeat(len + 4)); 
+    }
+}
+
+struct Point {
+    x: u32, 
+    y: u32,
+}
+
+impl Display for Point {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+struct Position {
+    longitude: f32,
+    latitude: f32,
+}
+
+impl Display for Position {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "({}, {})", self.longitude, self.latitude)
+    }
+}
+
+impl OnlinePrint for Point {}
+
+fn main() {
+    let p = Point{
+        x: 1111,
+        y:222,
+    };
+    
+    p.online_print()
+}
+```
+Listing 19-22: Implementing the  OutlinePrint  trait that requires the functionality from  Display
+
 
 ## 2.5 Using the Newtype Pattern to Implement External Traits on External Types

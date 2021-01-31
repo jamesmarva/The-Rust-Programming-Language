@@ -1,5 +1,5 @@
 fn main() {
-    let d = Dog;
+    let d  = Dog;
 
     // println!("A baby dog is called a {}", d.baby_name());
     println!("A baby dog is called a {}", Dog::baby_name());
