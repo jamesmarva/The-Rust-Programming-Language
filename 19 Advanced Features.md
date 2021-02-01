@@ -482,4 +482,4 @@ fn main() {
 Listing 19-22: Implementing the  OutlinePrint  trait that requires the functionality from  Display
 
 
-## 2.5 Using the Newtype Pattern to Implement External Traits on External Types
+## 2.5 用 `Newtype` 来实现外部的type 实现 trait （Using the Newtype Pattern to Implement External Traits on External Types）
