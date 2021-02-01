@@ -483,3 +483,23 @@ Listing 19-22: Implementing the  OutlinePrint  trait that requires the functiona
 
 
 ## 2.5 用 `Newtype` 来实现外部的type 实现 trait （Using the Newtype Pattern to Implement External Traits on External Types）
+
+
+
+
+# 4 Advanced Functions and Closures
+
+
+
+
+## 4.1 Function Pointers
+
+
+
+
+
+
+
+
+
+
