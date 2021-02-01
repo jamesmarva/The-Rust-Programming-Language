@@ -108,8 +108,7 @@ fn main() {
 比如我有两个函数，一个是在 `i32` 切片中找到最大的元素，一个是在 `char` 的切片中寻找最大的元素。要如何如何消除重复的代码？
 
 # 1 泛型数据类型(Generic Data Types)
-
-用泛型来创建函数签名或者结构体，这样我们就可以用多种不同的具体数据类型了。先来看看如何用泛型来定义函数，结构体，枚举类型，以及方法。然后在讨论泛型是如何影响代码的性能的。
+用泛型来创建函数 签名(function signature) 或者 结构体(struct)，这样我们就可以用多种不同的具体数据类型了。先来看看如何用泛型来定义函数，结构体，枚举类型，以及方法。然后在讨论泛型是如何影响代码的性能的。
 
 ### 1.1 函数定义(In Function Definitions)
 当定义泛型函数的时候，需要把泛型放到函数的签名当中，通常用来指定这个函数的参数和返回值的数据类型。这样使用会让我们的代码变得更加灵活并且在给使用者带来更能多的功能的同时也让代码变得更加简洁。
@@ -218,7 +217,8 @@ To learn more, run the command again with --verbose.
 
 ### 1.2 结构体的定义(In Struct Definitions)
 也可以用泛型参数来定义结构体(struct)，一个或者多个字段都可以是 通用类型(generic type)。
-```java
+```rust
+/// wrong code !!!
 struct Point<T> {
     x: T,
     y: T,
@@ -424,12 +424,12 @@ fn main() {
 ```
 因为Rust会将泛型代码编译成代码中对象的具体类型，所以我们无需再运行的时候付出任何运行成本。代码运行的是，它的性能和我们用手工复制了每个重复代码一样。单态化(monomorphization) 使得rust的泛型运行时候更加高效。
 
-# 2 特性: 共同的行为(Traits: Defining Shared Behavior)
+# 2 Trait: 共同的行为(Traits: Defining Shared Behavior)
 一个特性就会告诉Rust编译器 一个特定的类型有一个特定功能，并且和其他类型共享。可以用特征来定义一种通用的行为。我们可以用 `Traits` 来定义一组有相同的功能的类型。
 
 > 注意：特性(Traits) 和别的语言的 接口(interface) 是有相同的功能的，但是所有一点区别。
 
-### 2.1 定义特性(Defining a Trait)
+### 2.1 定义Trait (Defining a Trait)
 类型的行为包含了我么可以在改类型上的调用的方法。如果我们可以在不同的类型上定义相同的行为，那么不同的类型就有了相同的行为。特性的定义就是将一种将方法的签名分组归纳在一起以实现某些目的所需要的方式。
 
 有多个结构体(struct)，这种结构体非可以有多个类型变量和多个文本：`NewArticle` 结构体可以持有一种字段，这种字段保存的是新闻的内容。`Tweet` 的这种结构图的字段则保存的一个不超过 280 个字段的字段，并且还要标识出是否为新推文，转发的推文，或者是对另一个推文的回复。
@@ -502,7 +502,22 @@ println!("1 new tweet: {}", tweet.summarize());
 
 注意，因为这里我们都在同一个rs的文件中定义了 特征(trait)`Summary` 以及  `NewArticle`类型和`Tweet` 类型都在一个rs的文件中，那么就以为他们在统一作用域。假设想要这个rs文件的内容，当别人想要的这个库的功能的话，或者想要根据自己的需求实现`trait`，那么就要 先引入自己的代码中，通过代码 `use aggregator::Summary`来把这个 特征引入代码中。
 
-需要注意的一点是，类型实现特征(trait) 必须是在我们自己的本地板条箱(crate)中的。比如，我们既可以在类型 `Tweet` 中实现标准库中的 `Display`这个特征(trait)，作为我们的 `aggregator` 的功能。也可以在用`Vect<T>`中来实现 `Summary` ，因为Summary 在我们自己的 `aggregator` 的板条箱中。
+有个约束需要注意是，在编写类型（type）实现 trait 必须要遵守：trait 和 type，起码要要有一个是在我们自己crate中的。比如，我们既可以在类型 `Tweet` （type在local trait中）中实现标准库中的 `Display` （trait在std中）这个特征(trait)，作为我们的 `aggregator` 的功能。也可以在用 `Vect<T>` （type在std中）中来实现 `Summary`（trait在local crate 中）,比如下面的代码，因为 `Summary` 在我们自己的 `aggregator` 的板条箱中。
+```rust
+trait Summary {
+    fn summarize(&self) -> String;
+}
+impl <T> Summary for Vec<T> {
+    fn summarize(&self) -> String {
+        String::from("hello")
+    }
+}
+fn main() {
+    let vec: Vec<u32> = Vec::new();
+    println!("{}", vec.summarize());
+}
+```
+但是为什么呢？
 
 但是我们不能在外部的类型(types)中实现所有的外部的特征(trait) (can’t implement external traits on external types)。比如，我们就不能在 `Vec<T>` 中实现 特征 `Display` 在我们的 `aggregator`，这个板条箱中(注意，Summary 这个特性是在我们自己的板条箱中的)。这个限制是程序的一致性，称之为 `一致性(coherence)` 。这个限制是程序的一部分，可以确保别人不会破坏你的代码。如果没有这个规则，尼玛两个板条箱都会实行按一个相同的特征(trait) 在实现同一种类型，这样 Rust 就不知道那个实现是被使用的
 
