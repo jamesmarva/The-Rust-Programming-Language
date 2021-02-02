@@ -711,6 +711,8 @@ fn return_summarize() -> impl Summary {
 
 但是，仅当返回单一类型的时候，才可以用 `impl trait` 语法。比如，这个代码返回了 `NewsArticle` 或者 `Tweet` 两种类型，这样的代码会无法运行：
 ```rust
+/// # Wrong Code!!!
+
 pub trait Summary {
     fn summarize(&self) -> String;
 }
