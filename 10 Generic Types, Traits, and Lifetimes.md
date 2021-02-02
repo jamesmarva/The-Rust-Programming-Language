@@ -877,8 +877,21 @@ fn main() {
 如果我们不想讲 `largest` 函数限制为 `Copy` 特征的类型，就可以指定 `T` 绑定到特征`Clone`，而不是绑定到特征 `Copy`。这样我们就可以在想要`largest` 函数有所有权的时候，克隆在的 slice 中的每个值了。使用 `clone` 函数，就意味着我们在使用像 `Stirng` 这种类型的时候，就要在堆中开辟更多的空间，如果我们需要处理大量的数据，那么堆的分配就会很慢。
 
 另一种可以实现 `largest` 函数就是从 slice 中返回一个 `T` 类型的值的引用。如果我们吧返回类型更改为 `&T` 而不是 `T`，从而更改了函数的代码体来返回一个引用，我们就不用需要`Clone` 和 `Copy` 的特征绑定了，就可以避免堆的分配和回收了。尝试自己实现这个代码。
-
-### 2.6 用特征绑定来有条件的实现方法。 (Using Trait Bounds to Conditionally Implement Methods)
+```rust
+fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut rst: &T = &list[0];
+    let len = list.len();
+    let mut idx = 1;
+    while idx < len {
+        if &list[idx] > rst {
+            rst = &list[idx]
+        }
+        idx += 1
+    }
+    rst
+}
+```
+### 2.6 编写方法的时候用不同的方法绑定 (Using Trait Bounds to Conditionally Implement Methods)
 通过用`impl` 代码块来实现特征绑定，这个方案中有泛型的参数，我们可以为了实现指定的特征，根据条件来实现特征的方法。比如在 代码10-16中，`Pair<T>` 类型永远都实现了 `new` 函数。但是`Pair<T>` 只有在泛型 `T` 同时实现了 `PartialOrd` 特征以及 `Display` 特征的情况下才能实现 `cmp_display` 方法。
 ```rust
 use std::fmt::Display;
@@ -905,6 +918,8 @@ impl<T: Display + PartialOrd> Pair<T> {
 }
 ```
  ↑ 代码10-16 根据不同的条件来实现泛型中的方法。
+
+通过泛型，可以实现的针对某个 trait 都实线一个方法，这个其实和某个 trait 里的默认实现的功能很像。但是实际上是将两个trait进行结合的一种方式，也就说如果某个 trait 实现了一部分的代码，而另外的 trait 的方法想要使用这个方法，那么就要利用这个针对所有的泛型的实现了。比如说，如果一个type 实现了 `Display` 这个trait的话，那么就可以用 `to_string()` 这个方法了，但是如果你去看`Display` 的代码的话，那么就会发现 `Display` 是没有 to_string 的代码的，只有一个 `fmt` 的方法声明。这种基于一个 trait（Display） 的基础上实现的 一个trait 的语法称之为 *blanket implementations*。
 
 对于任何实现了一种特征的类型，我们可以根据不同的条件实现另一种特征。实现一个特征满足特征绑定的的情况称为`blanket implementations`，并且在标准库中已经广泛使用了。比如，标准库中实现了 `ToString` 特征，并且在所有的 `Display` 特征，代码就像下面这样：
 ```rust

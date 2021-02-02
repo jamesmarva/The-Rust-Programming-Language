@@ -15,3 +15,18 @@ fn largest<T: PartialOrd>(list: &[T]) -> &T {
     }
     rst
 }
+
+fn largest_new<T>(list: &[T]) -> &T
+    where T: PartialOrd
+{
+    let mut rst: &T = &list[0];
+    let len = list.len();
+    let mut idx = 1;
+    while idx < len {
+        if &list[idx] > rst {
+            rst = &list[idx]
+        }
+        idx += 1
+    }
+    rst
+}

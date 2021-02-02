@@ -18,9 +18,11 @@ impl <T: Display + PartialOrd> Pair<T>  {
         } else {
             println!("The largest member is y: {}", self.y);
         }
+        println!("x: {}; y: {}", self.x, self.y);
     }
 }
 
 fn main() {
-    
+    let pair = Pair::new(4444, 9999);
+    pair.cmp_display();
 }
