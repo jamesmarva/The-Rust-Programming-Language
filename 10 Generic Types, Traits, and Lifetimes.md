@@ -919,7 +919,7 @@ impl<T: Display + PartialOrd> Pair<T> {
 ```
  ↑ 代码10-16 根据不同的条件来实现泛型中的方法。
 
-通过泛型，可以实现的针对某个 trait 都实线一个方法，这个其实和某个 trait 里的默认实现的功能很像。但是实际上是将两个trait进行结合的一种方式，也就说如果某个 trait 实现了一部分的代码，而另外的 trait 的方法想要使用这个方法，那么就要利用这个针对所有的泛型的实现了。比如说，如果一个type 实现了 `Display` 这个trait的话，那么就可以用 `to_string()` 这个方法了，但是如果你去看`Display` 的代码的话，那么就会发现 `Display` 是没有 to_string 的代码的，只有一个 `fmt` 的方法声明。这种基于一个 trait（Display） 的基础上实现的 一个trait 的语法称之为 *blanket implementations*。
+通过泛型，针对某个 trait 都实现一个相同的方法，这个其实和某个 trait 里的默认实现的功能很像。但是实际上是将两个trait进行结合的一种方式，也就说如果某个 trait 实现了一部分的代码，而另外的 trait 的方法想要使用这个方法，那么就要利用这个针对所有的泛型的实现了。比如说，如果一个type 实现了 `Display` 这个trait的话，那么就可以用 `to_string()` 这个方法了，但是如果你去看 `Display` 的代码的话，那么就会发现 `Display` 是没有 `to_string` 的代码的，只有一个 `fmt` 的方法声明。这种基于一个 trait（Display） 的基础上实现的 一个trait 的语法称之为 *blanket implementations*，并且在Rust的标准库是广泛使用的。
 
 对于任何实现了一种特征的类型，我们可以根据不同的条件实现另一种特征。实现一个特征满足特征绑定的的情况称为`blanket implementations`，并且在标准库中已经广泛使用了。比如，标准库中实现了 `ToString` 特征，并且在所有的 `Display` 特征，代码就像下面这样：
 ```rust
@@ -927,7 +927,7 @@ impl<T: Display> ToString for T {
     // --snip--
 }
 ```
-因为在标准库中有这种 `blanket Implementation`，所以，我们就可以在任何实现了 `Display` 特征中调用 `ToString`特征才有 `to_string` 方法。比如，我们像下面代码一样，把整数的值转为字符串类型，因为这个额这个整数型的值已经实现了`Display` 特征了。
+因为在标准库中有这种 `blanket Implementation` ，所以，我们就可以在任何实现了 `Display` 特征中调用 `ToString` 特征才有 `to_string` 方法。比如，我们像下面代码一样，把整数的值转为字符串类型，因为这个额这个整数型的值已经实现了 `Display` 特征了。
 ```rust
 let s = 3.to_string();
 ```
@@ -935,10 +935,10 @@ let s = 3.to_string();
 
 特征(Traits) 以及 特征绑定(Trait bound) 让我么可以用泛型参数来减少重复的代码，同时还向编译器指向我么系统通过特征来实现特定的特征行为。编译器可以在根据特征绑定的信息来检查我们提供方法实现是否提供了正确的方法的行为。因为不必在代码的与运行的时候进行类型的检查，所以，所以就可以提升代码的性能了，不必放弃泛型的灵活性了。
 
-另一种泛型已经被使用称之为 `lifetimes`， `lifetimes` 不是确保类型有我们想要的行为，而是确保只要有我们想要引用的时候，那么就是有有效的引用。接下来我们来看看 `lifetimes`是如何做到的。
+另一种泛型（generic）已经被我们使用过了称之为 `lifetimes` ， `lifetimes` 不是确保类型有我们想要的行为，而是确保只要我们想要引用的时候，这个引用是肯定有效的。接下来我们来看看 `lifetimes` 是如何做到的。
 
-# 3 用 `LifeTime` 来验证引用的有效(Validating References with Lifetimes) 
-在第4章“引用和借”的时候我们讨论过一个细节，每个引用在 Rust中都有一个 *生命期限(lifetime)*，这个就是该引用的有效范围。在多数的时候，生命期限是隐式的(implicit)以及自动推断的(inferred)，就像大多数时候的类型也是自动推断的(inferred)。当代码可能出现多种类型的时候，我们必须要声明数据的类型。同样的，当引用的生命期限有不同的几种联系的时候，那么我们就要声明声明期限(lifetimes)。Rust 需要我们用生命周期参数来注释引用和生命期限的关系。
+# 3 用 `LifeTime` 来确保引用的有效(Validating References with Lifetimes) 
+在第4章 “[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html](References and Borrowing)” 的时候我们讨论过一个细节，每个引用在 Rust中都有一个 *生命期限(lifetime)*，这个就是该引用的有效范围。在多数的时候，生命期限是隐式的(implicit)以及自动推断的(inferred)，就像大多数时候的类型也是自动推断的(inferred)。当代码可能出现多种类型的时候，我们必须要声明数据的类型。同样的，当引用的生命期限有不同的几种联系的时候，那么我们就要声明声明期限(lifetimes)。Rust 需要我们用生命周期参数来注释引用和生命期限的关系。
 
 这里的 声明期限(lifetimes) 的概念和别的语言的lifetime不同，可以说，生命期限就是Rust语言的特色。尽管我们不会在本章中完整的介绍生命期限(lifetimes)概念，但是我们会讨论可能会遇到生命期限的几常见的方式，让你可以更熟悉这个概念。
 ## 3.1 用生命期来阻止悬挂引用(Preventing Dangling References with Lifetimes)
