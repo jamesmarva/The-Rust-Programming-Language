@@ -74,8 +74,14 @@ impl AveragedCollection {
 > 
 
 # 2 为不同的值而设计的 Trait 对象（Using Trait Objects That Allow for Values of Different Types）
+在 第8章，我们提及了一个 vector 的一个限制，就是一个 vector 只能存储一种type的数据。在代码8-10中我们写了一个变通的方法，定义了一个枚举类型 `SpreadsheetCell`，这个枚举类型可以存储几个不同类型的数据，比如整型（integer），浮点型（float），还要文本类型（text），这个代表含义就是我们可以在单元格中存储不同类型的数据。并且这个向量可以存储这样的枚举类型，代表一行这样的单元格的数据。当我们在编译的时候就已经知道算了数据类型是确定的几种类型的时候，这无疑是完美的解决方案。
+
+
 
 ## 2.1 为通用的行为定义一个Trait（Defining a Trait for Common Behavior）
+
+无论合适非
+
 ```rust
 pub trait Draw {
     fn draw(&self);
@@ -91,6 +97,10 @@ pub struct Screen {
 }
 ```
 代码 17-4 定义
+
+dyn 表示 type 是实现了 Draw 的，而 Box 则表示这个本身是个指针的对象。
+
+
 
 
 ```rust
