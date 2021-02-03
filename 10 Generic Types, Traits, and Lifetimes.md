@@ -938,7 +938,7 @@ let s = 3.to_string();
 另一种泛型（generic）已经被我们使用过了称之为 `lifetimes` ， `lifetimes` 不是确保类型有我们想要的行为，而是确保只要我们想要引用的时候，这个引用是肯定有效的。接下来我们来看看 `lifetimes` 是如何做到的。
 
 # 3 用 `LifeTime` 来确保引用的有效(Validating References with Lifetimes) 
-在第4章 “[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html](References and Borrowing)” 的时候我们讨论过一个细节，每个引用在 Rust中都有一个 *生命期限(lifetime)*，这个就是该引用的有效范围。在多数的时候，生命期限是隐式的(implicit)以及自动推断的(inferred)，就像大多数时候的类型也是自动推断的(inferred)。当代码可能出现多种类型的时候，我们必须要声明数据的类型。同样的，当引用的生命期限有不同的几种联系的时候，那么我们就要声明声明期限(lifetimes)。Rust 需要我们用生命周期参数来注释引用和生命期限的关系。
+在第4章 “[References and Borrowing](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html)” 的时候我们讨论过一个细节，每个引用在 Rust中都有一个 *生命期限(lifetime)*，这个就是该引用的有效范围。在多数的时候，生命期限是隐式的(implicit)以及自动推断的(inferred)，就像大多数时候的类型也是自动推断的(inferred)。当代码可能出现多种类型的时候，我们必须要声明数据的类型。同样的，当引用的生命期限有不同的几种联系的时候，那么我们就要声明声明期限(lifetimes)。Rust 需要我们用生命周期参数来注释引用和生命期限的关系。
 
 这里的 声明期限(lifetimes) 的概念和别的语言的lifetime不同，可以说，生命期限就是Rust语言的特色。尽管我们不会在本章中完整的介绍生命期限(lifetimes)概念，但是我们会讨论可能会遇到生命期限的几常见的方式，让你可以更熟悉这个概念。
 ## 3.1 用生命期来阻止悬挂引用(Preventing Dangling References with Lifetimes)
