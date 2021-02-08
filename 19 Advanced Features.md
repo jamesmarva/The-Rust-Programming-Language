@@ -488,16 +488,15 @@ Listing 19-22: Implementing the  OutlinePrint  trait that requires the functiona
 
 
 # 4 Advanced Functions and Closures
+接下来，我们来学些更高级的关于函数和闭包的特征，包括函数指针（function pointers）和返回闭包（closures）
+
+## 4.1 函数指针 （Function Pointers）
+We’ve talked about how to pass closures to functions; you can also pass regular functions to functions! This technique is useful when you want to pass a function you’ve already defined rather than defining a new closure. Doing this with function pointers will allow you to use functions as arguments to other functions. Functions coerce to the type fn (with a lowercase f), not to be confused with the Fn closure trait. The fn type is called a function pointer. The syntax for specifying that a parameter is a function pointer is similar to that of closures, as shown in Listing 19-27.
+
+我们已经谈论过了如何将一个闭包传递个函数；你也可以传一个常规的函数给一个函数。这个技术当你想要传一个已经定义好的函数作为参数给另一个函数的时候是很有用的，因为没有这个技术的话，那么想要作为参数传给函数只能去重新定义一个闭包了。这个技术可以让你用将一个函数作为参数传递给另一个函数。Function是表现为类型 `fn`（注意这是个小写的 f），不要和 `Fn` 闭包 trait 混淆。`fn` 类型被称之为函数指针（function pointer）。指定函数指针作为参数的语法和指定闭包（closure）的语法相似
 
 
-
-
-## 4.1 Function Pointers
-
-
-
-
-
+## 4.2 返回闭包（Returning Closures）
 
 
 

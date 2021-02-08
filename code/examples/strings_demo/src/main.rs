@@ -19,7 +19,8 @@ fn main() {
     };
     println!("{}", p.p);
     drop(s6);
-    }
+    // println!("{}", p.p);
+}
 
 
 struct MyPointer<'a> {
