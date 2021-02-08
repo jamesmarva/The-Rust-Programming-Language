@@ -493,8 +493,50 @@ Listing 19-22: Implementing the  OutlinePrint  trait that requires the functiona
 ## 4.1 函数指针 （Function Pointers）
 We’ve talked about how to pass closures to functions; you can also pass regular functions to functions! This technique is useful when you want to pass a function you’ve already defined rather than defining a new closure. Doing this with function pointers will allow you to use functions as arguments to other functions. Functions coerce to the type fn (with a lowercase f), not to be confused with the Fn closure trait. The fn type is called a function pointer. The syntax for specifying that a parameter is a function pointer is similar to that of closures, as shown in Listing 19-27.
 
-我们已经谈论过了如何将一个闭包传递个函数；你也可以传一个常规的函数给一个函数。这个技术当你想要传一个已经定义好的函数作为参数给另一个函数的时候是很有用的，因为没有这个技术的话，那么想要作为参数传给函数只能去重新定义一个闭包了。这个技术可以让你用将一个函数作为参数传递给另一个函数。Function是表现为类型 `fn`（注意这是个小写的 f），不要和 `Fn` 闭包 trait 混淆。`fn` 类型被称之为函数指针（function pointer）。指定函数指针作为参数的语法和指定闭包（closure）的语法相似
+我们已经谈论过了如何将一个闭包传递个函数；你也可以传一个常规的函数给一个函数。这个技术当你想要传一个已经定义好的函数作为参数给另一个函数的时候是很有用的，因为没有这个技术的话，那么想要作为参数传给函数只能去重新定义一个闭包了。这个技术可以让你用将一个函数作为参数传递给另一个函数。Function是表现为类型 `fn`（注意这是个小写的 f），不要和 `Fn` 闭包 trait 混淆。`fn` 类型被称之为函数指针（function pointer）。指定函数指针作为参数的语法和指定闭包（closure）的语法相似，就像代码19-27 里面展示的那样：
+```rust
+fn main() {
+    let a = do_twice(add_one, 5);
+    println!("{}", a);
+}
 
+fn add_one(x: i32) -> i32 {
+    x + 1
+}
+
+fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32 {
+    f(arg) + f(arg)
+}
+```
+19-27 
+
+不像一个闭包，fn 是一个类型而不是一个 trait，所以我们直接指定 fn 作为参数而不是指定一个泛型类型参数然后用一个 `Fn` 然后进行trait绑定。
+
+函数指针实现了所有闭包trait（`Fn`， `FnMut`， `FnOnce`），所以你可以将函数指针传递给一个想要闭包的函数参数来使用。写代码的最好的方式就是用泛型和一个闭包trait，这样函数既可以接受一个函数作为参数也可以接受一个闭包作为参数。
+
+举个只能接受 `fn` 而不是闭包的例子，就是在调用外部代码，而这个代码是无法使用闭包这个特性的：就比如 `C` 这就是没有闭包这个特性的语言。
+
+举个你可以选择定义一个内联闭包的（其实就是感觉匿名闭包）或者选择一个已经定义好的函数来作为参数的例子，下面是用闭包的例子
+```rust
+let l_of_num = vec![1, 2, 3];
+let l_of_string: Vec<String>  = l_of_num.iter()
+    .map(|x| x.to_string())
+    .collect();
+for s in l_of_string.iter() {
+    println!("{}", s);
+}
+```
+还有声明一个函数来代替这个闭包
+```rust
+let l_of_num = vec![1, 2, 3];
+let l_of_string: Vec<String>  = l_of_num.iter()
+    .map(ToString::to_string)
+    .collect();
+for s in l_of_string.iter() {
+    println!("{}", s);
+}
+```
+注意，这里我们就要用到我们之前“高级 traits”提过的，完全限定语法了，因为有很多函数都被命名为 `to_string`，而我们要用的则是在 `ToString` 中的 `to_string`，在标准库（standard library）中，所有的实现了 `Display` 的类型都会实现这个trait。
 
 ## 4.2 返回闭包（Returning Closures）
 
