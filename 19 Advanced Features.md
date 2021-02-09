@@ -540,9 +540,53 @@ for s in l_of_string.iter() {
 
 用元组结构体（tuple struct）还有 tuple-struct作为枚举变量来写一个例子。这些类型（指元祖，是用`()`来调用初始化的）这种看起来就像一个函数调用（元组结构体是本身是带括号的类型，而看起来却像一个函数）
 
+
 ## 4.2 返回闭包（Returning Closures）
+Closures are represented by traits, which means you can’t return closures directly. In most cases where you might want to return a trait, you can instead use the concrete type that implements the trait as the return value of the function. But you can’t do that with closures because they don’t have a concrete type that is returnable; you’re not allowed to use the function pointer fn as a return type, for example.
+
+The following code tries to return a closure directly, but it won’t compile:
+```rust
+fn returns_closure() -> dyn Fn(i32) -> i32 {
+    |x| x + 1
+}
+```
+The compiler error is as follows:
+```Rust
+ --> src\main.rs:6:26
+  |
+6 | fn returns_clousure() -> dyn Fn(i32) -> i32 {
+  |                          ^^^^^^^^^^^^^^^^^^ doesn't have a size known at compile-time
+  |
+  = note: for information on `impl Trait`, see <https://doc.rust-lang.org/book/ch10-02-traits.html#returning-types-that-implement-traits>
+help: use `impl Fn(i32) -> i32` as the return type, as all return paths are of type `[closure@src\main.rs:7:5: 7:14]`, which implements `Fn(i32) -> i32`
+  |
+6 | fn returns_clousure() -> impl Fn(i32) -> i32 {
+  |                          ^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0746`.
+error: could not compile `c_0`.
+
+To learn more, run the command again with --verbose.
+```
+# 5 宏函数（Macros）
 
 
 
+## 5.1 宏和函数的区别（The Difference Between Macros and Functions）
+
+## 5.2 用 macro_rules 来生命一个宏来进行元编程（Declarative Macros with macro_rules! for General Metaprogramming）
 
 
+## 5.3 Procedural Macros for Generating Code from Attributes
+
+## 5.4 How to Write a Custom derive Macro
+
+## 5.5 Attribute-like macros
+
+## 5.6 Function-like macros
+
+
+
+# 6 Summary
