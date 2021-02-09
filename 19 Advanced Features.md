@@ -538,6 +538,8 @@ for s in l_of_string.iter() {
 ```
 注意，这里我们就要用到我们之前“高级 traits”提过的，完全限定语法了，因为有很多函数都被命名为 `to_string`，而我们要用的则是在 `ToString` 中的 `to_string`，在标准库（standard library）中，所有的实现了 `Display` 的类型都会实现这个trait。
 
+用元组结构体（tuple struct）还有 tuple-struct作为枚举变量来写一个例子。这些类型（指元祖，是用`()`来调用初始化的）这种看起来就像一个函数调用（元组结构体是本身是带括号的类型，而看起来却像一个函数）
+
 ## 4.2 返回闭包（Returning Closures）
 
 
