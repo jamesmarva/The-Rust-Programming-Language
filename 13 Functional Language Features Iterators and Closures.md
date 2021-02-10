@@ -207,8 +207,7 @@ To learn more, run the command again with --verbose.
 
 为了创建一个可以保存闭包的结构体，我们需要指定这个闭包的类型是什么，因为结构体定义需要知道每个字段的类型。每个闭包实例有自己独特的匿名类型，即使两个闭包有两个相同签名，但是类型依然被认为是不同。为了定义用了闭包结结构体，枚举，或者函数参数，我们要用到泛型（generics）和 trait 绑定。
 
-`Fn` trait 是有 标准库（standard library）提供的。所有的闭包都实现了三个 trait：`Fn`， `FnMut` 或者 `FnOnce` 中的一个。
-
+`Fn` trait 是有 标准库（standard library）提供的。所有的闭包都实现了三个 trait：`Fn`， `FnMut` 或者 `FnOnce` 中的一个。我们会在下面来的小节“在闭包中捕获环境中的参数来”讨论这个这三个的区别，这给个例子中我们可以用 `Fn` trait。
 
 
 ```rust
@@ -221,10 +220,103 @@ struct Cacher<T>
 ```
 代码13-9 定义一个 `Cacher` 结构体来存放闭包到 `calcalution` 变量中，保存 `Option<T>` 到变量 value 中。
 
+---
+注意：函数可以实现所有的三个 `Fn` trait（`Fn`、`FnMut`、`FnOnce`） 。如果我们想要实现的需求中不用去从环境中获取数据，那么我们可以用函数而不是闭包来实现这个需求。we can use a function rather than a closure where we need something that implements an  Fn  trait.
+---
+
+```rust
+impl<T> Cacher<T>
+where T: Fn<u32> -> u32]
+{
+    fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: None,
+        }
+    }
+
+    fn value(&mut self, arg: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let tmp_rst = (self.calculation)(arg);
+                self.value = Some(tmp_rst);
+                tmp_rst
+            }
+        }
+    }
+}
+```
+13-10 
+
+代码13-11 显示了如何用 `Cacher` 来实现健身App
+```rust
+use std::thread;
+use std::time::Duration;
+
+struct Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    calculation: T,
+    value: Option<u32>,
+}
+
+impl<T> Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: None,
+        }
+    }
+
+    fn value(&mut self, arg: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let v = (self.calculation)(arg);
+                self.value = Some(v);
+                v
+            }
+        }
+    }
+}
+
+fn generate_workout(intensity: u32, random_number: u32) {
+    let mut expensive_result = Cacher::new(|num| {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    });
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!", expensive_result.value(intensity));
+        println!("Next, do {} situps!", expensive_result.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", expensive_result.value(intensity));
+        }
+    }
+}
+
+fn main() {
+    let simulated_user_specified_value = 10;
+    let simulated_random_number = 7;
+    generate_workout(simulated_user_specified_value, simulated_random_number);
+}
+```
+13-11
+
+
 ## 1.4 利用Cacher的限制(Limitations of the Cacher Implementation)
 值的缓存是个使用很广的实用行为，我们也许希望在代码中的别的闭包也使用他们。可是，目前 `Cacher` 的实现仍然存在两个小问题，这就使得在不同的上下文中复用变得很困难。
 
-第一个问题是，`Chcher` 的实例对于 `value` 放来的任何参数都是返回相同的值，也就说下面的这个测试例子会失败：
+第一个问题是，`Cacher` 的实例对于 `value` 放来的任何参数都是返回相同的值，因为缓存的值没有随着传入的值而改变返回，也就说下面的这个测试例子会失败：
 ```rust
 fn main() {
     let mut c = Cacher::new(|a| a);
@@ -268,7 +360,50 @@ error: test failed, to rerun pass '--lib'
 尝试修改 `Cacher`，用一个 hash map 来代替单独的一个值。hashmap 的 key是传递进来的 arg的值，但是value则是对应的 key 的闭包返回的值。之前我们会用 `self.value` 来看是 `Some` 还是 `None`，但是现在我们会用去map中找值，如果存在就返回，如果不存在就调用闭包，把结果保存map 对应 `arg` 的位置。
 
 当前的 `Cacher` 实现的第二个问题是，我们只能传入一个 `u32` 的值，并且返回一个 `u32` 的值的闭包。举个栗子，我们想要能够缓存一个 传入字符串切片(string slice)，然后返回这个切片长度的闭包的结果。为了解决这个问题，尝试引入更多的泛型参数来增加 `Cacher` 的灵活性。
-## 1.5 使用闭包来使用环境的变量(Capturing the Environment with Closures)
+## 1.5 用闭包来获得环境的变量的数据(Capturing the Environment with Closures)
+在上个例子中，我们用仅仅把闭包作为内联的匿名函数用。可是闭包有个函数没有的功能：他们可以获取上下文环境中的数据，并且从定义他们（闭包）的环境中读取数据。
+
+在13-12 有个闭包可以用来自闭包周围环境的变量 `x`
+```rust
+fn main() {
+    let x = 4;
+    let equal_to_x  = |z| z==x;
+    let y = 4;
+    assert!(equal_to_x(y));
+}
+```
+13-12 闭包从封闭的作用域（enclosing scope））中引用一个变量
+
+但是同样的操作，我们用函数实现就不能编译：
+```rust
+fn main() {
+    let x = 4;
+    fn equal_to_x(z: i32) -> bool {
+        z == x
+    }
+    let y = 4;
+    assert!(equal_to_x(y));
+}
+```
+编译就会得到一个错误信息
+```
+$ cargo run
+   Compiling equal-to-x v0.1.0 (file:///projects/equal-to-x)
+error[E0434]: can't capture dynamic environment in a fn item
+ --> src/main.rs:5:14
+  |
+5 |         z == x
+  |              ^
+  |
+  = help: use the `|| { ... }` closure form instead
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0434`.
+error: could not compile `equal-to-x`.
+
+To learn more, run the command again with --verbose.
+```
 
 # 2 (使用迭代器处理元素序列) Processing a Series of Items with Iterators
 
