@@ -29,30 +29,25 @@ where T: Fn(usize) -> usize
     }
 
     fn get(&mut self, argu: usize) -> usize {
+        let local_value = self.value;
+        let arg = self.arg;
         let mut tmp_clo = || {
-            let tmp_val = ((&self).calculation)(argu);
+            let tmp_val = (self.calculation)(argu);
             self.value = Some(tmp_val);
             self.arg = argu;
             tmp_val
         };
        
-        // let mut local_value = self.value;
-        match self.value {
+        match local_value {
             Some(val) => {
-                if self.arg == argu {
+                if arg == argu {
                     val
                 } else {
-                    let tmp_val = ((&self).calculation)(argu);
-                    self.value = Some(tmp_val);
-                    self.arg = argu;
-                    tmp_val
+                    tmp_clo()
                 }
             },
             None => {
-                let tmp_val = ((&self).calculation)(argu);
-                self.value = Some(tmp_val);
-                self.arg = argu;
-                tmp_val
+                tmp_clo()
             }
         }
     }
