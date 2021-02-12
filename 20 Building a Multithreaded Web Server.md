@@ -15,6 +15,27 @@
 
 ## 1.1 Listening to the TCP Connection
 
+## 1.2 Reading the Request
+
+
+
+## 1.3 A Closer Look at an HTTP Request
+
+
+
+## 1.4 Writing a Response
+
+
+
+## 1.5 Returning Real HTML
+
+
+## 1.5 Validating the Request and Selectively Responding
+
+
+## 1.6 A Touch of Refactoring
+
+
 
 # 2 
 
