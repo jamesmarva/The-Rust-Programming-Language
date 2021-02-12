@@ -25,5 +25,4 @@ fn handle_tcpstream(mut stream: TcpStream) {
     );
     stream.write(resp_content.as_bytes()).unwrap();
     stream.flush().unwrap();
-
 }
