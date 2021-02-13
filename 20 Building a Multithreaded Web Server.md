@@ -66,7 +66,13 @@
 ### 2.2.6 A Worker Struct Responsible for Sending Code from the ThreadPool to a Thread
 
 
+### 2.2.7 Sending Requests to Threads via Channels
 
+# 3 Graceful Shutdown and Cleanup
+
+
+
+## 3.1 Implementing the Drop Trait on ThreadPool
 
 
 
