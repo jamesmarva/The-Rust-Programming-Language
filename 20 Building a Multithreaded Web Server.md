@@ -52,17 +52,18 @@
 ### 2.2.2 Creating a Similar Interface for a Finite Number of Threads
 
 
-### 2.2.3 building-the-threadpool-struct-using-compiler-driven-development
+### 2.2.3 building the threadpool struct using compiler driven development
 
 
 
 
+### 2.2.4 Validating the Number of Threads in new
 
 
+### 2.2.5 Creating Space to Store the Threads
 
 
-
-
+### 2.2.6 A Worker Struct Responsible for Sending Code from the ThreadPool to a Thread
 
 
 
