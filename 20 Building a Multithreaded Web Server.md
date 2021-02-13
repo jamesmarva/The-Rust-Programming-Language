@@ -46,3 +46,43 @@
 
 ## 2.2 Improving Throughput with a Thread Pool
 
+### 2.2.1 Code Structure If We Could Spawn a Thread for Each Request
+
+
+### 2.2.2 Creating a Similar Interface for a Finite Number of Threads
+
+
+### 2.2.3 building-the-threadpool-struct-using-compiler-driven-development
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
