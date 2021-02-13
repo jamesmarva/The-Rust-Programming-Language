@@ -16,6 +16,7 @@ fn handle_tcpstream(mut stream: TcpStream) {
     let mut buffer = [0u8; 1024 * 8];
 
     stream.read(&mut buffer).unwrap();
+    println!("request: \n{}", String::from_utf8_lossy(&buffer[..]));
 
     let get_method_req_line_bytes = b"GET / HTTP/1.1\r\n";
     if buffer.starts_with(get_method_req_line_bytes) {
@@ -28,8 +29,10 @@ fn handle_tcpstream(mut stream: TcpStream) {
         stream.write(resp_str.as_bytes()).unwrap();
         stream.flush().unwrap();
     } else {
-
         let html = fs::read_to_string("404.html").unwrap();
-        
+        let resp_header = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+        let resp = format!("{}{}", resp_header, html);
+        stream.write(resp.as_bytes()).unwrap();
+        stream.flush().unwrap();
     }
 }

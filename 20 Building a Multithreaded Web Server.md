@@ -37,5 +37,12 @@
 
 
 
-# 2 
+# 2 Turning Our Single-Threaded Server into a Multithreaded Server
+
+
+
+## 2.1 Simulating a Slow Request in the Current Server Implementation
+
+
+## 2.2 Improving Throughput with a Thread Pool
 
