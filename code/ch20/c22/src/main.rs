@@ -9,7 +9,7 @@ fn main() {
 type Job = Box<dyn FnOnce() + Send + 'static>;
 struct Worker {
     id: usize,
-    thread: thread::JoinHandle<()>,
+    thread: Option<thread::JoinHandle<()>>,
 }
 
 impl Worker {
@@ -20,7 +20,9 @@ impl Worker {
                job()
            } 
         });
-        Worker{id, thread}
+        Worker{id, 
+            thread:Some(thread)
+        }
     }
 }
 
@@ -52,9 +54,18 @@ impl Drop for ThreadPool {
     fn drop(&mut self) {
         for worker in &mut self.workers {
             println!("Shutting down worker {}", worker.id);
-            worker.thread.join().unwrap();
+            // worker.thread.join().unwrap();
+
+            // OK
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+
+            // OK 
+            // match worker.thread.take() {
+            //     Some(x) => x.join().unwrap(),
+            //     None =>{},
+            // }
         }
     }
 }
-
-

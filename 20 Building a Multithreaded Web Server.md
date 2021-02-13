@@ -74,6 +74,11 @@
 
 ## 3.1 Implementing the Drop Trait on ThreadPool
 
+The error tells us we can’t call join because we only have a mutable borrow of each worker and join takes ownership of its argument.
+We did this in Listing 17-15: if `Worker` holds an `Option<thread::JoinHandle<()>>` instead, we can call the `take` method on the Option to move the value out of the `Some` variant and leave a `None` variant in its place.
+
+
+## 3.2 Signaling to the Threads to Stop Listening for Jobs
 
 
 
@@ -82,14 +87,14 @@
 
 
 
+We could do more here! If you want to continue enhancing this project, here are some ideas:
+
+- Add more documentation to `ThreadPool` and its public methods.
+- Add tests of the library’s functionality.
+- Change calls to `unwrap` to more robust error handling.
+- Use `ThreadPool` to perform some task other than serving web requests.
+- Find a thread pool crate on crates.io and implement a similar web server using the crate instead. Then compare its API and robustness to the thread pool we implemented.
 
 
-
-
-
-
-
-
-
-
+# 4 Summary 
 
