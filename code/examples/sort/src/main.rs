@@ -1,6 +1,9 @@
+use sort::merge_sort_mod;
+
 fn main() {
     let mut a = [12,232,234,2,34,234,234,2,34,2,34,234,234,2,34,234,2,34,2,34,234,2,34,2];
-    quick(&mut a);
+    // quick(&mut a);
+    merge_sort_mod::merge_sort_1(&mut a);
     for item in &a {
         println!("{}", item);
     }
