@@ -1,5 +1,21 @@
+fn main() {
+    let mut a = [12,232,234,2,34,234,234,2,34,2,34,234,234,2,34,234,2,34,2,34,234,2,34,2];
+    merge_sort_1(&mut a);
+    for i in &a {
+        println!("{}", i);
+    }
+}
+
 pub fn merge_sort_1(arr: &mut [i32]) {
-    let tmp = [0i32; (arr.len() - 1) as usize];
+    // let x = [1, 2, 3];
+    let mut tmp: Vec<i32> = Vec::new();
+    let mut l = arr.len();
+    while l > 0 {
+        tmp.push(0i32);
+        l-=1;
+    }
+    let len = arr.len();
+    merge_core(arr, &mut tmp, 0, (len - 1) as usize);
 }
 fn merge_core(arr: &mut [i32], tmp: &mut [i32], start: usize, end: usize) {
     if start >= end {
