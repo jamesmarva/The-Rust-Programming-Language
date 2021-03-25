@@ -1,5 +1,6 @@
 pub fn merge_sort_1(arr: &mut [i32]) {
-    let tmp = [0i32; (arr.len() - 1) as usize];
+    let mut tmp: Vec<i32> = Vec::new();
+    merge_core(arr, &mut tmp, 0, arr.len());
 }
 fn merge_core(arr: &mut [i32], tmp: &mut [i32], start: usize, end: usize) {
     if start >= end {
